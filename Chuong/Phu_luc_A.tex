@@ -1,8 +1,65 @@
 % !TeX root = ../main.tex
 
 \documentclass[../main.tex]{subfiles}
+
 \begin{document}
 
-Nội dung phụ lục A sẽ được viết ở đây.
+Phụ lục này trình bày các đoạn mã Python được sử dụng để tối ưu hóa và nhận dạng tham số cho hai đối tượng điều khiển trong hệ thống: đối tượng van điều khiển (mô hình quán tính bậc nhất có trễ - Q1T) và đối tượng bộ quá nhiệt (mô hình quán tính bậc hai có trễ - Q2T). Các đoạn mã này thực hiện bài toán tối ưu hóa phi tuyến với ràng buộc để xác định các tham số mô hình từ dữ liệu đáp ứng thực nghiệm.
+
+\section{Mã nguồn nhận dạng đối tượng quán tính bậc nhất có trễ (Q1T)}
+
+Đoạn mã sau đây thực hiện nhận dạng tham số cho mô hình quán tính bậc nhất có trễ, được sử dụng để mô hình hóa đối tượng van điều khiển. Mô hình có dạng:
+\begin{equation}
+O_1(s) = \frac{K_v}{T_v s + 1}e^{-\tau_v s}
+\end{equation}
+
+Đáp ứng bậc thang của mô hình trong miền thời gian được biểu diễn bởi:
+\begin{equation}
+y_{m}(t; K_v, T_v, \tau_v) = \begin{cases}
+0 & \forall\, t < \tau_v \\
+K_v\left[1 - e^{-(t-\tau_v)/T_v}\right] & \forall\, t \geq \tau_v
+\end{cases}
+\end{equation}
+
+\lstinputlisting[language=Python, style=tech, caption={Mã nguồn nhận dạng đối tượng quán tính bậc nhất có trễ (Q1T)}, label={code:q1t}]{../qtb1t.py}
+
+\section{Mã nguồn nhận dạng đối tượng quán tính bậc hai có trễ (Q2T)}
+
+Đoạn mã sau đây thực hiện nhận dạng tham số cho mô hình quán tính bậc hai có trễ, được sử dụng để mô hình hóa đối tượng bộ quá nhiệt. Mô hình có dạng:
+\begin{equation}
+O_2(s) = \frac{K_{bqn}}{(T_1 s + 1)(T_2 s + 1)}e^{-\tau_{bqn} s}
+\end{equation}
+
+Đáp ứng bậc thang của mô hình trong miền thời gian được biểu diễn bởi:
+\begin{equation}
+y_{m}(t; K_{bqn}, T_1, T_2, \tau_{bqn}) = \begin{cases}
+0 & \forall\, t < \tau_{bqn} \\
+K_{bqn}\left[1 - \frac{T_1 e^{-(t-\tau_{bqn})/T_1} - T_2 e^{-(t-\tau_{bqn})/T_2}}{T_1 - T_2}\right] & \forall\, t \geq \tau_{bqn}
+\end{cases}
+\end{equation}
+
+\lstinputlisting[language=Python, style=tech, caption={Mã nguồn nhận dạng đối tượng quán tính bậc hai có trễ (Q2T)}, label={code:q2t}]{../qtb2t.py}
+
+\section{Giải thích các thành phần chính}
+
+Cả hai đoạn mã đều tuân theo cấu trúc chung như sau:
+
+\begin{itemize}
+    \item \textbf{Đọc dữ liệu}: Đọc dữ liệu đáp ứng thực nghiệm từ file CSV, bao gồm các cặp giá trị thời gian và giá trị đầu ra.
+    
+    \item \textbf{Định nghĩa mô hình}: Hàm \texttt{func()} mô tả đáp ứng bậc thang của mô hình trong miền thời gian, với các tham số cần nhận dạng.
+    
+    \item \textbf{Hàm mục tiêu}: Hàm \texttt{objective()} tính tổng bình phương sai số giữa dữ liệu thực nghiệm và giá trị tính toán từ mô hình.
+    
+    \item \textbf{Giá trị khởi tạo và ràng buộc}: Xác định giá trị ban đầu và các ràng buộc vật lý cho các tham số (hệ số khuếch đại và hằng số thời gian phải dương, thời gian trễ không âm).
+    
+    \item \textbf{Tối ưu hóa}: Sử dụng phương pháp \texttt{minimize()} từ thư viện \texttt{scipy.optimize} để tìm bộ tham số tối ưu.
+    
+    \item \textbf{Đánh giá kết quả}: Tính hệ số xác định $R^2$ để đánh giá độ khớp của mô hình với dữ liệu thực nghiệm.
+    
+    \item \textbf{Visualization}: Vẽ đồ thị so sánh giữa dữ liệu thực nghiệm và đường cong mô hình đã được tối ưu.
+\end{itemize}
+
+Các đoạn mã này được sử dụng để xác định các tham số mô hình từ dữ liệu đáp ứng thực nghiệm, làm cơ sở cho việc thiết kế và chỉnh định các bộ điều khiển trong hệ thống điều khiển cascade.
 
 \end{document}

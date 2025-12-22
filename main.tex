@@ -1,5 +1,5 @@
-\documentclass[a4paper,13pt,3p,oneside]{report}
-% \documentclass[a4paper,13pt,3p,twoside]{report}
+% \documentclass[a4paper,13pt,3p,oneside]{report}
+\documentclass[a4paper,13pt,3p,twoside]{report}
 
 
 % \usepackage{minted} % yêu cầu biên dịch với -shell-escape
@@ -179,6 +179,10 @@
 \lstnewenvironment{influxql}[1][]{\lstset{language=InfluxQL,#1}}{}
 \lstnewenvironment{fluxcode}[1][]{\lstset{language=Flux,#1}}{}
 
+% ==== ĐỔI TÊN LISTING THÀNH MÃ NGUỒN ====
+\renewcommand{\lstlistingname}{Mã nguồn}
+% \renewcommand{\lstlistlistingname}{DANH MỤC MÃ NGUỒN}
+
  % ===================================================
 
 \renewcommand{\bibname}{Danh_sach_tai_lieu_tham_khao} 
@@ -203,7 +207,7 @@
 
 \fancypagestyle{plain}{%
 \fancyhf{} % clear all header and footer fields
-\fancyfoot[RO,RE]{\thepage} %RO=right odd, RE=right even
+\fancyfoot[RO,LE]{\thepage} % RO=right odd (outer), LE=left even (outer)
 \renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0pt}}
 
@@ -309,7 +313,7 @@
 % \pagenumbering{gobble}
 % \subfile{Chuong/0_0_Loi_cam_doan.tex}
 
-\newpage
+\cleardoublepage
 \pagenumbering{gobble}
 \subfile{Chuong/0_1_Loi_cam_on.tex}
 
@@ -317,13 +321,13 @@
 % \pagenumbering{gobble}
 % \subfile{Chuong/0_2_Tom_tat_noi_dung.tex}
 
-\newpage
+\cleardoublepage
 \pagenumbering{gobble}
 \subfile{Chuong/0_3_Loi_noi_dau.tex}
 
 % ===================================================
 % \pagestyle{empty} % Header và footer rỗng
-\newpage
+\cleardoublepage
 \pagenumbering{roman} % Xóa page numbering ở cuối trang
 \pagestyle{plain}
 \renewcommand*\contentsname{MỤC LỤC}
@@ -356,7 +360,7 @@
 \addtocontents{toc}{\protect\thispagestyle{plain}}
 \tableofcontents 
 \thispagestyle{plain}
-\cleardoublepage
+\newpage
 
 % \pagenumbering{roman}
 %Tạo danh mục hình vẽ.
@@ -367,7 +371,7 @@
 \listoffigures} 
 \thispagestyle{plain}
 % \phantomsection\addcontentsline{toc}{section}{\numberline {} DANH MỤC HÌNH VẼ}
-% \newpage
+\newpage
 
 
  %Tạo danh mục bảng biểu.
@@ -378,7 +382,7 @@
 \listoftables}
 \thispagestyle{plain}
 % \phantomsection\addcontentsline{toc}{section}{\numberline {} DANH MỤC BẢNG BIỂU}
-
+\newpage
 % \glsaddall
 \renewcommand*{\acronymname}{}
 \renewcommand*{\descriptionname}{Ý nghĩa}
@@ -400,7 +404,7 @@
 % ===================================================
 
 
-\newpage
+\cleardoublepage
 \pagenumbering{arabic}
 
 \pagestyle{fancy}
@@ -412,12 +416,13 @@
 \makeatother
 \fancyhead[LO]{\nouppercase{\leftmark}}
 \fancyhead[RE]{\nouppercase{\leftmark}}
-\fancyfoot[RO]{\thepage}
+\fancyfoot[RO,LE]{\thepage}
 \renewcommand{\sectionmark}[1]{}
 
-\chapter{CƠ SỞ CÔNG NGHỆ VÀ XÂY DỰNG MÔ HÌNH ĐIỀU KHIỂN PID}
-\label{chuong1}
-\subfile{Chuong/1_Chuong_1.tex} % Phần mở đầu
+% \newpage
+% \chapter{CƠ SỞ CÔNG NGHỆ VÀ XÂY DỰNG MÔ HÌNH ĐIỀU KHIỂN PID}
+% \label{chuong1}
+% \subfile{Chuong/1_Chuong_1.tex} % Phần mở đầu
 
 \newpage
 % \pagestyle{fancy} % Áp dụng header và footer
@@ -445,29 +450,31 @@
 
 % ===================================================
 
-\newpage
+\cleardoublepage
 \renewcommand\bibname{TÀI LIỆU THAM KHẢO}
 \printbibliography
 \phantomsection\addcontentsline{toc}{chapter}{TÀI LIỆU THAM KHẢO}
 
-% \appendixpage
-% \appendices
-% \addappheadtotoc
+\appendixpage
+\appendices
+\addappheadtotoc
 
-% % \chapter*{PHỤ LỤC} %Kết luận và hướng phát triển}
+% \chapter*{PHỤ LỤC} %Kết luận và hướng phát triển}
 
-% %\mainmatter
-% \titleformat{\chapter}[hang]{\centering\bfseries}{ \thechapter.\ }{0pt}{}[]
-% \titlespacing*{\chapter}{0pt}{-20pt}{20pt}
+%\mainmatter
+\titleformat{\chapter}[hang]{\centering\bfseries}{ \thechapter.\ }{0pt}{}[]
+\titlespacing*{\chapter}{0pt}{-20pt}{20pt}
 
-% \titlecontents{chapter}
-%     [0.0cm]             % left margin
-%     {\bfseries\vspace{0.3cm}}                  % above code
-%     {{\bfseries{\scshape} \thecontentslabel.\ }} % numbered format
-%     {}         % unnumbered format
-%     {\titlerule*[0.3pc]{.}\contentspage}         % filler-page-format, e.g dots
-% \chapter{MÃ NGUỒN VÀ TÀI LIỆU KỸ THUẬT}
-% \subfile{Chuong/Phu_luc_A}
+\titlecontents{chapter}
+    [0.0cm]             % left margin
+    {\bfseries\vspace{0.3cm}}                  % above code
+    {{\bfseries{\scshape} \thecontentslabel.\ }} % numbered format
+    {}         % unnumbered format
+    {\titlerule*[0.3pc]{.}\contentspage}         % filler-page-format, e.g dots
+\chapter{MÃ NGUỒN VÀ TÀI LIỆU KỸ THUẬT}
+\subfile{Chuong/Phu_luc_A}
+\label{phu_luc_a}
+
 % \newpage
 % \chapter{THÔNG SỐ THIẾT KẾ MÔ HÌNH}
 % \subfile{Chuong/Phu_luc_B}
