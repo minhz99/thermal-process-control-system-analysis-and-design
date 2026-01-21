@@ -3,5 +3,10 @@
 \documentclass[../main.tex]{subfiles}
 \begin{document}
 
+Trên cơ sở phân tích đặc trưng nhà máy nhiệt điện và cơ chế truyền nhiệt của bộ quá nhiệt, nhóm đã lựa chọn cấu trúc điều khiển cascade hai vòng để thỏa mãn yêu cầu vừa nhanh vừa ổn định. Quá trình nhận dạng thực nghiệm xây dựng được mô hình Q1T cho van điều khiển và Q2T cho bộ quá nhiệt với hệ số xác định $R^2$ cao, tạo nền tảng tin cậy cho bước tổng hợp bộ điều khiển.
+
+Từ các mô hình đã nhận dạng, ba phương pháp thiết kế đã được triển khai và so sánh: Ziegler--Nichols, IMC và điều khiển bền vững. Kết quả mô phỏng trên MATLAB/Simulink cho thấy cả ba phương án đều triệt tiêu sai số xác lập, độ quá điều chỉnh nhỏ và thời gian đáp ứng đáp ứng yêu cầu công nghệ; trong đó phương án bền vững cho chất lượng cao nhất về độ mượt, khả năng kháng nhiễu và dự trữ ổn định, được đề xuất cho triển khai thực tế.
+
+Dựa trên thuật toán đã chọn, chương trình PLC S7-1200 được thiết kế trong TIA Portal với cấu hình I/O, ánh xạ biến, các network xử lý tín hiệu, chuyển chế độ Manual/Auto, cảnh báo và tích hợp khối PID\_Compact. Kiến trúc này bảo đảm tính mô-đun, dễ vận hành và thuận tiện hiệu chỉnh tham số trên HMI. Kết quả đạt được khẳng định tính khả thi của giải pháp cascade trên nền tảng PLC cho bài toán điều khiển nhiệt độ hơi quá nhiệt, đồng thời mở ra hướng nghiên cứu tiếp theo về tối ưu tham số online, mở rộng giám sát SCADA và thử nghiệm trên đối tượng thực để nâng cao độ tin cậy và an toàn của hệ thống.
 
 \end{document}

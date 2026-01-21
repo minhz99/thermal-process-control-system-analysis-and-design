@@ -2,45 +2,38 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import TransferFunction, step
 
-# Tham số bộ quá nhiệt (dạng tích 2 khâu Quán tính bậc nhất)
-# K = 9
-# T (T1 = T2) = 18.315
-# to = 11.68
-# R^2 = 0.9984
+# Tham so
+K_v, T_v, tau_v = 1.02, 3.484, 1.923
+K_bqn, T1, T2, tau_bqn = 2.09, 18.243, 18.237, 12.367
+K_p1, T_i1 = 0.2614, 3.484
 
-# Tham số van
-# K = 1
-# T (T1 = T2) = 1.984
-# to = 0.88
-# R^2 = 0.9999
+# Ham truyen
+O2_num, O2_den = [K_v], [T_v, 1]
+R2_num, R2_den = [K_p1 * T_i1, K_p1], [T_i1, 0]
+R2O2_num, R2O2_den = [K_p1 * K_v * T_i1, K_p1 * K_v], [T_i1 * T_v, T_i1, 0]
+W2_num, W2_den = R2O2_num, [T_i1 * T_v, T_i1 * (1 + K_p1 * K_v), K_p1 * K_v]
+O1_num, O1_den = [K_bqn], [T1 * T2, T1 + T2, 1]
+V1_num, V1_den = np.convolve(W2_num, O1_num), np.convolve(W2_den, O1_den)
+V1 = TransferFunction(V1_num, V1_den)
 
-K = 1
-T1 = 1.984 # hằng số thời gian thứ nhất (s)
-T2 = 1.984 # hằng số thời gian thứ hai (s)
-delay = 0.881 # trễ 10 giây
+# Mo phong
+t = np.linspace(0, 600, 10000)
+t_out, y_V1 = step(V1, T=t)
+tau_V1 = tau_v + tau_bqn
+y_V1_delay = np.zeros_like(y_V1)
+delay_samples = int(tau_V1 / (t[1] - t[0]))
+if delay_samples < len(y_V1):
+    y_V1_delay[delay_samples:] = y_V1[:len(y_V1) - delay_samples]
 
-# Hàm truyền dạng tích 2 khâu Q1T
-num = [K]
-den = [T1 * T2, T1 + T2, 1]
-
-G_q1q1 = TransferFunction(num, den)
-
-# Thời gian mô phỏng
-t = np.linspace(0, 20, 4000)
-
-# Đáp ứng bậc thang
-t_out, y = step(G_q1q1, T=t)
-
-# Mô phỏng trễ thời gian
-y_delay = np.zeros_like(y)
-idx = t_out >= delay
-y_delay[idx] = y[:np.sum(idx)]
-
-# Vẽ
-plt.figure()
-plt.plot(t_out, y_delay, linewidth=2)
-plt.xlabel("Thời gian (s)")
-plt.ylabel("Nhiệt độ (°C)")
-plt.title("Đáp ứng bậc thang – Dạng tích 2 khâu Q1T (Bộ quá nhiệt O2(s))")
-plt.grid(True)
+# Ve do thi
+plt.figure(figsize=(10, 6))
+plt.plot(t_out, y_V1_delay, linewidth=2)
+plt.xlabel("Thoi gian (s)")
+plt.ylabel("Bien do")
+plt.title("Dap ung bac thang cua doi tuong tuong duong vong ngoai $V_1(s)$")
+plt.grid(True, alpha=0.3)
+plt.xlim([0, 200])
+plt.tight_layout()
 plt.show()
+
+print(f"tau_V1 = {tau_V1:.3f} s, K_V1 = {K_bqn:.3f}")

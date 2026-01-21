@@ -38,3 +38,6 @@ Thumbs.db
 *.fls
 *.fdb_latexmk
 Hinhve/.DS_Store
+/__pycache__
+*.bbl-SAVE-ERROR
+*.bcf-SAVE-ERROR

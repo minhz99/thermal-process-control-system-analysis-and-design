@@ -1,5 +1,5 @@
-% \documentclass[a4paper,13pt,3p,oneside]{report}
-\documentclass[a4paper,13pt,3p,twoside]{report}
+\documentclass[a4paper,13pt,3p,oneside]{report}
+% \documentclass[a4paper,13pt,3p,twoside]{report}
 
 
 % \usepackage{minted} % yêu cầu biên dịch với -shell-escape
@@ -58,6 +58,7 @@
 
 \usepackage{blindtext}
 \usepackage[table,xcdraw]{xcolor}
+% colortbl được tự động load bởi xcolor với option table
 
 \usepackage{listings} % Gói cho phép chèn code và định dạng code
 
@@ -110,10 +111,13 @@
   style=tech,
   extendedchars=true,
   inputencoding=utf8,
+  upquote=true,  % Sử dụng quote thẳng thay vì curly quotes
+  showstringspaces=false,
+  escapeinside={},  % Không escape, xử lý trực tiếp
   literate=
    {đ}{{\dj}}1 {Đ}{{\DJ}}1
    {°}{{$^\circ$}}1 {Δ}{{$\Delta$}}1 {×}{{$\times$}}1 {≈}{{$\approx$}}1
-   {ρ}{{$\rho$}}1
+   {²}{{$^2$}}1 {ρ}{{$\rho$}}1
 }
 
 % ==== NGÔN NGỮ: JSON ====
@@ -419,10 +423,10 @@
 \fancyfoot[RO,LE]{\thepage}
 \renewcommand{\sectionmark}[1]{}
 
-% \newpage
-% \chapter{CƠ SỞ CÔNG NGHỆ VÀ XÂY DỰNG MÔ HÌNH ĐIỀU KHIỂN PID}
-% \label{chuong1}
-% \subfile{Chuong/1_Chuong_1.tex} % Phần mở đầu
+\newpage
+\chapter{CƠ SỞ CÔNG NGHỆ VÀ XÂY DỰNG MÔ HÌNH ĐIỀU KHIỂN PID}
+\label{chuong1}
+\subfile{Chuong/1_Chuong_1.tex} % Phần mở đầu
 
 \newpage
 % \pagestyle{fancy} % Áp dụng header và footer
@@ -432,13 +436,13 @@
 
 \newpage
 % \pagestyle{fancy} % Áp dụng header và footer
-\chapter{TRIỂN KHAI VÀ THỰC THI HỆ THỐNG ĐIỀU KHIỂN TRÊN PLC S7-1200}
+\chapter{THIẾT KẾ VÀ XÂY DỰNG HỆ THỐNG ĐIỀU KHIỂN TRÊN PLC SIEMENS S7-1200}
 \label{chuong3}
 \subfile{Chuong/3_Chuong_3.tex}
 
 \newpage
 % \pagestyle{fancy} % Áp dụng header và footer
-\chapter{KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN}
+\chapter{KẾT LUẬN}
 \label{chuong4}
 \subfile{Chuong/4_Chuong_4.tex}
 
