@@ -193,10 +193,10 @@
 % \usepackage[backend=bibtex,style=ieee]{biblatex}  %backend=biber is 'better'
 \usepackage[natbib,backend=biber,style=ieee]{biblatex} % Giúp chèn tài liệu tham khảo
 % \usepackage[backend=biber,style=authoryear,maxnames=99,uniquename=false]{biblatex}
-% \DefineBibliographyStrings{english}{%
-%     and = {và},
-%     volume = {tập},
-% }
+\DefineBibliographyStrings{english}{%
+    and = {và},
+    volume = {tập},
+}
 
 \renewcommand\appendixname{PHỤ LỤC}
 \renewcommand\appendixpagename{PHỤ LỤC}
@@ -456,6 +456,7 @@
 
 \cleardoublepage
 \renewcommand\bibname{TÀI LIỆU THAM KHẢO}
+\nocite{*}
 \printbibliography
 \phantomsection\addcontentsline{toc}{chapter}{TÀI LIỆU THAM KHẢO}
 
