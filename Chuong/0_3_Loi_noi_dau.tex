@@ -8,16 +8,20 @@
 \end{center}
 \vspace{1cm}
 
-Trong quá trình sản xuất điện năng của nhà máy nhiệt điện, lò hơi đóng vai trò là một khâu quan trọng với nhiệm vụ biến đổi năng lượng hóa học tàng trữ trong nhiên liệu thành nhiệt năng của hơi nước. Hơi bão hòa sau khi thoát ra khỏi bao hơi sẽ được dẫn đến các bộ quá nhiệt, tại đây hơi bão hòa được gia nhiệt thêm để đạt nhiệt độ cao hơn, trở thành hơi quá nhiệt trước khi được đưa vào tuabin để quay máy phát điện. Quá trình này là nền tảng cho việc chuyển đổi năng lượng nhiệt thành cơ năng và cuối cùng là điện năng.
+Trong các nhà máy nhiệt điện, việc quản lý và điều khiển hệ thống cung cấp nhiên liệu đóng vai trò then chốt để đảm bảo vận hành ổn định. Đặc biệt, hệ thống điều khiển lưu lượng dầu nhiên liệu có ảnh hưởng trực tiếp đến hiệu suất cháy, mức tiêu hao năng lượng và sự an toàn tổng thể của lò hơi.
 
-Nhiệt độ hơi quá nhiệt là một trong những thông số vận hành quan trọng nhất của lò hơi trong nhà máy nhiệt điện. Việc duy trì nhiệt độ hơi quá nhiệt ổn định trong phạm vi cho phép khi phụ tải của lò thay đổi luôn được đặt lên hàng đầu. Điều này không chỉ nhằm cải thiện hiệu suất chuyển đổi từ nhiệt năng thành cơ năng mà còn để bảo vệ các vật liệu kim loại khỏi sự phá hủy do nhiệt độ quá cao, đồng thời đảm bảo chất lượng hơi đạt tiêu chuẩn trước khi đưa vào tuabin. Mục tiêu này chỉ có thể đạt được khi hệ thống điều chỉnh nhiệt độ hơi quá nhiệt hoạt động tốt, ổn định và có chất lượng cao.
+Lưu lượng dầu cấp vào buồng đốt cần được kiểm soát chính xác theo tải tiêu thụ thực tế. Việc cung cấp thiếu hoặc thừa nhiên liệu đều dẫn đến sụt giảm hiệu suất, lãng phí năng lượng, gia tăng khí thải độc hại và tiềm ẩn nguy cơ mất an toàn cháy nổ. Thông qua các cảm biến (lưu lượng, áp suất, nhiệt độ) và hệ thống điều khiển trung tâm (PLC/DCS), hệ thống tự động thu thập thông tin và hiệu chỉnh cơ cấu chấp hành nhằm duy trì lưu lượng dầu luôn ở giới hạn tối ưu trước mọi điều kiện vận hành.
 
-Tuy nhiên, việc điều khiển nhiệt độ hơi quá nhiệt gặp phải nhiều thách thức do đặc tính phức tạp của đối tượng nhiệt. Độ trễ thời gian lớn và quán tính nhiệt trong hệ thống một vòng điều khiển là nguyên nhân cơ bản làm giảm tốc độ đáp ứng của hệ thống, từ đó làm giảm độ chính xác của quá trình điều chỉnh. Để nâng cao chất lượng điều chỉnh, trong thực tế người ta thường áp dụng cấu trúc điều khiển hai vòng kết hợp với các bộ điều khiển được thiết kế theo các luật điều chỉnh phù hợp.
+Nhiệm vụ của bài tập lớn là nghiên cứu nguyên lý, xây dựng mô hình và mô phỏng hệ thống điều khiển lưu lượng dầu nhiên liệu. Thông qua quá trình thực hiện, học viên không chỉ nắm vững mối quan hệ giữa các tham số công nghệ và rèn luyện kỹ năng tổng hợp hệ thống tự động, mà còn nhận thức được ứng dụng thực tiễn của đề tài trong việc tối ưu hóa chi phí vận hành, bảo vệ tuổi thọ thiết bị và giảm thiểu khí thải (CO$_2$, NO$_x$) ra môi trường.
 
-Mặt khác, việc thiết kế hệ thống điều khiển cho đối tượng nhiệt còn gặp khó khăn do tính chất phi tuyến, độ trễ vận chuyển lớn và sự bất định của các thông số đối tượng. Những đặc điểm này khiến các phương pháp tổng hợp kinh điển truyền thống thường cho hiệu quả không cao. Trong bối cảnh đó, phương pháp tổng hợp bộ điều khiển bền vững đã ra đời như một giải pháp khả thi, cho phép thiết kế hệ thống điều chỉnh với độ ổn định cao, sai số điều chỉnh nhỏ và quá trình quá độ có hệ số tắt dần tốt ngay cả khi có sự thay đổi lớn về phụ tải hoặc nhiễu loạn.
+Nội dung bài tập lớn được cấu trúc thành bốn chương chính:
+\begin{itemize}[noitemsep,topsep=5pt]
+    \item \textbf{Chương 1} giới thiệu cơ sở công nghệ và phân tích hệ thống cấp dầu nhiên liệu dựa trên sơ đồ HMI thực tế.
+    \item \textbf{Chương 2} trình bày thiết kế sơ đồ P\&ID và luận chứng lựa chọn thiết bị đo lường, chấp hành.
+    \item \textbf{Chương 3} (trọng tâm) tiến hành nhận dạng đối tượng theo mô hình SOPDT, tổng hợp bộ điều khiển PID bền vững tối ưu và đánh giá hệ thống qua mô phỏng MATLAB.
+    \item \textbf{Chương 4} đúc kết kết quả đạt được và đánh giá tổng quan hiệu quả của giải pháp.
+\end{itemize}
 
-Khảo sát thực tế cho thấy, hệ thống điều chỉnh nhiệt độ hơi quá nhiệt tại các nhà máy nhiệt điện sau một thời gian vận hành thường xuất hiện các hiện tượng không mong muốn như biên độ dao động lớn và thời gian điều chỉnh kéo dài khi có sự thay đổi đáng kể về phụ tải hoặc nhiễu. Độ quá điều chỉnh lớn có thể dẫn đến nhiệt độ hơi quá nhiệt vượt ra ngoài giới hạn cho phép, gây nguy hiểm cho thiết bị và có thể dẫn đến thiệt hại kinh tế lớn khi buộc phải dừng tổ máy. Một trong những nguyên nhân chủ yếu của vấn đề này là do các thông số của bộ điều khiển chưa được tối ưu hoặc không được hiệu chỉnh phù hợp với đặc tính thực tế của đối tượng.
-
-Xuất phát từ những phân tích trên, đồ án này tập trung nghiên cứu và thiết kế hệ thống điều khiển nhiệt độ hơi quá nhiệt cho lò hơi nhà máy nhiệt điện với mục tiêu nâng cao chất lượng điều chỉnh, đảm bảo tính ổn định và độ chính xác cao của hệ thống trong các điều kiện vận hành khác nhau. Nội dung đồ án bao gồm việc xây dựng mô hình toán học của đối tượng, phân tích các phương pháp điều khiển phù hợp và thiết kế, mô phỏng hệ thống điều khiển đáp ứng các yêu cầu kỹ thuật đặt ra.
+\vspace{1cm}
 
 \end{document}

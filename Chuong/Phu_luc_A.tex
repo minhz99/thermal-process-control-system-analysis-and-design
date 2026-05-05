@@ -4,37 +4,166 @@
 
 \begin{document}
 
-Phụ lục này trình bày các đoạn mã Python được sử dụng để nhận dạng tham số và thiết kế bộ điều khiển cho hệ thống điều khiển cascade.
+\section*{Mã nguồn MATLAB mô phỏng hệ thống điều khiển lưu lượng dầu}
 
-\section{Mã nguồn nhận dạng đối tượng quán tính bậc nhất có trễ (Q1T)}
+Phụ lục này trình bày toàn bộ mã nguồn MATLAB được sử dụng để nhận dạng đối tượng điều khiển, tổng hợp bộ điều khiển PID và mô phỏng đáp ứng quá độ của hệ thống điều khiển lưu lượng dầu nhiên liệu.
 
-Mã nguồn nhận dạng tham số cho mô hình Q1T $O_1(s) = \frac{K_v}{T_v s + 1}e^{-\tau_v s}$ của đối tượng van điều khiển:
+\subsection*{A.1 Khai báo tham số và hàm truyền đối tượng}
 
-\lstinputlisting[language=Python, style=tech, caption={Mã nguồn nhận dạng Q1T}, label={code:q1t}, inputencoding=utf8, extendedchars=true]{../qtb1t.py}
+\begin{lstlisting}[language=Matlab, caption={Khai báo tham số hệ thống và hàm truyền đối tượng SOPDT}, label={lst:khai_bao}]
+%% ========================================================
+%  HE THONG DIEU KHIEN LUU LUONG DAU NHIEN LIEU
+%  Mo phong MATLAB - Nhan dang doi tuong va tong hop PID
+%  ========================================================
+clc; clear; close all;
 
-\section{Mã nguồn nhận dạng đối tượng quán tính bậc hai có trễ (Q2T)}
+%% BUOC 1: Khai bao tham so doi tuong (nhan dang tu thuc nghiem)
+K  = 0.294;   % He so truyen (Gain)
+T  = 3.04;    % Hang so quan tinh T1 = T2 (s)
+L  = 1.84;    % Thoi gian tre thuan (Dead time, s)
 
-Mã nguồn nhận dạng tham số cho mô hình Q2T $O_2(s) = \frac{K_{bqn}}{(T_1 s + 1)(T_2 s + 1)}e^{-\tau_{bqn} s}$ của đối tượng bộ quá nhiệt:
+%% BUOC 2: Xay dung ham truyen doi tuong SOPDT
+%   O(s) = K * exp(-L*s) / (1 + T*s)^2
+s = tf('s');
+G_plant_no_delay = K / (T*s + 1)^2;
 
-\lstinputlisting[language=Python, style=tech, caption={Mã nguồn nhận dạng Q2T}, label={code:q2t}, inputencoding=utf8, extendedchars=true]{../qtb2t.py}
+% Xap xi Pade bac 1 cho khau tre exp(-L*s)
+[num_pade, den_pade] = pade(L, 1);
+G_delay = tf(num_pade, den_pade);
 
-\section{Mã nguồn nhận dạng đối tượng tương đương và thiết kế bộ điều khiển vòng ngoài}
+G_plant = G_plant_no_delay * G_delay;
+fprintf('Ham truyen doi tuong (xap xi Pade bac 1):\n');
+G_plant
+\end{lstlisting}
 
-Mã nguồn nhận dạng đối tượng tương đương $G(s) = W_2(s) \cdot O_1(s)$ dạng Q1T và tính toán tham số bộ điều khiển PID vòng ngoài theo Ziegler-Nichols:
-\begin{align}
-K_{p2} &= \frac{1.2 T_e}{K_e \tau_e}, \quad T_{i2} = 2 \tau_e, \quad T_{d2} = 0.5 \tau_e
-\end{align}
+\subsection*{A.2 Khai báo tham số bộ điều khiển PID}
 
-\lstinputlisting[language=Python, style=tech, caption={Mã nguồn nhận dạng đối tượng tương đương và thiết kế PID vòng ngoài (Ziegler-Nichols)}, label={code:draw}, inputencoding=utf8, extendedchars=true]{../draw.py}
+\begin{lstlisting}[language=Matlab, caption={Tham số bộ điều khiển PID bền vững tối ưu}, label={lst:pid}]
+%% BUOC 3: Tham so bo dieu khien PID (tinh toan theo phuong phap R1)
+%   Kp = 8.33,  Ti = 6.073 s,  Td = 1.52 s
+Kp = 8.33;
+Ti = 6.073;
+Td = 1.52;
 
-\section{Mã nguồn tính toán đối tượng tương đương vòng ngoài}
+% Ham truyen PID ly tuong:
+%   R(s) = Kp * (1 + 1/(Ti*s) + Td*s)
+R_pid = Kp * (1 + 1/(Ti*s) + Td*s);
+fprintf('Ham truyen bo dieu khien PID:\n');
+R_pid
 
-Mã nguồn tính toán và mô phỏng đáp ứng bậc thang của đối tượng tương đương vòng ngoài $V_1(s) = W_2(s) \cdot O_1(s)$ dạng Q2T với $\tau_{V1} = \tau_v + \tau_{bqn}$:
+%% BUOC 4: Xay dung he kin
+%   G_cl(s) = R(s)*G(s) / (1 + R(s)*G(s))
+G_open  = R_pid * G_plant;          % Ham truyen ho
+G_closed = feedback(G_open, 1);     % Ham truyen kin
+fprintf('Ham truyen he kin:\n');
+G_closed
+\end{lstlisting}
 
-\lstinputlisting[language=Python, style=tech, caption={Mã nguồn tính toán đối tượng tương đương vòng ngoài $V_1(s)$}, label={code:draw2}, inputencoding=utf8, extendedchars=true]{../draw2.py}
+\subsection*{A.3 Mô phỏng đáp ứng quá độ}
 
-\section{Giải thích các thành phần chính}
+\begin{lstlisting}[language=Matlab, caption={Vẽ đáp ứng bậc thang và phân tích chất lượng}, label={lst:dap_ung}]
+%% BUOC 5: Mo phong dap ung bac thang (Step Response)
+t_sim = 0:0.01:60;   % Thoi gian mo phong: 0 -- 60 giay
 
-Các đoạn mã tuân theo cấu trúc: đọc dữ liệu từ CSV, định nghĩa hàm mô hình, xây dựng hàm mục tiêu (tổng bình phương sai số), thiết lập giá trị khởi tạo và ràng buộc, tối ưu hóa bằng \texttt{scipy.optimize.minimize()}, đánh giá kết quả qua $R^2$ và vẽ đồ thị so sánh.
+figure('Name', 'Dap ung qua do he kin', 'NumberTitle', 'off', ...
+       'Position', [100, 100, 800, 500]);
+
+[y, t] = step(G_closed, t_sim);
+plot(t, y, 'b-', 'LineWidth', 2);
+hold on;
+yline(1.0, 'k--', 'Setpoint', 'LineWidth', 1.2);
+yline(1.05, 'r:', '+5%', 'LineWidth', 1);
+yline(0.95, 'r:', '-5%', 'LineWidth', 1);
+hold off;
+
+grid on;
+title('Dap ung bac thang cua he thong dieu khien (vong kin)', ...
+      'FontSize', 13, 'FontWeight', 'bold');
+xlabel('Thoi gian (s)', 'FontSize', 11);
+ylabel('Luu luong chuan hoa y(t)', 'FontSize', 11);
+legend('Dap ung y(t)', 'Setpoint', 'Bien +-5%', 'Location', 'southeast');
+
+%% BUOC 6: Phan tich chi tieu chat luong
+info = stepinfo(G_closed);
+fprintf('\n===== Chi tieu chat luong he thong =====\n');
+fprintf('Thoi gian dat dinh (Peak time)  Tp = %.2f s\n', info.PeakTime);
+fprintf('Do vot lo (Overshoot)           Os = %.2f %%\n', info.Overshoot);
+fprintf('Thoi gian qua do (Settling)     Ts = %.2f s\n', info.SettlingTime);
+fprintf('Bien do dinh                        = %.4f\n', info.Peak);
+fprintf('Sai lech tinh (ess)             ~  0 (co tich phan I)\n');
+\end{lstlisting}
+
+\subsection*{A.4 Phân tích bền vững -- Đồ thị Bode}
+
+\begin{lstlisting}[language=Matlab, caption={Vẽ đồ thị Bode và xác định biên độ dự trữ, pha dự trữ}, label={lst:bode}]
+%% BUOC 7: Ve do thi Bode cua ham truyen ho G_open
+figure('Name', 'Do thi Bode - Ham truyen ho', 'NumberTitle', 'off', ...
+       'Position', [100, 100, 800, 600]);
+
+margin(G_open);
+grid on;
+title('Do thi Bode - Ham truyen ho R(s)*G(s)', ...
+      'FontSize', 13, 'FontWeight', 'bold');
+
+% In bien do du tru va pha du tru
+[Gm, Pm, Wcg, Wcp] = margin(G_open);
+fprintf('\n===== Do ben vung he thong =====\n');
+fprintf('Bien do du tru  Gm = %.2f dB  (tai w = %.3f rad/s)\n', ...
+        20*log10(Gm), Wcg);
+fprintf('Pha du tru      Pm = %.2f deg (tai w = %.3f rad/s)\n', Pm, Wcp);
+if 20*log10(Gm) > 6 && Pm > 30
+    fprintf('=> He THOA MAN yeu cau ben vung (Gm>6dB, Pm>30 deg)\n');
+else
+    fprintf('=> CANH BAO: He co the khong du ben vung!\n');
+end
+\end{lstlisting}
+
+\subsection*{A.5 Mô phỏng đáp ứng xung (Impulse Response)}
+
+\begin{lstlisting}[language=Matlab, caption={Đáp ứng xung của đối tượng}, label={lst:impulse}]
+%% BUOC 8: Dap ung xung cua doi tuong (Plant)
+figure('Name', 'Dap ung xung doi tuong', 'NumberTitle', 'off', ...
+       'Position', [100, 100, 800, 450]);
+
+impulse(G_plant, 30);
+grid on;
+title('Dap ung xung cua doi tuong G_{plant}(s)', ...
+      'FontSize', 13, 'FontWeight', 'bold');
+xlabel('Thoi gian (s)', 'FontSize', 11);
+ylabel('Dap ung y(t)', 'FontSize', 11);
+\end{lstlisting}
+
+\subsection*{A.6 Kết quả tóm tắt}
+
+\begin{table}[H]
+    \centering
+    \caption{Tổng hợp tham số đối tượng và bộ điều khiển}
+    \label{tab:tom_tat_tham_so}
+    \begin{tabular}{|l|c|c|}
+        \hline
+        \textbf{Thông số} & \textbf{Ký hiệu} & \textbf{Giá trị} \\
+        \hline
+        Hệ số truyền đối tượng & $K$ & $0{,}294$ \\
+        \hline
+        Hằng số quán tính & $T_1 = T_2$ & $3{,}04\,\text{s}$ \\
+        \hline
+        Thời gian trễ thuần & $\tau$ & $1{,}84\,\text{s}$ \\
+        \hline
+        Tỷ lệ PID & $K_p$ & $8{,}33$ \\
+        \hline
+        Hằng số tích phân & $T_i$ & $6{,}073\,\text{s}$ \\
+        \hline
+        Hằng số vi phân & $T_d$ & $1{,}52\,\text{s}$ \\
+        \hline
+        Thời gian đạt đỉnh & $T_p$ & $\approx 4\,\text{s}$ \\
+        \hline
+        Độ vọt lố & $O_s$ & $\approx 21\,\%$ \\
+        \hline
+        Thời gian quá độ & $T_s$ & $\approx 26\,\text{s}$ \\
+        \hline
+        Sai lệch tĩnh & $e_{ss}$ & $\approx 0$ \\
+        \hline
+    \end{tabular}
+\end{table}
 
 \end{document}

@@ -3,1177 +3,129 @@
 \documentclass[../main.tex]{subfiles}
 \begin{document}
 
-Chương này trình bày chi tiết quá trình nhận dạng đối tượng điều khiển, thiết kế hệ thống điều khiển cascade và tổng hợp bộ điều khiển cho hệ thống điều khiển nhiệt độ hơi quá nhiệt. Nội dung chương bao gồm việc xác định mô hình toán học của các đối tượng điều khiển, phân tích đặc tính động học của chúng, và thiết kế các bộ điều khiển theo ba phương pháp khác nhau là Ziegler-Nichols, IMC và điều khiển bền vững. Kết quả mô phỏng trên MATLAB/Simulink được sử dụng để so sánh và đánh giá hiệu quả của từng phương pháp, làm cơ sở cho việc lựa chọn giải pháp tối ưu để triển khai thực tế.
+\section{Triết lý thiết kế hệ thống điều khiển}
 
-\section{Nhận dạng đối tượng điều khiển}
+\subsection{Thiết kế sơ đồ cấu trúc điều khiển hệ thống}
 
-\subsection{Cơ sở lý thuyết nhận dạng}
+Sơ đồ đường ống và công cụ điều khiển (P\&ID – Piping and Instrumentation Diagram) là tài liệu kỹ thuật nền tảng định hình toàn bộ cấu trúc điều khiển của hệ thống cấp dầu nhiên liệu. Khác với sơ đồ công nghệ PFD chỉ mô tả luồng vật chất, P\&ID thể hiện đầy đủ các vòng điều chỉnh, thiết bị đo lường, cơ cấu chấp hành và mối liên hệ tín hiệu giữa chúng. Hệ thống điều khiển cung cấp dầu nhiên liệu được tổ chức thành bốn mạch vòng điều chỉnh có quan hệ phân cấp và phối hợp chặt chẽ với nhau, bao gồm mạch vòng lưu lượng (FIC), mạch vòng áp suất (PIC), mạch vòng nhiệt độ (TIC) và mạch vòng mức (LIC).
 
-Nhận dạng đối tượng điều khiển là quá trình xác định mô hình toán học mô tả mối quan hệ giữa đầu vào và đầu ra của hệ thống. Theo lý thuyết điều khiển, đặc tính động học của đối tượng được thể hiện trên đặc tính tần số hoặc đặc tính thời gian, trong đó đặc tính quá độ (đáp ứng đối với tín hiệu bậc thang) phản ánh đầy đủ và trực quan các đặc điểm động học của đối tượng. Hệ thống điều khiển cascade hai vòng trong đồ án này bao gồm hai đối tượng chính cần được nhận dạng là đối tượng bộ quá nhiệt (vòng ngoài) và đối tượng van điều khiển (vòng trong).
-
-\subsubsection{Lựa chọn cấu trúc mô hình}
-
-Dựa trên phân tích đặc tính quá độ, đối tượng bộ quá nhiệt được xấp xỉ tốt bởi mô hình quán tính bậc hai có trễ (Q2T) dưới dạng tích hai khâu quán tính bậc nhất nối tiếp. Trong khi đó, đối tượng van điều khiển được xấp xỉ tốt bởi mô hình quán tính bậc nhất có trễ (Q1T). Do đó, các mô hình được lựa chọn lần lượt là:
-\begin{equation}
-O_1(s) = \dfrac{K_{bqn}}{(T_1 s + 1)(T_2 s + 1)}e^{-\tau_{bqn} s}
-\label{eq:model_bqn_q2t}
-\end{equation}
-\begin{equation}
-O_2(s) = \dfrac{K_v}{T_v s + 1}e^{-\tau_v s}
-\label{eq:model_valve_q1t}
-\end{equation}
-
-Trong đó $K_{bqn}$, $T_1$, $T_2$, $\tau_{bqn}$ là các tham số của đối tượng bộ quá nhiệt; còn $K_v$, $T_v$, $\tau_v$ lần lượt là hệ số khuếch đại, hằng số thời gian và thời gian trễ của đối tượng van. Việc lựa chọn hai cấu trúc mô hình này giúp phản ánh đúng động học của từng đối tượng, đồng thời đảm bảo số tham số nhận dạng vừa đủ để đạt độ khớp cao.
-
-\subsubsection{Phương pháp nhận dạng đối tượng}
-
-Phương pháp nhận dạng được áp dụng trong đồ án này dựa trên bài toán tối ưu hóa phi tuyến với ràng buộc. Từ dữ liệu thu được từ đáp ứng bậc thang, ta có tập dữ liệu: $\{(t_i, y(t_i))\}_{i=1}^{N}$, trong đó $y(t_i)$ là giá trị đo được tại thời điểm $t_i$.
-
-Đối với đối tượng bộ quá nhiệt (mô hình Q2T), véctơ tham số cần xác định là $\mathbf{A}_{bqn} = \{K_{bqn}, T_1, T_2, \tau_{bqn}\}$. Đối với đối tượng van (mô hình Q1T), véctơ tham số là $\mathbf{A}_v = \{K_v, T_v, \tau_v\}$. Bài toán nhận dạng được phát biểu dưới dạng tối ưu hóa:
-\begin{equation}
-\min_{\mathbf{A}} f(\mathbf{A}) = \min_{\mathbf{A}} \sum_{i=1}^{N}\left[y_{m}(t_i; \mathbf{A}) - y(t_i)\right]^2
-\end{equation}
-trong đó $y_{m}(t_i; \mathbf{A})$ là giá trị tính toán từ mô hình tại thời điểm $t_i$ với bộ tham số $\mathbf{A}$.
-
-Các ràng buộc vật lý được áp dụng: hệ số khuếch đại và hằng số thời gian phải dương, thời gian trễ không âm. Để tính toán $y_{m}(t;\mathbf{A})$, đáp ứng bậc thang của các mô hình được biểu diễn dưới dạng giải tích thông qua biến đổi Laplace ngược.
-
-\subsubsection{Đáp ứng bậc thang của mô hình Q1T (van)}
-
-Đối tượng van được khảo sát bằng đáp ứng xung với biên độ $1{,}05 \cdot \delta(t)$, trong đó $\delta(t)$ là hàm xung đơn vị. Để mô hình hóa và nhận dạng tham số, phương pháp sử dụng đáp ứng bậc thang đơn vị làm cơ sở tính toán được áp dụng. Mối liên hệ giữa đáp ứng xung $h(t)$ và đáp ứng bậc thang $y_{step}(t)$ được xác định thông qua tích phân: $y_{step}(t) = \int_0^t h(\tau) \, d\tau$. Do đó, việc tính toán đáp ứng bậc thang từ hàm truyền là hợp lý và cho phép xác định các tham số mô hình một cách chính xác. Kỹ thuật này, được sử dụng rộng rãi trong điều khiển quá trình, giúp đơn giản hóa việc xử lý dữ liệu và tính toán các tham số mô hình mà vẫn đảm bảo độ chính xác.
-
-Đối với mô hình Q1T, hàm truyền trong miền tần số là:
-\begin{equation}
-O_2(s) = \frac{K_v}{T_v s + 1}e^{-\tau_v s}
-\end{equation}
-Trong đó, hệ số khuếch đại $K_v$ phản ánh tỷ lệ giữa giá trị xác lập của đáp ứng bậc thang và biên độ của tín hiệu đầu vào bậc thang. Với tín hiệu đầu vào là hàm bậc thang đơn vị $u(t) = 1$ (với $t \geq 0$), biến đổi Laplace của nó là $U(s) = 1/s$. Đáp ứng trong miền tần số được xác định như sau:
-\begin{equation}
-Y_2(s) = O_2(s) \cdot U(s) = \frac{K_v}{T_v s + 1} \cdot \frac{1}{s} \cdot e^{-\tau_v s}
-\end{equation}
-
-Để thực hiện biến đổi Laplace ngược, phân tích thành phân số từng phần:
-\begin{equation}
-Y_2(s) = K_v \cdot \frac{1}{s(T_v s + 1)} \cdot e^{-\tau_v s} = K_v \left(\frac{1}{s} - \frac{1}{s + \dfrac{1}{T_v}}\right) e^{-\tau_v s}
-\end{equation}
-Áp dụng định lý dịch chuyển trong miền thời gian cho thừa số $e^{-\tau_v s}$, biến đổi Laplace ngược cho:
-\begin{equation}
-\mathcal{L}^{-1}\left\{\frac{1}{s} - \frac{1}{s + \dfrac{1}{T_v}}\right\} = 1 - e^{\frac{-t}{T_v}}
-\end{equation}
-Kết hợp với thời gian trễ $\tau_v$, đáp ứng trong miền thời gian là:
-\begin{equation}
-y_{m}(t; K_v, T_v, \tau_v) = \begin{cases}
-0 & \forall\, t < \tau_v \\
-K_v\left[1 - e^{\frac{-(t-\tau_v)}{T_v}}\right] & \forall\, t \geq \tau_v
-\end{cases}
-\end{equation}
-
-\subsubsection{Đáp ứng bậc thang của mô hình Q2T (bộ quá nhiệt)}
-
-Đối tượng bộ quá nhiệt không được kích thích trực tiếp bằng tín hiệu bậc thang, mà phản ứng với sự thay đổi bậc thang của lưu lượng nước phun giảm ôn có biên độ $\Delta F = -4{,}3$ t/h. Sự thay đổi này xuất hiện ở đầu ra của van điều khiển (sau khi vòng điều khiển bên trong đã ổn định), tạo thành tín hiệu đầu vào hiệu quả cho đối tượng bộ quá nhiệt. Để mô hình hóa, tín hiệu đầu vào được chuẩn hóa thành bậc thang đơn vị và hệ số khuếch đại $K_{bqn}$ (có đơn vị $^{\circ}\mathrm{C}$/(t/h)) được định nghĩa là độ thay đổi nhiệt độ ứng với biến thiên lưu lượng bậc thang đơn vị (1 t/h).
-
-Đối với mô hình Q2T, hàm truyền trong miền tần số là:
-\begin{equation}
-O_1(s) = \dfrac{K_{bqn}}{(T_1 s + 1)(T_2 s + 1)}e^{-\tau_{bqn} s}
-\end{equation}
-Trong đó, hệ số khuếch đại $K_{bqn}$ (đơn vị $^{\circ}\mathrm{C}$/(t/h)) là độ thay đổi nhiệt độ ứng với biến thiên lưu lượng bậc thang đơn vị (1 t/h). Khi tín hiệu đầu vào được chuẩn hóa thành hàm bậc thang đơn vị $U(s) = 1/s$ (tương ứng với $\Delta F = 1$ t/h sau khi chuẩn hóa), đáp ứng trong miền tần số là:
-\begin{equation}
-Y_1(s) = O_1(s) \cdot U(s) = \frac{K_{bqn}}{(T_1 s + 1)(T_2 s + 1)} \cdot \frac{1}{s} \cdot e^{-\tau_{bqn} s}
-\end{equation}
-
-Cần lưu ý rằng biên độ $\Delta F = -4{,}3$ t/h là biên độ của tín hiệu bậc thang đầu vào trong thực tế, không phải là tham số động học của mô hình. Biên độ này chỉ ảnh hưởng đến biên độ đáp ứng nhiệt độ (ký hiệu $\Delta T$), nhưng không ảnh hưởng đến các tham số động học $T_1$, $T_2$ và $\tau_{bqn}$ của mô hình. Việc chuẩn hóa về bậc thang đơn vị cho phép xác định hàm truyền và các tham số mô hình một cách tổng quát, sau đó có thể nhân với hệ số thực tế khi cần thiết.
-
-\noindent
-Phân tích thành phân số từng phần và biến đổi Laplace ngược, ta có:
-\begin{equation}
-\mathcal{L}^{-1}\left\{\frac{1}{s(T_1 s + 1)(T_2 s + 1)}\right\} = 1 - \frac{T_1 e^{\frac{-t}{T_1}} - T_2 e^{\frac{-t}{T_2}}}{T_1 - T_2}
-\end{equation}
-Áp dụng định lý dịch chuyển cho thời gian trễ $\tau_{bqn}$ và nhân với hệ số khuếch đại $K_{bqn}$, đáp ứng trong miền thời gian với tín hiệu bậc thang đơn vị chuẩn hóa là:
-\begin{equation}
-y_{m}(t; K_{bqn}, T_1, T_2, \tau_{bqn}) = \begin{cases}
-0 & \forall\, t < \tau_{bqn} \\
-K_{bqn}\left[1 - \dfrac{T_1 e^{\frac{-(t-\tau_{bqn})}{T_1}} - T_2 e^{\frac{-(t-\tau_{bqn})}{T_2}}}{T_1 - T_2}\right] & \forall\, t \geq \tau_{bqn}
-\end{cases}
-\end{equation}
-Để áp dụng với dữ liệu có biến thiên lưu lượng $\Delta F = -4{,}3$ t/h, đáp ứng thực tế được tính bằng cách nhân biểu thức trên với hệ số $\Delta F$:
-\begin{equation}
-y(t) = \Delta F \cdot y_{m}(t; K_{bqn}, T_1, T_2, \tau_{bqn})
-\end{equation}
-trong đó $y(t)$ là giá trị đo được từ đáp ứng thực tế, $y_{m}(t; K_{bqn}, T_1, T_2, \tau_{bqn})$ là giá trị tính từ mô hình với tín hiệu bậc thang đơn vị chuẩn hóa (1 t/h). Biểu thức này thể hiện mô hình chuẩn hóa theo bậc thang đơn vị, trong đó $K_{bqn}$ là hệ số khuếch đại mô hình, còn biên độ đáp ứng $\Delta T$ được xác định bởi tích $\Delta F \cdot K_{bqn}$.
-
-Trong trường hợp đặc biệt $T_1 \approx T_2$, đáp ứng Q2T sẽ tiến gần đến dạng:
-\begin{equation*}
-K\left[1 - e^{\frac{-(t-\tau)}{T}}\left(1 + \frac{t-\tau}{T}\right)\right]
-\end{equation*} 
-
-Các biểu thức trên cho phép tính trực tiếp $y_{m}(t_i;\mathbf{A})$, từ đó đánh giá hàm mục tiêu $f(\mathbf{A})$ và thực hiện tối ưu hóa.
-
-\subsubsection{Thuật toán tối ưu hóa}
-
-Bài toán tối ưu phi tuyến có ràng buộc được giải bằng phương pháp tối ưu hóa số, sử dụng thư viện {\small\texttt{scipy.optimize.minimize}} trong Python (xem \textbf{Phụ lục \ref{phu_luc_a}}). Thuật toán bắt đầu từ điểm khởi tạo ban đầu $\mathbf{A}_0$ và lặp lại quá trình cập nhật các tham số theo hướng giảm hàm mục tiêu cho đến khi đạt điều kiện hội tụ.
-
-\subsubsection{Đánh giá chất lượng mô hình}
-
-Chất lượng mô hình nhận dạng được đánh giá thông qua hệ số xác định $R^2$, được tính theo công thức:
-\begin{equation}
-R^2 = 1 - \frac{\sum_{i=1}^{N}(y(t_i) - y_{m}(t_i, \mathbf{A}))^2}{\sum_{i=1}^{N}(y(t_i) - \bar{y})^2}
-\end{equation}
-trong đó $y(t_i)$ là giá trị đo được tại thời điểm $t_i$, $y_{m}(t_i, \mathbf{A})$ là giá trị mô hình tương ứng, $\bar{y}$ là giá trị trung bình của dữ liệu thực tế. Hệ số $R^2$ nằm trong khoảng $[0, 1]$, với giá trị càng gần 1 chứng tỏ mô hình càng phù hợp với dữ liệu. Trong thực tế kỹ thuật, giá trị $R^2 > 0,95$ được coi là mô hình có độ chính xác cao.
-
-\subsection{Nhận dạng đối tượng van điều khiển}
-\label{nhan_dang_van}
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.5\textwidth]{Hinhve/chuong2_dap_ung_van.png}
-    \caption{Đường đặc tính thực tế của đối tượng van điều khiển}
-    \label{fig:ch2_dac_tinh_thuc_te_van}
-    \end{figure}
-Đối tượng van điều khiển đóng vai trò là khâu chấp hành trong hệ thống, có nhiệm vụ điều chỉnh lưu lượng nước phun giảm ôn vào dòng hơi để thay đổi nhiệt độ. Đặc tính động học của van điều khiển ảnh hưởng trực tiếp đến tốc độ đáp ứng và độ chính xác của vòng điều khiển bên trong. Để nhận dạng đối tượng van, thí nghiệm đáp ứng xung được thực hiện bằng cách đưa tín hiệu điều khiển dạng xung có biên độ $1{,}05 \cdot \delta(t)$ vào van và quan sát đáp ứng đầu ra theo thời gian, trong đó $\delta(t)$ là hàm xung đơn vị.
-
-Dữ liệu thu được từ thí nghiệm, được thể hiện trên \textbf{Hình \ref{fig:ch2_dac_tinh_thuc_te_van}}, cho thấy đặc tính động học của van có thể được xấp xỉ tốt bằng mô hình quán tính bậc nhất có trễ (Q1T). Quá trình nhận dạng được thực hiện bằng phương pháp tối ưu hóa phi tuyến với mô hình hàm truyền:
-\begin{equation}
-O_2(s) = \frac{K_v}{T_v s + 1}e^{-\tau_v s}
-\end{equation}
-
-Để xác định các tham số của mô hình van điều khiển, bài toán cực tiểu hóa hàm mục tiêu bình phương sai số được giải quyết bằng thuật toán tối ưu hóa phi tuyến có ràng buộc. Cụ thể, véctơ tham số $\mathbf{A} = \{K, T, \tau\}$ được tối ưu nhằm tối thiểu hóa chênh lệch giữa mô hình và dữ liệu thực tế, như được trình bày trong \textbf{Mã nguồn \ref{code:q1t}}. Quá trình tối ưu hóa sử dụng thư viện {\small\texttt{scipy.optimize}} của Python, đảm bảo các điều kiện ràng buộc vật lý cho các tham số. Kết quả xác định thông số mô hình được tổng hợp trong \textbf{Bảng \ref{tab:ket_qua_nhan_dang_van}}.
-
-\begin{table}[htbp]
-\centering
-\caption{Kết quả nhận dạng đối tượng van điều khiển}
-\label{tab:ket_qua_nhan_dang_van}
-\renewcommand{\arraystretch}{1.5}
-\begin{tabular}{lcc}
-\toprule
-\textbf{Tham số} & \textbf{Ký hiệu} & \textbf{Giá trị} \\
-\midrule
-Hệ số khuếch đại & $K_v$ & 1,02 \\
-Hằng số thời gian & $T_v$ & 3,484 s \\
-Thời gian trễ & $\tau_v$ & 1,923 s \\
-Hệ số xác định & $R^2$ & 0,9965 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Từ các tham số nhận dạng được, hàm truyền cụ thể của đối tượng van điều khiển được xác định:
-\begin{equation}
-O_2(s) = \frac{1,02}{(3,484s + 1)}e^{-1,923s}
-\end{equation}
-
-\subsubsection{Phân tích ý nghĩa vật lý của các tham số}
+Mạch vòng điều chỉnh lưu lượng (FIC) và mạch vòng điều chỉnh áp suất (PIC) được tích hợp trong cùng một sơ đồ P\&ID vì hai mạch vòng này có quan hệ vật lý mật thiết: áp suất và lưu lượng của dòng dầu trong đường ống phụ thuộc lẫn nhau qua đặc tính thủy lực của hệ thống. Lưu lượng kế FT đo lưu lượng thực tế và truyền tín hiệu về bộ điều khiển FIC; bộ điều khiển FIC xuất tín hiệu điều khiển đến van điều chỉnh FCV trên đường dầu cấp cho lò. Đồng thời, mạch vòng áp suất với cảm biến PT và bộ điều khiển PIC duy trì áp suất đường phân phối ổn định thông qua van bypass hồi lưu, nhằm cải thiện tính tuyến tính của van FCV và đảm bảo chất lượng phun sương tại đầu đốt.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{Hinhve/fit-van.png}
-    \caption{So sánh đáp ứng thực tế và mô hình nhận dạng của đối tượng van}
-    \label{fig:ch2_dap_ung_van}
-    \end{figure}
-
-Hệ số khuếch đại $K_v = 1,02$ phản ánh quan hệ xác lập giữa tín hiệu điều khiển và độ mở van (hoặc lưu lượng). Giá trị gần 1 cho thấy đối tượng van có tỷ lệ truyền đạt xấp xỉ đơn vị ở chế độ làm việc khảo sát.
-
-Hằng số thời gian $T_v = 3,484$ giây đặc trưng cho quán tính của đối tượng van theo mô hình Q1T. Với mô hình bậc nhất, sau khi hết thời gian trễ, đáp ứng đạt khoảng 63\% giá trị xác lập tại thời điểm xấp xỉ $T_v$.
-
-Thời gian trễ $\tau_v = 1,923$ giây phản ánh độ trễ trong cơ cấu truyền động, xử lý tín hiệu và thời gian chết của van. Thời gian trễ này cần được xem xét trực tiếp khi chỉnh định bộ điều khiển vòng trong để tránh tác động quá mạnh gây dao động hoặc bão hòa cơ cấu chấp hành.
-
-Đặc điểm nổi bật của đối tượng van theo kết quả nhận dạng là động học bậc nhất có trễ, đáp ứng không dao động và tương đối nhanh, phù hợp với yêu cầu của vòng điều khiển bên trong trong cấu trúc cascade.
-
-\subsubsection{Đánh giá chất lượng mô hình nhận dạng}
-
-Chất lượng của mô hình nhận dạng được đánh giá thông qua hệ số xác định $R^2 = 0,9965$ (xem \textbf{Bảng \ref{tab:ket_qua_nhan_dang_van}}). Giá trị $R^2$ gần 1 cho thấy mô hình Q1T mô tả tốt động học của van; sai số giữa mô hình và dữ liệu là tương đối nhỏ và mô hình có thể sử dụng cho mục đích tổng hợp bộ điều khiển vòng trong.
-
-Sự trùng khớp giữa đường cong mô hình và dữ liệu có thể quan sát được trên \textbf{Hình \ref{fig:ch2_dap_ung_van}}, trong đó mô hình tái tạo được giai đoạn trễ ban đầu ($\tau_v = 1,923$ s), giai đoạn quá độ bậc nhất và giá trị xác lập cuối cùng.
-
-\subsection{Nhận dạng đối tượng bộ quá nhiệt}
-\label{nhan_dang_bqn}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.45\textwidth]{Hinhve/chuong2_dap_ung_bqn.png}
-    \caption{Đường đặc tính thực tế của đối tượng bộ quá nhiệt}
-    \label{fig:ch2_dac_tinh_thuc_te_bqn}
-    \end{figure}
-
-Đối tượng bộ quá nhiệt là khâu chính của vòng ngoài, thể hiện động học của quá trình gia nhiệt hơi bão hòa thành hơi quá nhiệt với đặc trưng quán tính lớn và thời gian trễ đáng kể do quá trình trao đổi nhiệt. Mô hình toán học được xác định nhờ nhận dạng đáp ứng bậc thang: thay đổi đột ngột đầu vào, ghi nhận sự tiến triển nhiệt độ theo thời gian cho đến trạng thái xác lập.
-
-Dữ liệu trên \textbf{Hình \ref{fig:ch2_dac_tinh_thuc_te_bqn}} cho thấy nhiệt độ tăng từ khoảng 520$^{\circ}\mathrm{C}$ lên khoảng 529$^{\circ}\mathrm{C}$ theo kiểu đường cong chữ S đặc trưng: có trễ ban đầu, sau đó tăng nhanh rồi tiệm cận dần. Đường cong không dao động, quá trình tắt dần mượt mà, phù hợp với mô hình Q2T (hai khâu quán tính bậc nhất nối tiếp với $T_1 \approx T_2$).
-
-Dựa trên phân tích đặc tính quá độ, mô hình hàm truyền dạng tích hai khâu quán tính bậc nhất nối tiếp có trễ (Q2T) được lựa chọn để mô tả đối tượng bộ quá nhiệt:
-\begin{equation}
-O_1(s) = \frac{K_{bqn}}{(T_1 s + 1)(T_2 s + 1)}e^{-\tau_{bqn} s}
-\end{equation}
-trong đó $K_{bqn}$ là hệ số khuếch đại (có đơn vị $^{\circ}\mathrm{C}$/(t/h)), được định nghĩa là độ thay đổi nhiệt độ ứng với biến thiên lưu lượng bậc thang đơn vị (1 t/h); $T_1$, $T_2$ là hai hằng số thời gian ($T_1 \approx T_2$), và $\tau_{bqn}$ là thời gian trễ. Việc lựa chọn mô hình này đảm bảo mô tả đúng đặc tính tắt dần mượt mà của quá trình nhiệt, đồng thời vẫn đủ linh hoạt để bám sát dữ liệu khi $T_1$ và $T_2$ không hoàn toàn trùng nhau.
-
-Quá trình nhận dạng các tham số mô hình được thực hiện bằng phương pháp tối ưu hóa phi tuyến. Véctơ tham số cần xác định là $\mathbf{A}_{bqn} = \{K_{bqn}, T_1, T_2, \tau_{bqn}\}$. Thuật toán tối ưu hóa số được áp dụng để tìm bộ tham số tối ưu sao cho tổng bình phương sai lệch giữa đáp ứng của mô hình và dữ liệu thực tế đạt giá trị cực tiểu. Kết quả nhận dạng được tổng hợp trong \textbf{Bảng \ref{tab:ket_qua_nhan_dang_bqn}}.
-
-\begin{table}[htbp]
-\centering
-\caption{Kết quả nhận dạng đối tượng bộ quá nhiệt}
-\label{tab:ket_qua_nhan_dang_bqn}
-\renewcommand{\arraystretch}{1.5}
-\begin{tabular}{lcc}
-\toprule
-\textbf{Tham số} & \textbf{Ký hiệu} & \textbf{Giá trị} \\
-\midrule
-Hệ số khuếch đại & $K_{bqn} = \dfrac{\Delta T}{|\Delta F|}$ & 2,09$^{\circ}\mathrm{C}$/(t/h) \\
-Hằng số thời gian & $T_1$ & 18,243 s \\
-Hằng số thời gian & $T_2$ & 18,237 s \\
-Thời gian trễ & $\tau_{bqn}$ & 12,367 s \\
-Hệ số xác định & $R^2$ & 0,9986 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Từ các tham số nhận dạng được, hàm truyền cụ thể của đối tượng bộ quá nhiệt được xác định như sau:
-\begin{equation}
-O_1(s) = \frac{2,09}{(18,243s + 1)(18,237s + 1)}e^{-12,367s}
-\end{equation}
-trong đó hệ số khuếch đại $K_{bqn} = 2,09$ có đơn vị $^{\circ}\mathrm{C}$/(t/h), là độ thay đổi nhiệt độ ứng với biến thiên lưu lượng bậc thang đơn vị (1 t/h).
-
-\subsubsection{Phân tích ý nghĩa vật lý của các tham số}
-
-Hệ số khuếch đại $K_{bqn} = 2,09$ $^{\circ}\mathrm{C}$/(t/h) phản ánh mức độ nhạy của quá trình nhiệt trong bộ quá nhiệt đối với tín hiệu điều khiển đầu vào. Cụ thể, $K_{bqn}$ cho biết mức tăng nhiệt độ hơi quá nhiệt ứng với mỗi đơn vị thay đổi lưu lượng nước phun giảm ôn (1 t/h). Giá trị này được xác định dựa trên tỷ số giữa biên độ đáp ứng nhiệt độ thực tế $\Delta T = 9$ $^{\circ}\mathrm{C}$ và mức thay đổi lưu lượng nước $\Delta F = -4{,}3$ t/h. Như vậy, $K_{bqn}$ đặc trưng cho khả năng tác động lên nhiệt độ hơi quá nhiệt của hệ thống khi điều chỉnh lưu lượng nước giảm ôn.
-
-Hai hằng số thời gian $T_1 = 18,243$ s và $T_2 = 18,237$ s đặc trưng cho quán tính nhiệt của bộ quá nhiệt và cho thấy $T_1 \approx T_2$, phù hợp với mô hình Q2T dạng hai khâu quán tính nối tiếp. Việc $T_1$ và $T_2$ rất gần nhau phản ánh quá trình trao đổi nhiệt nhiều giai đoạn có đặc tính tắt dần mượt mà, không dao động.
-
-Thời gian trễ $\tau_{bqn} = 12{,}367$ giây phản ánh độ trễ vận chuyển và khuếch tán nhiệt từ vị trí phun nước đến điểm đo nhiệt độ hơi quá nhiệt. Đây là đặc tính vốn có của quá trình trao đổi nhiệt phân bố và cần được xem xét kỹ lưỡng trong thiết kế bộ điều khiển để tránh hiện tượng dao động hoặc mất ổn định.
-
-Đặc điểm nổi bật của đối tượng bộ quá nhiệt là có quán tính lớn, thời gian trễ đáng kể và đặc tính tắt dần mượt mà (hai hằng số thời gian gần bằng nhau). 
-
-Mô hình Q2T phản ánh đúng bản chất của quá trình trao đổi nhiệt có nhiều giai đoạn nối tiếp và phù hợp tốt với dữ liệu thực tế.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.7\textwidth]{Hinhve/fit-bqn.png}
-\caption{So sánh đáp ứng thực tế và mô hình nhận dạng của bộ quá nhiệt}
-\label{fig:ch2_dap_ung_bqn}
+    \includegraphics[width=0.85\textwidth]{Hinhve/hinh4.png}
+    \caption{Sơ đồ P\&ID mạch vòng điều chỉnh lưu lượng và áp suất}
+    \label{fig:pid_luu_luong_ap_suat}
 \end{figure}
 
-\subsubsection{Đánh giá chất lượng mô hình nhận dạng}
+Mạch vòng điều chỉnh nhiệt độ (TIC) kiểm soát nhiệt độ dầu tại đầu ra bộ gia nhiệt thông qua vòng điều khiển kín: cảm biến nhiệt độ TT đo nhiệt độ thực tế của dầu, tín hiệu phản hồi về bộ điều khiển TIC, và bộ điều khiển phát lệnh đến van điều chỉnh hơi (steam control valve) có bộ truyền động khí nén để tăng hoặc giảm lưu lượng hơi nước cấp vào bộ gia nhiệt.
 
-Chất lượng của mô hình nhận dạng được đánh giá thông qua cả phương pháp định tính và định lượng. Về mặt định tính, sự phù hợp giữa đáp ứng của mô hình và dữ liệu thực tế được minh họa trên \textbf{Hình \ref{fig:ch2_dap_ung_bqn}}. Kết quả so sánh cho thấy mô hình Q2T với các tham số đã nhận dạng phản ánh tốt các đặc điểm động học chính của đối tượng thực, bao gồm: (1) thời gian trễ ban đầu trước khi nhiệt độ bắt đầu thay đổi đáng kể, (2) đặc tính quá độ dạng chữ S với đặc tính tắt dần mượt mà, (3) tốc độ tăng nhiệt độ trong giai đoạn chuyển tiếp, và (4) giá trị xác lập cuối cùng.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{Hinhve/hinh3.png}
+    \caption{Sơ đồ P\&ID mạch vòng điều chỉnh nhiệt độ}
+    \label{fig:pid_nhiet_do}
+\end{figure}
 
-Về mặt định lượng, chất lượng mô hình được đánh giá thông qua hệ số xác định $R^2$. Kết quả nhận dạng cho hệ số xác định $R^2 = 0,9986$ (xem \textbf{Bảng \ref{tab:ket_qua_nhan_dang_bqn}}). Giá trị này rất gần với 1, chứng tỏ mô hình giải thích được phần lớn phương sai trong dữ liệu thực tế.
+Mạch vòng điều chỉnh mức (LIC) đảm bảo duy trì mức dầu trong bể chứa ở phạm vi an toàn bằng cách điều chỉnh van nạp, đồng thời đóng vai trò bảo vệ hệ thống bơm thông qua cơ chế khóa liên động (interlock) theo các báo động giới hạn thấp thấp (LL) và cao cao (HH). Khi mức dầu đạt ngưỡng LL, hệ thống sẽ tự động dừng bơm để tránh chạy khô; khi đạt ngưỡng HH, van nạp sẽ bị đóng khẩn cấp để ngăn ngừa tràn bể.
 
-Để đánh giá thêm về độ lớn sai số tuyệt đối, có thể tính chỉ số RMSE\footnote{RMSE (Root Mean Square Error) hay căn bậc hai trung bình bình phương sai số là thước đo độ lệch chuẩn của phần dư giữa giá trị dự đoán và giá trị quan sát. RMSE có cùng đơn vị với biến phụ thuộc, do đó dễ diễn giải hơn so với các chỉ số không thứ nguyên. Giá trị RMSE càng nhỏ chứng tỏ mô hình càng chính xác. Trong kỹ thuật điều khiển, RMSE thường được sử dụng để so sánh chất lượng của các mô hình nhận dạng khác nhau cho cùng một đối tượng.}:
-\begin{equation}
-\text{RMSE} = \sqrt{\frac{1}{N}\sum_{i=1}^{N}(y(t_i) - y_{m}(t_i, \mathbf{A}))^2}
-\end{equation}
-trong đó: $y(t_i)$ là giá trị đo được, $y_{m}(t_i, \mathbf{A})$ là giá trị mô hình tương ứng.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{Hinhve/hinh5.png}
+    \caption{Sơ đồ P\&ID mạch vòng điều chỉnh mức}
+    \label{fig:pid_muc}
+\end{figure}
 
-Đối với bộ quá nhiệt, giá trị RMSE được ước tính khoảng 0,36$^{\circ}\mathrm{C}$, rất nhỏ so với biên độ đáp ứng thực tế $\Delta T \approx 9$ $^{\circ}\mathrm{C}$ và nhiệt độ vận hành khoảng 520-529$^{\circ}\mathrm{C}$. Sai số tương đối chỉ khoảng 4,0\% so với biên độ đáp ứng, là hoàn toàn chấp nhận được trong công nghệ điều khiển nhiệt độ hơi quá nhiệt.
+\subsection{Vai trò của từng phần tử trong sơ đồ cấu trúc}
 
-Sự trùng khớp tốt giữa đường cong mô hình và dữ liệu thực tế, được xác nhận bởi chỉ số $R^2$ cao, chứng tỏ tính hợp lý của việc lựa chọn cấu trúc mô hình Q2T. Mô hình với bốn tham số ($K_{bqn}$, $T_1$, $T_2$, $\tau_{bqn}$) phản ánh tốt động học của quá trình trao đổi nhiệt và đảm bảo có thể sử dụng tin cậy trong quá trình thiết kế bộ điều khiển cho vòng ngoài của hệ thống điều khiển cascade.
+Mỗi mạch vòng điều chỉnh khép kín được cấu thành từ ba phần tử cốt lõi, mỗi phần tử đảm nhận một chức năng không thể thay thế trong toàn bộ chuỗi điều khiển.
 
-Sự khác biệt về đặc tính động học giữa đối tượng van điều khiển và đối tượng bộ quá nhiệt thể hiện rõ qua các tham số thời gian đặc trưng. Đối tượng van có động học nhanh, được mô tả bởi mô hình Q1T với hằng số thời gian $T_v = 3{,}484$ s và thời gian trễ $\tau_v = 1{,}923$ s. Ngược lại, đối tượng bộ quá nhiệt là một quá trình nhiệt có quán tính lớn, được mô tả bởi mô hình Q2T với hai hằng số thời gian gần bằng nhau ($T_1 = 18{,}243$ s, $T_2 = 18{,}237$ s) và thời gian trễ đáng kể $\tau_{bqn} = 12{,}367$ s. Khi xét tổng hằng số thời gian tương đương, động học của bộ quá nhiệt chậm hơn khoảng một bậc độ lớn so với van, với tỷ lệ $\dfrac{(T_1 + T_2)(T_1 + T_2)}{T_v} \approx 10{,}47$, trong khi tỷ lệ thời gian trễ đạt khoảng $6{,}43$.
+Thiết bị đo lường (Transmitter) là phần tử đầu tiên trong vòng điều khiển, có chức năng thu thập trạng thái vật lý thực của thông số quá trình (lưu lượng FT, nhiệt độ TT, áp suất PT, mức LT) và chuẩn hóa thành tín hiệu điện chuẩn 4–20\,mA để truyền về bộ điều khiển. Đây là cơ sở dữ liệu thực nghiệm duy nhất để bộ điều khiển đối chiếu với giá trị đặt và đưa ra quyết định điều khiển; sai số của thiết bị đo trực tiếp ảnh hưởng đến độ chính xác của toàn bộ hệ thống.
 
-Sự chênh lệch lớn về tốc độ đáp ứng này là cơ sở lý thuyết then chốt cho việc lựa chọn cấu trúc điều khiển cascade. Theo nguyên lý thiết kế cascade, tỷ lệ tốc độ giữa vòng trong và vòng ngoài cần đạt tối thiểu từ 3:1 đến 5:1 để đảm bảo hiệu quả. Trong trường hợp của đồ án này, các tỷ lệ thu được vượt xa yêu cầu tối thiểu, cho thấy vòng điều khiển bên trong với đối tượng van có khả năng phản ứng nhanh và bù trừ hiệu quả các nhiễu tác động lên lưu lượng nước phun giảm ôn, trước khi chúng lan truyền và ảnh hưởng đến nhiệt độ hơi quá nhiệt ở vòng ngoài. Các số liệu chi tiết được tổng hợp trong \textbf{Bảng~\ref{tab:so_sanh_van_bqn}}.
+Bộ điều khiển trung tâm (Controller) nhận tín hiệu sai số (sai lệch giữa giá trị đặt và giá trị đo thực) và tính toán tín hiệu đầu ra điều khiển dựa trên thuật toán PID. Thành phần tỷ lệ P đảm bảo tốc độ phản hồi nhanh; thành phần tích phân I khử sai lệch tĩnh và đảm bảo bám theo giá trị đặt; thành phần vi phân D cải thiện tốc độ đáp ứng và giảm vọt lố. Sự phối hợp hài hòa của ba thành phần này quyết định chất lượng điều chỉnh của vòng kín.
 
-\begin{table}[htbp]
-\centering
-\caption{So sánh đặc tính động học giữa đối tượng van và bộ quá nhiệt}
-\label{tab:so_sanh_van_bqn}
-\renewcommand{\arraystretch}{1.5}
-\small
-\begin{tabular}{lccc}
-\toprule
-\textbf{Đặc tính} & \textbf{Van} & \textbf{Bộ quá nhiệt} & \textbf{Tỷ lệ} \\
-\midrule
-Hằng số thời gian & $T_v = 3{,}484$ s & $T_1 = 18{,}243$ s \\ 
-                  &                  & $T_2 = 18{,}237$ s & -- \\
-Tổng HS thời gian & $T_v$ & $T_1 + T_2 = 36{,}48$ s & ${\approx}10{,}47$ \\
-Thời gian trễ & $\tau_v = 1{,}923$ s & $\tau_{bqn} = 12{,}367$ s & ${\approx}6{,}43$ \\
-Đặc tính quá độ & Tắt dần mượt & Tắt dần mượt & -- \\
-Bản chất vật lý & Cơ điện & Nhiệt & -- \\
-\bottomrule
-\end{tabular}
-\end{table}
+Cơ cấu chấp hành (Final Control Element) là phần tử tác động vật lý trở lại đối tượng điều khiển để khử sai số. Đối với mạch vòng nhiệt độ, cơ cấu chấp hành là van cấp hơi; với mạch vòng lưu lượng, đó là van tuyến tính FCV; với mạch vòng mức, đó là van nạp hoặc bơm chuyển. Chất lượng và độ chính xác của cơ cấu chấp hành, đặc biệt là đặc tính tuyến tính của van, có ảnh hưởng lớn đến khả năng điều chỉnh chính xác của toàn bộ vòng kín.
 
-\subsection{Tổng hợp kết quả nhận dạng}
+\subsection{Phân tích ưu điểm của sơ đồ cấu trúc và sự phù hợp với yêu cầu công nghệ}
 
-\begin{table}[htbp]
-\centering
-\caption{Tham số nhận dạng được của hai đối tượng}
-\label{tab:tham_so_nhan_dang}
-\renewcommand{\arraystretch}{1.5}
-\begin{tabular}{lcc}
-\toprule
-\textbf{Tham số} & \textbf{Van điều khiển} & \textbf{Bộ quá nhiệt} \\
-\midrule
-Hệ số khuếch đại & $K_v = 1,02$ & $K_{bqn} = 2,09\,^{\circ}\mathrm{C}$/(t/h) \\
-Hằng số thời gian & $T_v = 3,484$ s & $T_1 = 18,243$ s; $T_2 = 18,237$ s \\
-Thời gian trễ & $\tau_v = 1,923$ s & $\tau_{bqn} = 12,367$ s \\
-Hệ số xác định & $R^2 = 0,9965$ & $R^2 = 0,9986$ \\
-\bottomrule
-\end{tabular}
-\end{table}
+Thiết kế cấu trúc phân mảnh theo P\&ID, trong đó mỗi thông số công nghệ có một vòng điều chỉnh PID độc lập, mang lại những ưu điểm rõ rệt so với các phương án điều khiển tập trung phức tạp hơn. Trước hết, về độ tin cậy cục bộ, các mạch vòng điều chỉnh hoạt động độc lập với nhau, không phụ thuộc lẫn nhau về mặt phần mềm. Nếu mạch vòng nhiệt độ TIC gặp sự cố, mạch vòng lưu lượng FIC vẫn có thể tiếp tục hoạt động với thiết lập áp suất bơm mặc định, đảm bảo lò hơi không bị ngắt hoàn toàn. Điều này rất quan trọng trong môi trường vận hành liên tục của nhà máy nhiệt điện, nơi mọi sự cố dừng máy không kế hoạch đều gây tổn thất kinh tế lớn.
 
-Việc phân tích các tham số nhận dạng của hai đối tượng cho thấy sự khác biệt căn bản về đặc tính động học giữa chúng. Cụ thể, đối tượng van điều khiển có động học điển hình của hệ bậc nhất có trễ, được mô tả với hằng số thời gian $T_v = 3{,}484$~s và thời gian trễ $\tau_v = 1{,}923$~s. Trong khi đó, đối tượng bộ quá nhiệt thể hiện động học bậc hai có trễ với quán tính lớn, tương ứng với hai hằng số thời gian gần bằng nhau ($T_1 = 18{,}243$~s, $T_2 = 18{,}237$~s) và thời gian trễ đáng kể $\tau_{bqn} = 12{,}367$~s. Sự chênh lệch rõ rệt về tỷ lệ các tham số động học này tạo ra nền tảng lý thuyết thuyết phục cho việc lựa chọn cấu trúc điều khiển cascade trong hệ thống.
+Ngoài ra, thuật toán PID kinh điển phù hợp với bản chất tuyến tính hóa cục bộ của các đối tượng nhiệt điện, vốn được đặc trưng bởi quán tính lớn và thời gian trễ vừa phải, và có thể được mô hình hóa tốt bằng hàm truyền bậc nhất hoặc bậc hai có trễ. Bên cạnh đó, việc mỗi phần tử trong sơ đồ có ký hiệu định danh thẻ (tagging) rõ ràng theo chuẩn ISA, chẳng hạn như PT-101, FCV-201, TT-301, giúp công tác bảo trì, hiệu chuẩn và khắc phục sự cố được khoanh vùng chính xác mà không ảnh hưởng đến các vòng điều khiển khác.
 
-Các hàm truyền đầy đủ của hai đối tượng, được trình bày trong \textbf{Bảng \ref{tab:ham_truyen_doi_tuong}}, cho phép mô tả chính xác mối quan hệ động học giữa đầu vào và đầu ra của từng đối tượng. Hàm truyền của bộ quá nhiệt $O_1(s)$ có dạng Q2T với hệ số khuếch đại $K_{bqn} = 2,09$ $^{\circ}$C/(t/h), phản ánh mức độ nhạy của quá trình nhiệt đối với thay đổi lưu lượng nước phun giảm ôn, trong khi hàm truyền của van điều khiển $O_2(s)$ có dạng Q1T với hệ số khuếch đại $K_v = 1,02$.
+\section{Luận chứng lựa chọn thiết bị}
+
+\subsection{Dải làm việc của thông số quá trình, mức cảnh báo và bảo vệ}
+
+Việc xác định chính xác dải làm việc của từng thông số quá trình là cơ sở để lựa chọn thiết bị phù hợp và thiết lập các ngưỡng bảo vệ hệ thống. Căn cứ vào đặc tính của dầu HFO và yêu cầu vận hành lò hơi, các thông số và ngưỡng bảo vệ được tổng hợp trong Bảng~\ref{tab:alarm_levels}.
 
 \begin{table}[H]
     \centering
-    \caption{Hàm truyền của các đối tượng điều khiển}
-    \label{tab:ham_truyen_doi_tuong}
-    \renewcommand{\arraystretch}{2}
-    \begin{tabular}{cp{11cm}}
-    \toprule
-    \textbf{Đối tượng} & \textbf{Hàm truyền} \\
-    \midrule
-    Bộ quá nhiệt & $O_1(s) = \dfrac{2,09}{(18,243s + 1)(18,237s + 1)}e^{-12,367s}$ \\
-    & (với đơn vị: $^{\circ}\mathrm{C}$/(t/h) cho hệ số khuếch đại $K_{bqn}$) \\
-    \midrule
-    Van điều khiển & $O_2(s) = \dfrac{1,02}{(3,484s + 1)}e^{-1,923s}$ \\
-    \bottomrule
-    \end{tabular}
-    \end{table}
-
-Về chất lượng nhận dạng, cả hai đối tượng đều đạt hệ số xác định $R^2$ cao: van đạt $R^2 = 0,9965$ và bộ quá nhiệt đạt $R^2 = 0,9986$, như thể hiện trong \textbf{Bảng \ref{tab:tham_so_nhan_dang}}. Các giá trị này chứng tỏ mô hình nhận dạng phù hợp tốt với dữ liệu thực tế và đủ tin cậy để phục vụ tổng hợp bộ điều khiển. Việc lựa chọn van theo mô hình Q1T và bộ quá nhiệt theo mô hình Q2T mang lại nhiều ưu điểm: thứ nhất, phản ánh đúng cấu trúc động học của từng đối tượng theo dữ liệu thực tế; thứ hai, các tham số $K$, $T$ và $\tau$ có ý nghĩa vật lý trực quan và dễ diễn giải; thứ ba, thuận lợi cho việc áp dụng các phương pháp chỉnh định cổ điển (Ziegler-Nichols) và dựa trên mô hình (IMC), đồng thời dễ triển khai trên MATLAB/Simulink.
-
-Sự chênh lệch về tốc độ đáp ứng giữa vòng trong (van) và vòng ngoài (bộ quá nhiệt) tạo điều kiện lý tưởng cho việc áp dụng cấu trúc điều khiển cascade, vượt xa yêu cầu tối thiểu là 3:1 đến 5:1 theo lý thuyết thiết kế cascade. Điều này đảm bảo rằng vòng trong có thể ổn định và phản ứng kịp thời với nhiễu trước khi ảnh hưởng lan truyền đến vòng ngoài.
-
-\section{Thiết kế hệ thống điều khiển cascade}
-
-\subsection{Nguyên lý điều khiển cascade}
-
-Hệ thống điều khiển cascade là cấu trúc điều khiển nhiều vòng, trong đó đầu ra của bộ điều khiển vòng ngoài (bộ điều khiển chính) đóng vai trò là giá trị đặt cho vòng điều khiển bên trong (vòng phụ). Cấu trúc này được áp dụng rộng rãi trong điều khiển quá trình công nghiệp, đặc biệt là các quá trình có quán tính lớn, thời gian trễ đáng kể và chịu ảnh hưởng của nhiều nguồn nhiễu. Ưu điểm chính của điều khiển cascade là cải thiện đáng kể chất lượng điều khiển so với hệ thống một vòng đơn giản.
-
-Cấu trúc cascade trong hệ thống điều khiển nhiệt độ hơi quá nhiệt gồm hai vòng điều khiển với chức năng như sau:
-
-\begin{itemize}
-    \item \textbf{Vòng điều khiển ngoài (vòng nhiệt độ):}
-    \begin{itemize}
-        \item Nhiệm vụ: Điều khiển nhiệt độ hơi quá nhiệt (biến điều khiển chính) về giá trị đặt mong muốn.
-        \item Nguyên lý: Bộ điều khiển vòng ngoài nhận tín hiệu phản hồi từ cảm biến đo nhiệt độ đặt sau bộ quá nhiệt, so sánh với giá trị đặt nhiệt độ và tính toán tín hiệu điều khiển.
-        \item Tín hiệu ra: Thay vì điều khiển van trực tiếp, tín hiệu điều khiển của vòng ngoài được sử dụng làm giá trị đặt cho vòng điều khiển bên trong.
-    \end{itemize}
-
-    \item \textbf{Vòng điều khiển bên trong (vòng van/lưu lượng):}
-    \begin{itemize}
-        \item Nhiệm vụ: Điều khiển lưu lượng nước phun giảm ôn hoặc vị trí van về đúng giá trị đặt do vòng ngoài cung cấp.
-        \item Nguyên lý: Bộ điều khiển vòng trong nhận tín hiệu phản hồi từ cảm biến lưu lượng hoặc cảm biến vị trí van, so sánh với giá trị đặt từ vòng ngoài và tính toán tín hiệu điều khiển trực tiếp cho van.
-        \item Hiệu quả: Nhờ có vòng điều khiển bên trong, các nhiễu tác động lên lưu lượng nước phun giảm ôn hoặc đặc tính van sẽ được bù trừ nhanh chóng trước khi ảnh hưởng đến nhiệt độ hơi quá nhiệt.
-    \end{itemize}
-\end{itemize}
-
-Các ưu điểm cụ thể của cấu trúc cascade trong ứng dụng này bao gồm cải thiện tốc độ đáp ứng của hệ thống do vòng trong có thể phản ứng nhanh với các thay đổi, giảm ảnh hưởng của nhiễu tác động vào vòng trong nhờ cơ chế bù trừ nhanh, và tăng độ ổn định tổng thể của hệ thống bằng cách chia nhỏ bài toán điều khiển phức tạp thành hai vòng đơn giản hơn. Tuy nhiên, hệ thống cascade cũng phức tạp hơn về mặt thiết kế và yêu cầu chỉnh định cẩn thận các tham số của cả hai bộ điều khiển.
-
-\subsection{Cấu trúc hệ thống}
-
-Cấu trúc chi tiết của hệ thống điều khiển cascade được thiết kế dựa trên các đối tượng đã nhận dạng. Sơ đồ khối của hệ thống bao gồm các khâu chính. Bộ điều khiển vòng ngoài $R_1(s)$ nhận tín hiệu đặt nhiệt độ $r(t)$ và tín hiệu phản hồi nhiệt độ thực tế $y(t)$, tính toán tín hiệu điều khiển $u_1(t)$ làm giá trị đặt cho vòng trong. Bộ điều khiển vòng trong $R_2(s)$ nhận giá trị đặt từ vòng ngoài và tín hiệu phản hồi lưu lượng hoặc vị trí van $y_2(t)$, tính toán tín hiệu điều khiển $u_2(t)$ cho van. Đối tượng van $O_2(s)$ nhận tín hiệu $u_2(t)$ và điều chỉnh lưu lượng nước phun giảm ôn. Đối tượng bộ quá nhiệt $O_1(s)$ nhận lưu lượng nước phun giảm ôn và cho ra nhiệt độ hơi quá nhiệt $y(t)$.
-
-Các bộ điều khiển $R_1(s)$ và $R_2(s)$ được thiết kế theo cấu trúc PID, với hàm truyền tổng quát có dạng:
-
-\begin{equation}
-R(s) = K_p\left(1 + \frac{1}{T_i s} + T_d s\right) = K_p\frac{T_i T_d s^2 + T_i s + 1}{T_i s}
-\end{equation}
-
-trong đó $K_p$ là hệ số khuếch đại tỷ lệ, $T_i$ là thời gian tích phân và $T_d$ là thời gian vi phân.
-
-\subsubsection{Lựa chọn cấu trúc bộ điều khiển cho vòng trong}
-
-Bộ điều khiển vòng trong $R_2(s)$ được chọn theo cấu trúc PI (bỏ khâu vi phân, tức $T_d = 0$) dựa trên các lý do sau. Thứ nhất, cấu trúc PI đảm bảo đáp ứng nhanh và ổn định cho đối tượng van điều khiển, đáp ứng yêu cầu của vòng điều khiển bên trong cần có tốc độ phản ứng cao để kịp thời triệt nhiễu trước khi ảnh hưởng lan truyền đến vòng ngoài. Khâu tỷ lệ P cung cấp phản ứng tức thời với sai lệch, trong khi khâu tích phân I loại bỏ sai số xác lập, đảm bảo lưu lượng nước phun giảm ôn (hoặc vị trí van) đạt chính xác giá trị đặt từ vòng ngoài.
-
-Thứ hai, việc không sử dụng khâu vi phân D giúp tránh khuếch đại nhiễu tần số cao thường có trong tín hiệu đo lưu lượng hoặc vị trí van do rung động cơ học, nhiễu điện từ và độ phân giải hữu hạn của cảm biến. Khâu vi phân có đặc tính khuếch đại tín hiệu ở tần số cao theo tỷ lệ tuyến tính với tần số, do đó sẽ làm tăng mạnh biên độ nhiễu và gây dao động không mong muốn trong tín hiệu điều khiển, ảnh hưởng đến tuổi thọ của cơ cấu chấp hành.
-
-Thứ ba, đặc tính động học của đối tượng van theo mô hình Q1T với $T_v = 3,484$ s và $\tau_v = 1,923$ s cho thấy đáp ứng không dao động và tương đối nhanh. Do đó, việc sử dụng khâu vi phân là không cần thiết và thậm chí có thể phản tác dụng bằng cách làm tăng nhạy cảm với nhiễu và làm tín hiệu điều khiển kém mượt. Cấu trúc PI đơn giản là đủ để đảm bảo chất lượng điều khiển cho vòng trong.
-
-\subsubsection{Lựa chọn cấu trúc bộ điều khiển cho vòng ngoài}
-
-Bộ điều khiển vòng ngoài $R_1(s)$ sử dụng cấu trúc PID đầy đủ nhằm cải thiện chất lượng đáp ứng quá độ của nhiệt độ hơi quá nhiệt. Quyết định này được biện minh bởi đặc tính động học phức tạp của đối tượng bộ quá nhiệt theo mô hình Q2T, với quán tính lớn (hai hằng số thời gian xấp xỉ 18 s) và thời gian trễ đáng kể ($\tau_{bqn} = 12,367$ s).
-
-Khâu vi phân trong bộ điều khiển PID đóng vai trò quan trọng trong việc bù trễ lớn và cải thiện độ ổn định của hệ thống. Cụ thể, khâu vi phân phản ứng với tốc độ biến thiên của sai lệch nhiệt độ, tạo ra tác động điều khiển có tính dự đoán, giúp hệ thống phản ứng sớm hơn với xu hướng thay đổi của nhiệt độ. Điều này đặc biệt quan trọng đối với đối tượng có thời gian trễ lớn, vì bộ điều khiển cần "dự đoán" trước để bù trừ độ trễ vốn có trong quá trình trao đổi nhiệt.
-
-Ngoài ra, khâu vi phân giúp giảm xu hướng dao động của đối tượng bộ quá nhiệt do hệ số cản nhỏ hơn 1 bằng cách cung cấp thêm cản cho hệ thống, làm giảm độ quá điều chỉnh và rút ngắn thời gian quá độ. Tuy nhiên, cần lưu ý rằng khâu vi phân được thiết kế với hệ số (thời gian vi phân $T_d$) nhỏ và thường được kết hợp với bộ lọc thông thấp nhằm hạn chế ảnh hưởng của nhiễu đo nhiệt độ, vốn có biên độ nhỏ hơn nhiễu đo lưu lượng nhưng vẫn cần được xem xét cẩn thận.
-
-Cấu trúc và đặc điểm của các bộ điều khiển trong hệ thống cascade được tổng hợp tại \textbf{Bảng \ref{tab:cau_truc_bo_dieu_khien}}.
-
-\begin{table}[htbp]
-\centering
-\caption{Cấu trúc các bộ điều khiển trong hệ thống cascade}
-\label{tab:cau_truc_bo_dieu_khien}
-\renewcommand{\arraystretch}{1.5}
-\begin{tabular}{lccp{6cm}}
-\toprule
-\textbf{Bộ điều khiển} & \textbf{Ký hiệu} & \textbf{Loại} & \textbf{Hàm truyền} \\
-\midrule
-Vòng trong & $R_2(s)$ & PI & $R_2(s) = K_{p1}\left(1 + \dfrac{1}{T_{i1} s}\right)$ \\
-\midrule
-Vòng ngoài & $R_1(s)$ & PID & $R_1(s) = K_{p2}\left(1 + \dfrac{1}{T_{i2} s} + T_{d2} s\right)$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Hàm truyền của vòng điều khiển bên trong (vòng kín) có dạng:
-\begin{equation}
-W_2(s) = \frac{R_2(s)O_2(s)}{1 + R_2(s)O_2(s)}
-\end{equation}
-
-Hàm truyền của toàn bộ hệ thống cascade có dạng:
-\begin{equation}
-W(s) = \frac{R_1(s)W_2(s)O_1(s)}{1 + R_1(s)W_2(s)O_1(s)}
-\end{equation}
-
-Việc thiết kế hệ thống cascade tuân theo nguyên tắc thiết kế từ trong ra ngoài. Đầu tiên, vòng điều khiển bên trong được thiết kế và chỉnh định để đạt được đáp ứng nhanh và ổn định. Sau khi vòng trong hoạt động tốt, nó được coi như một khâu có hàm truyền $W_2(s)$ trong quá trình thiết kế vòng ngoài. Tiếp theo, bộ điều khiển vòng ngoài được thiết kế để điều khiển nhiệt độ hơi quá nhiệt, với đối tượng điều khiển tương đương là tích của $W_2(s)$ và $O_1(s)$.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.7\textwidth]{Hinhve/chuong2_so_do_cascade.png}
-\caption{Sơ đồ khối hệ thống điều khiển cascade}
-\label{fig:ch2_so_do_cascade}
-\end{figure}
-
-\subsubsection{Lý do lựa chọn cấu trúc điều khiển cascade}
-
-Việc lựa chọn cấu trúc điều khiển cascade cho hệ thống điều khiển nhiệt độ hơi quá nhiệt được biện minh bởi nhiều yếu tố về lý thuyết điều khiển và đặc tính động học của các đối tượng đã nhận dạng. Theo lý thuyết điều khiển quá trình, cấu trúc cascade đặc biệt phù hợp với các hệ thống có chuỗi các đối tượng mắc nối tiếp với tốc độ đáp ứng khác biệt lớn, trong đó biến quá trình trung gian có thể đo được và chịu ảnh hưởng của nhiễu quan trọng.
-
-Trong hệ thống này, sự khác biệt lớn về động học giữa van điều khiển và bộ quá nhiệt tạo điều kiện thuận lợi cho việc áp dụng cấu trúc cascade. Cụ thể, đối tượng van điều khiển có động học Q1T với $T_v = 3,484$ s và $\tau_v = 1,923$ s, cho đáp ứng nhanh và không dao động. Ngược lại, đối tượng bộ quá nhiệt có động học Q2T với $T_1 \approx T_2 \approx 18$ s và thời gian trễ lớn $\tau_{bqn} = 12,367$ s. Với quy ước so sánh tốc độ dựa trên tổng hằng số thời gian tương đương $T_1+T_2$, ta có tỷ lệ tốc độ $(T_1+T_2)/T_v \approx 10,47$, vượt xa yêu cầu tối thiểu 3--5 theo tiêu chuẩn thiết kế cascade. Điều này đảm bảo rằng vòng trong có thể ổn định và phản ứng kịp thời với nhiễu trước khi ảnh hưởng lan truyền đến vòng ngoài.
-
-Ngoài ra, lưu lượng nước phun giảm ôn (hoặc vị trí van) là biến quá trình trung gian có thể đo được và chịu ảnh hưởng trực tiếp của nhiễu như biến động áp suất nước phun, ma sát van, và nhiễu điện từ trong môi trường công nghiệp. Với cấu trúc cascade, vòng trong có khả năng phát hiện và bù trừ các nhiễu này ngay lập tức thông qua phản hồi nhanh, trước khi chúng kịp ảnh hưởng đến nhiệt độ hơi quá nhiệt ở vòng ngoài. Điều này giúp cải thiện đáng kể chất lượng điều khiển so với cấu trúc một vòng đơn giản, trong đó bộ điều khiển chỉ phản ứng sau khi nhiễu đã gây ra sai lệch nhiệt độ đáng kể.
-
-\subsubsection{Tổng hợp vai trò của các vòng điều khiển trong cấu trúc cascade}
-
-Với cấu trúc cascade được lựa chọn ở trên, mỗi vòng điều khiển đóng vai trò riêng biệt nhưng bổ sung cho nhau nhằm đảm bảo chất lượng điều khiển tổng thể của hệ thống. Vòng điều khiển bên trong (vòng phụ) với bộ điều khiển PI điều khiển lưu lượng nước phun giảm ôn (hoặc vị trí van) đảm bảo khả năng phản ứng nhanh với các thay đổi của giá trị đặt từ vòng ngoài và triệt nhiễu sớm tại nguồn. Cụ thể, vòng trong có động học nhanh (mô hình Q1T với $T_v$ nhỏ hơn đáng kể so với động học của bộ quá nhiệt) cho phép bù trừ kịp thời các nhiễu tác động vào lưu lượng nước phun giảm ôn trước khi chúng lan truyền và ảnh hưởng đến nhiệt độ hơi quá nhiệt. Khả năng triệt nhiễu này là ưu điểm quan trọng nhất của cấu trúc cascade so với cấu trúc một vòng.
-
-Vòng điều khiển bên ngoài (vòng chính) với bộ điều khiển PID tập trung vào mục tiêu chính là điều khiển chính xác nhiệt độ hơi quá nhiệt về giá trị đặt mong muốn. Vòng ngoài không cần quan tâm đến chi tiết các nhiễu tác động vào van hoặc lưu lượng nước phun giảm ôn vì các nhiễu này đã được vòng trong xử lý. Do đó, vòng ngoài có thể được chỉnh định để tối ưu hóa chất lượng điều khiển nhiệt độ với đáp ứng quá độ tốt (độ quá điều chỉnh nhỏ, thời gian xác lập ngắn) và sai số xác lập bằng không, phù hợp với yêu cầu vận hành của nhà máy nhiệt điện.
-
-Sự phân chia trách nhiệm rõ ràng này không chỉ cải thiện chất lượng điều khiển mà còn đơn giản hóa quá trình thiết kế và chỉnh định. Cấu trúc cascade phù hợp với đặc tính động học của các đối tượng đã nhận dạng (ví dụ tỷ lệ tốc độ $(T_1+T_2)/T_v$ lớn hơn 5) và tạo cơ sở vững chắc cho bước chỉnh định tham số bộ điều khiển theo các phương pháp khác nhau (Ziegler-Nichols, IMC, điều khiển bền vững) ở các phần tiếp theo.
-
-\subsection{Triển khai trên MATLAB/Simulink}
-
-Hệ thống điều khiển cascade được triển khai trên MATLAB/Simulink để mô phỏng và đánh giá hiệu năng trước khi triển khai thực tế. Mô hình Simulink bao gồm các khối chính: khối \textit{Sum} để tính sai số giữa giá trị đặt và tín hiệu phản hồi cho cả hai vòng; khối \textit{PID Controller} để triển khai các bộ điều khiển với các tham số có thể thay đổi dễ dàng; khối \textit{Transfer Fcn} để mô hình hóa các đối tượng điều khiển; khối \textit{Transport Delay} để mô phỏng thời gian trễ của các đối tượng; khối \textit{Scope} để quan sát kết quả mô phỏng.
-
-Để điền tham số cho các khối \textit{Transfer Fcn}, mẫu số của các hàm truyền được triển khai dưới dạng đa thức theo biến $s$. Từ các mô hình đã nhận dạng:
-\begin{align}
-O_1(s) &= \frac{2{,}09}{(18{,}243s + 1)(18{,}237s + 1)}e^{-12{,}367s}, \\
-O_2(s) &= \frac{1{,}02}{(3{,}484s + 1)}e^{-1{,}923s},
-\end{align}
-ta khai triển mẫu số của đối tượng $O_1(s)$:
-\begin{align}
-(18{,}243s + 1)(18{,}237s + 1) &= 332{,}698\,s^2 + 36{,}48\,s + 1.
-\end{align}
-
-Như vậy, khi cấu hình khối \textit{Transfer Fcn} trong Simulink, có thể nhập trực tiếp các hệ số tử số và mẫu số như sau: đối tượng bộ quá nhiệt $O_1(s)$ có tử số $[2.09]$ và mẫu số $[332.698\;\;36.48\;\;1]$, còn đối tượng van $O_2(s)$ có tử số $[1.02]$ và mẫu số $[3.484\;\;1]$ (trong môi trường MATLAB, các hệ số được nhập với dấu chấm thập phân). Thời gian trễ được mô phỏng bằng khối \textit{Transport Delay} với giá trị tương ứng: $\tau_{bqn} = 12{,}367$ s cho bộ quá nhiệt và $\tau_v = 1{,}923$ s cho van.
-
-Cấu trúc cascade được xây dựng theo nguyên tắc lồng ghép vòng trong vào vòng ngoài. Vòng trong được tạo bởi bộ điều khiển $R_2$ (cấu trúc PI), đối tượng van $O_2(s)$ và khối phản hồi tín hiệu lưu lượng hoặc vị trí van. Đầu ra của vòng trong là lưu lượng nước phun giảm ôn, đồng thời cũng là đầu vào của đối tượng bộ quá nhiệt. Vòng ngoài được tạo bởi bộ điều khiển $R_1$ (cấu trúc PID), cả vòng trong đã đóng và đối tượng bộ quá nhiệt $O_1(s)$, cùng với khối phản hồi tín hiệu nhiệt độ. Giá trị đặt cho vòng trong là đầu ra của bộ điều khiển vòng ngoài, tạo nên cấu trúc cascade điển hình.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=1\textwidth]{Hinhve/chuong2_simulink_model.png}
-\caption{Mô hình Simulink của hệ thống điều khiển cascade}
-\label{fig:ch2_simulink_model}
-\end{figure}
-
-\section{Tổng hợp bộ điều khiển}
-
-Phần này trình bày quá trình tổng hợp bộ điều khiển cho hệ thống điều khiển cascade theo ba phương pháp khác nhau: Ziegler--Nichols, IMC và điều khiển bền vững. Mỗi phương pháp được trình bày với cơ sở lý thuyết, các bước thực hiện chi tiết, tính toán tham số bộ điều khiển và kết quả mô phỏng ban đầu. Phần đánh giá chi tiết kết quả của từng phương pháp được trình bày trong Section 2.4.
-
-\subsection{Phương pháp Ziegler-Nichols}
-
-Trong hệ thống điều khiển cascade, phương pháp Ziegler--Nichols được áp dụng theo nguyên tắc thiết kế từ trong ra ngoài. Cụ thể, vòng điều khiển bên trong được chỉnh định trước và coi như một khâu động học cố định trong quá trình thiết kế vòng ngoài. Do đó, các tham số Ziegler--Nichols của vòng ngoài được xác định dựa trên đối tượng tương đương $G(s) = W_2(s)O_1(s)$, thay vì trực tiếp trên đối tượng bộ quá nhiệt $O_1(s)$.
-
-\begin{table}[htbp]
-    \centering
-    \caption{Các tham số đặc trưng của đối tượng theo phương pháp Ziegler-Nichols}
-    \label{tab:tham_so_ZN}
-    \renewcommand{\arraystretch}{1.5}
-    \begin{tabular}{clp{8cm}}
-    \toprule
-    \textbf{Ký hiệu} & \textbf{Tên tham số} & \textbf{Cách xác định} \\
-    \midrule
-    $\tau$ & Thời gian trễ & Khoảng thời gian từ khi đưa tín hiệu bước vào cho đến khi đầu ra bắt đầu thay đổi \\
-    $T$ & Hằng số thời gian & Xác định từ độ dốc của tiếp tuyến tại điểm uốn của đường cong đáp ứng \\
-    $K$ & Hệ số khuếch đại tĩnh & Tỷ số giữa độ biến thiên đầu ra và độ biến thiên đầu vào ở trạng thái xác lập \\
-    \bottomrule
+    \caption{Dải thông số làm việc và các mức cảnh báo, bảo vệ}
+    \label{tab:alarm_levels}
+    \begin{tabular}{|p{3.5cm}|p{3.5cm}|p{6cm}|}
+        \hline
+        \textbf{Thông số} & \textbf{Dải thiết kế} & \textbf{Mức cảnh báo \& Bảo vệ} \\
+        \hline
+        \textbf{Áp suất phân phối} & 5 đến 20\,bar & Cảnh báo Cao (P$>$H): Mở van nhánh hồi lưu.\par Cảnh báo Thấp (P$<$H): Bật bơm phụ. \\
+        \hline
+        \textbf{Nhiệt độ dầu HFO} & 80°C – 120°C & Hạ giới: 60°C (Nguy cơ tắc dòng).\par Thượng giới: 140°C (Cảnh báo đóng van hơi). \\
+        \hline
+        \textbf{Mức bể đệm} & 10\% - 90\% chiều cao & Low-Low (LL): Khóa liên động tắt bơm.\par High-High (HH): Báo tràn khẩn cấp. \\
+        \hline
     \end{tabular}
 \end{table}
 
-Phương pháp Ziegler-Nichols là một trong những phương pháp chỉnh định bộ điều khiển PID kinh điển và phổ biến nhất trong công nghiệp. Phương pháp này được phát triển bởi J.G. Ziegler và N.B. Nichols vào năm 1942, dựa trên các thí nghiệm thực tế với nhiều loại đối tượng công nghiệp khác nhau. Có hai biến thể chính của phương pháp này là phương pháp đáp ứng bước và phương pháp dao động tới hạn, trong đồ án này sử dụng phương pháp đáp ứng bước do phù hợp với đặc điểm đối tượng.
+\subsection{Lựa chọn thiết bị đo}
 
-Phương pháp đáp ứng bước của Ziegler-Nichols áp dụng cho các đối tượng có dạng đường cong chữ S đặc trưng, tức là các đối tượng quán tính có thời gian trễ. Từ đường cong đáp ứng bước (đặc tính quá độ) của đối tượng, ba tham số đặc trưng cần được xác định, như mô tả trong \textbf{Bảng \ref{tab:tham_so_ZN}}.
+Lựa chọn thiết bị đo lường phù hợp là yếu tố quyết định đến độ chính xác và độ tin cậy của toàn bộ hệ thống điều khiển. Đối với từng thông số công nghệ, thiết bị đo được lựa chọn dựa trên dải đo, điều kiện môi trường làm việc và yêu cầu độ chính xác.
 
-Các công thức tính toán tham số bộ điều khiển PID theo Ziegler-Nichols được cho trong \textbf{Bảng \ref{tab:cong_thuc_ZN}}.
+Đối với thiết bị đo lưu lượng (Flow Transmitter – FT), đồng hồ đo lưu lượng kiểu Coriolis được ưu tiên lựa chọn. Nguyên lý hoạt động dựa trên hiệu ứng lực Coriolis cho phép đo trực tiếp khối lượng dòng chảy với sai số chỉ khoảng ±0,1\%, không bị ảnh hưởng bởi sự thay đổi về nhiệt độ, áp suất hay độ nhớt của dầu – điều này đặc biệt quan trọng với dầu HFO có độ nhớt thay đổi theo nhiệt độ. Đối với các phân tuyến nhỏ hơn hoặc khi chi phí là yếu tố quan trọng, đồng hồ đo kiểu bánh răng oval (oval gear flow meter) có thể được sử dụng thay thế.
 
-\begin{table}[htbp]
-\centering
-\caption{Công thức chỉnh định bộ điều khiển theo Ziegler-Nichols}
-\label{tab:cong_thuc_ZN}
-\renewcommand{\arraystretch}{1.5}
-\begin{tabular}{lccc}
-\toprule
-\textbf{Loại điều khiển} & \textbf{$K_p$} & \textbf{$T_i$} & \textbf{$T_d$} \\
-\midrule
-P & $T/(K\tau)$ & -- & -- \\
-PI & $0,9T/(K\tau)$ & $3,33\tau$ & -- \\
-PID & $1,2T/(K\tau)$ & $2\tau$ & $0,5\tau$ \\
-\bottomrule
-\end{tabular}
-\end{table}
+Đối với cảm biến áp suất (Pressure Transmitter – PT), thiết bị sử dụng công nghệ điện dung màng cách ly được lựa chọn, cho dải áp tới 30\,bar với sai số nhỏ hơn 0,1\% span. Thiết bị đo áp suất được trang bị kèm theo các rơ-le công tắc áp suất (pressure switch) để cấp báo P$>$H và P$<$H khi áp suất vượt ngưỡng.
 
-Áp dụng phương pháp Ziegler-Nichols cho vòng điều khiển bên trong với đối tượng van $O_2(s)$, mô hình van đã nhận dạng có dạng Q1T:
-\[
-O_2(s) = \frac{1{,}02}{(3{,}484s + 1)}e^{-1{,}923s}.
-\]
-Các tham số đặc trưng $T$, $\tau$, $K$ của mô hình Q1T được dùng trực tiếp trong công thức Ziegler--Nichols để tính tham số bộ điều khiển PI vòng trong. Bộ điều khiển PI được chọn thay vì PID cho vòng trong nhằm tránh khuếch đại nhiễu đo lường và do đối tượng van có đáp ứng không dao động.
+Đối với cảm biến nhiệt độ (Temperature Transmitter – TT), điện trở nhiệt RTD loại Pt100 (Platinum 100\,$\Omega$ tại 0°C) được lựa chọn vì có độ ổn định cao, khả năng chống nhiễu tốt và dải đo phù hợp cho nhiệt độ dưới 200°C. Tín hiệu từ Pt100 được chuyển đổi thành tín hiệu 4–20\,mA thông qua bộ chuyển đổi tín hiệu (head-mounted transmitter) để truyền về DCS.
 
-Đối với vòng điều khiển ngoài, phương pháp Ziegler-Nichols phải được áp dụng trên đối tượng tương đương vòng ngoài $G(s) = W_2(s)O_1(s)$, trong đó $W_2(s)$ là hàm truyền vòng kín của vòng trong:
-\begin{equation}
-W_2(s) = \frac{R_2(s)O_2(s)}{1 + R_2(s)O_2(s)}
-\end{equation}
+Đối với cảm biến mức (Level Transmitter – LT), phương pháp đo bằng sóng siêu âm không tiếp xúc được áp dụng cho bể chứa HFO. Phương pháp này có ưu điểm không cần tiếp xúc trực tiếp với dầu, tránh được ảnh hưởng của độ bám dính và tính ăn mòn của dầu đối với điện cực đo.
 
-Với bộ điều khiển PI vòng trong $R_2(s) = 1{,}5986\left(1 + \dfrac{1}{6{,}4036s}\right)$ và đối tượng van $O_2(s) = \dfrac{1{,}02}{(3{,}484s + 1)}e^{-1{,}923s}$, hàm truyền vòng kín $W_2(s)$ có dạng phức tạp do có thời gian trễ. 
+\subsection{Lựa chọn cơ cấu chấp hành}
 
-Để xác định các tham số Ziegler-Nichols cho vòng ngoài, cần thực hiện các bước sau:
-\begin{enumerate}
-    \item Mô phỏng đáp ứng bước của đối tượng tương đương $G(s) = W_2(s)O_1(s)$
-    \item Từ đáp ứng bước, xác định các tham số đặc trưng $K_e$, $T_e$, $\tau_e$ bằng phương pháp nhận dạng số (tối ưu hóa phi tuyến) để xấp xỉ về mô hình Q1T
-    \item Áp dụng công thức Ziegler-Nichols (\textbf{Bảng \ref{tab:cong_thuc_ZN}}) để tính tham số bộ điều khiển PID
-\end{enumerate}
+Van điều khiển lưu lượng (Control Valve – FCV) là cơ cấu chấp hành trực tiếp tác động lên thông số điều khiển chính. Cụm van cầu (globe valve) với thiết kế đĩa van tuyến tính được lựa chọn vì đặc tính kiểm soát độ mở chính xác trong toàn bộ dải điều chỉnh, phù hợp với yêu cầu điều chỉnh bám sát của vòng PID. Van sử dụng bộ truyền động khí nén (pneumatic actuator) kết hợp bộ định vị van thông minh (smart valve positioner) để đảm bảo vị trí van thực tế luôn trùng khớp với lệnh điều khiển. Cấu hình hỏng-mở (fail-open) được lựa chọn để trong trường hợp mất khí nén, van sẽ mở hoàn toàn, đảm bảo dòng dầu không bị ngắt đột ngột gây tắt lửa lò hơi bất ngờ.
 
-\subsubsection{Tính toán tham số bộ điều khiển}
+Bộ điều khiển trung tâm là PLC Siemens S7-1200, được lựa chọn do hỗ trợ đầy đủ khối hàm thư viện điều khiển PID Compact (FB41) với tính năng tự chỉnh định (auto-tuning), tương thích truyền thông Profinet với hệ thống SCADA và có khả năng mở rộng dễ dàng. Cấu trúc phần cứng mô-đun của S7-1200 cho phép tích hợp các module vào/ra analog và số phục vụ đọc tín hiệu từ các cảm biến và xuất tín hiệu điều khiển đến van.
 
-\textbf{Bước 1: Thiết kế bộ điều khiển vòng trong}
+\section{Phương pháp xử lý số liệu}
 
-Bộ điều khiển PI cho vòng trong được thiết kế trực tiếp trên đối tượng van $O_2(s)$ với các tham số $T_v = 3{,}484$ s, $\tau_v = 1{,}923$ s, $K_v = 1{,}02$. Áp dụng công thức Ziegler-Nichols cho PI:
-\begin{align}
-K_{p1} &= \frac{0{,}9 \times T_v}{K_v \times \tau_v} = \frac{0{,}9 \times 3{,}484}{1{,}02 \times 1{,}923} = 1{,}5986 \\
-T_{i1} &= 3{,}33 \times \tau_v = 3{,}33 \times 1{,}923 = 6{,}4036~\text{s}
-\end{align}
-Bộ điều khiển PI cho vòng trong:
-\begin{equation}
-R_2(s) = 1{,}5986\left(1 + \frac{1}{6{,}4036s}\right)
-\end{equation}
+\subsection{Phương pháp thí nghiệm và xử lý số liệu vận hành}
 
-\textbf{Bước 2: Xác định đối tượng tương đương vòng ngoài}
+Để nhận dạng đặc tính động học của đối tượng điều khiển, phương pháp thực nghiệm hàm quá độ (Transient Response Method) được áp dụng. Phương pháp này có ưu điểm là không cần biết trước cấu trúc bên trong của hệ thống, chỉ cần quan sát phản ứng đầu ra khi có kích thích đầu vào xác định, từ đó xác định các tham số của mô hình toán học. Trong điều kiện lò đốt vận hành ổn định tại điểm làm việc danh định, một tín hiệu kích thích dạng hàm bậc thang với biên độ $\Delta U$ được áp đặt lên van điều tiết FCV trong khi giữ nguyên các điều kiện vận hành khác. Đáp ứng lưu lượng thực tế $y(t)$ được ghi lại từ phần mềm HMI của DCS với tần số lấy mẫu đủ cao cho đến khi hệ thống đạt trạng thái xác lập mới. Từ đường cong đáp ứng này, tiến hành xác định điểm uốn và kẻ tiếp tuyến để khai thác các tham số đặc trưng của mô hình SOPDT (Second-Order Plus Dead Time), bao gồm hệ số truyền $K$, các hằng số thời gian quán tính $T_1$, $T_2$ và thời gian trễ thuần $\tau$.
 
-Để xác định các tham số đặc trưng $K_e$, $T_e$, $\tau_e$ của đối tượng tương đương $G(s) = W_2(s)O_1(s)$ theo đúng phương pháp Ziegler-Nichols, cần mô phỏng đáp ứng bước của $G(s)$ và nhận dạng tham số từ đường cong đáp ứng.
+\subsection{Bảng số liệu thực nghiệm}
 
-Với bộ điều khiển PI vòng trong $R_2(s) = 1{,}5986\left(1 + \dfrac{1}{6{,}4036s}\right)$ và đối tượng van $O_2(s) = \dfrac{1{,}02}{(3{,}484s + 1)}e^{-1{,}923s}$, hàm truyền vòng kín $W_2(s)$ được tính toán:
-\begin{equation}
-W_2(s) = \frac{R_2(s)O_2(s)}{1 + R_2(s)O_2(s)}
-\end{equation}
-Đối tượng tương đương vòng ngoài:
-\begin{equation}
-G(s) = W_2(s)O_1(s) = W_2(s) \cdot \frac{2{,}09}{(18{,}243s + 1)(18{,}237s + 1)}e^{-12{,}367s}
-\end{equation}
-Quá trình mô phỏng đáp ứng bước của $G(s)$ được thực hiện bằng Python với tín hiệu đầu vào là hàm bậc thang đơn vị. Từ đường cong đáp ứng thu được (có dạng đường cong chữ S đặc trưng), các tham số đặc trưng được nhận dạng bằng phương pháp tối ưu hóa phi tuyến tương tự như phương pháp nhận dạng đối tượng đã trình bày ở phần \textbf{\ref{nhan_dang_van}}. Mô hình Q1T được sử dụng để xấp xỉ đối tượng tương đương $G(s) \approx \dfrac{K_e}{T_e s + 1}e^{-\tau_e s}$
+Thí nghiệm được thực hiện bằng cách áp đặt tín hiệu bậc thang mở van $u(t) = 5{,}1 \cdot \mathbf{1}(t)$ (biên độ kích thích 5,1 đơn vị) lên đối tượng trong điều kiện lò hơi đang vận hành ổn định. Dữ liệu đáp ứng lưu lượng được trích xuất từ phần mềm HMI và các tọa độ đặc trưng phục vụ nhận dạng mô hình được tổng hợp trong Bảng~\ref{tab:thong_so_thuc_nghiem}.
 
-\begin{figure}[htbp]
+\begin{table}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{Hinhve/chuong2_dap_ung_G_ZN.png}
-    \caption{Đáp ứng bước của đối tượng tương đương $G(s) = W_2(s)O_1(s)$ và mô hình Q1T nhận dạng được}
-    \label{fig:ch2_dap_ung_G_ZN}
-\end{figure}
-
-Kết quả nhận dạng từ đáp ứng bước cho các tham số:
-\begin{align}
-K_e &= 2{,}0951 \\
-T_e &= 30{,}2760~\text{s} \\
-\tau_e &= 24{,}1583~\text{s}
-\end{align}
-Chất lượng mô hình xấp xỉ được đánh giá bằng hệ số xác định $R^2 = 0{,}9978$, cho thấy mô hình Q1T phản ánh tốt động học của đối tượng tương đương.
-
-\textbf{Bước 3: Thiết kế bộ điều khiển vòng ngoài}
-
-Áp dụng công thức Ziegler-Nichols cho PID với các tham số $T_e$, $\tau_e$, $K_e$ đã được nhận dạng từ đáp ứng bước:
-\begin{align}
-K_{p2} &= \frac{1{,}2 \times T_e}{K_e \times \tau_e} = \frac{1{,}2 \times 30{,}2760}{2{,}0951 \times 24{,}1583} = 0{,}7178 \\
-T_{i2} &= 2 \times \tau_e = 2 \times 24{,}1583 = 48{,}3165~\text{s} \\
-T_{d2} &= 0{,}5 \times \tau_e = 0{,}5 \times 24{,}1583 = 12{,}0791~\text{s}
-\end{align}
-
-Bộ điều khiển PID cho vòng ngoài:
-\begin{equation}
-R_1(s) = 0{,}7178\left(1 + \frac{1}{48{,}3165s} + 12{,}0791s\right)
-\end{equation}
-
-\begin{table}[htbp]
-    \centering
-    \caption{Tham số bộ điều khiển theo Ziegler-Nichols}
-    \label{tab:tinh_toan_ZN}
-    \renewcommand{\arraystretch}{1.2}
-    \begin{tabular}{lcc}
-    \toprule
-    \textbf{Thông số} & \textbf{Vòng trong} & \textbf{Vòng ngoài} \\
-    \midrule
-    \multicolumn{3}{l}{\textit{Tham số mô hình Q1T}} \\
-    \midrule
-    Hằng số thời gian $T_e$ (s) & 3,484 & 30,2760 \\
-    Thời gian trễ $\tau_e$ (s) & 1,923 & 24,1583 \\
-    Hệ số khuếch đại $K_e$ & 1,02 & 2,0951 \\
-    \midrule
-    \multicolumn{3}{l}{\textit{Tham số bộ điều khiển}} \\
-    \midrule
-    Loại bộ điều khiển & PI & PID \\
-    $K_p$ & 1,5986 & 0,7178 \\
-    $T_i$ (s) & 6,4036 & 48,3165 \\
-    $T_d$ (s) & -- & 12,0791 \\
-    \bottomrule
+    \caption{Các điểm đặc trưng của đáp ứng quá độ thực nghiệm}
+    \label{tab:thong_so_thuc_nghiem}
+    \begin{tabular}{|l|c|c|}
+        \hline
+        \textbf{Điểm đồ thị / Thông số} & \textbf{Thời gian t (s)} & \textbf{Biên độ y(t)} \\
+        \hline
+        Nền ban đầu ($y(0)$) & $0{,}0$ & $1{,}30$ \\
+        \hline
+        Giao điểm tiếp tuyến / Trục hoành (A) & $2{,}579$ & $1{,}30$ \\
+        \hline
+        Điểm uốn (U) & $6{,}20$ & $1{,}88$ \\
+        \hline
+        Giao điểm tiếp tuyến / Trục tiệm cận (B) & $11{,}74$ & $2{,}80$ \\
+        \hline
+        Giá trị xác lập mới ($y(\infty)$) & $\infty$ & $2{,}80$ \\
+        \hline
+        \textbf{Biên độ tín hiệu kích $u_0$} & \multicolumn{2}{c|}{$5{,}1$} \\
+        \hline
     \end{tabular}
 \end{table}
 
-\subsubsection{Kết quả mô phỏng}
-
-Sau khi tính toán các tham số bộ điều khiển theo phương pháp Ziegler-Nichols với các giá trị nhận dạng được từ đáp ứng bước của đối tượng tương đương ($K_{p2} = 0{,}7178$, $T_{i2} = 48{,}3165$ s, $T_{d2} = 12{,}0791$ s), hệ thống điều khiển cascade được triển khai trên MATLAB/Simulink để đánh giá hiệu năng. 
-
-Kết quả mô phỏng cho thấy việc nhận dạng chính xác đối tượng tương đương $G(s) = W_2(s)O_1(s)$ từ đáp ứng bước đã giúp tính toán được các tham số bộ điều khiển phù hợp với động học thực tế của hệ thống. Điều này khác biệt so với phương pháp xấp xỉ đơn giản trước đây, cho phép hệ thống đạt được hiệu năng tốt mà không cần tinh chỉnh tham số.
-
-Với các tham số đã tính toán, hệ thống được mô phỏng và đáp ứng được thể hiện trong \textbf{Hình \ref{fig:ch2_ket_qua_ZN}}.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.7\textwidth]{Hinhve/chuong2_ket_qua_ZN.png}
-\caption{Đáp ứng của hệ thống với bộ điều khiển Ziegler-Nichols}
-\label{fig:ch2_ket_qua_ZN}
-\end{figure}
-
-\begin{table}[htbp]
-\centering
-\caption{Kết quả mô phỏng với phương pháp Ziegler-Nichols}
-\label{tab:ket_qua_ZN}
-\renewcommand{\arraystretch}{1.2}
-\begin{tabular}{lcp{6cm}}
-\toprule
-\textbf{Chỉ tiêu} & \textbf{Giá trị} & \textbf{Nhận xét} \\
-\midrule
-Thời gian trễ $t_d$ (s) & $\approx 10$--$15$ & Do thời gian trễ của đối tượng \\
-Thời gian lên $t_r$ (s) & $\approx 50$--$60$ & Tốc độ đáp ứng hợp lý \\
-Thời gian xác lập $t_s$ (s) & $\approx 150$--$200$ & Ổn định nhanh, không cần tinh chỉnh \\
-Độ quá điều chỉnh $M_p$ (\%) & $\approx 3$--$4$ & Rất nhỏ, dao động nhẹ và ổn định \\
-Sai số xác lập $e_{ss}$ ($^{\circ}\mathrm{C}$) & $\approx 0$ & Triệt tiêu hoàn toàn nhờ khâu tích phân \\
-\midrule
-\multicolumn{3}{l}{\textit{Đánh giá định tính}} \\
-\midrule
-Đáp ứng quá độ & Mượt mà, ổn định & Dao động nhẹ, tắt dần nhanh \\
-Ổn định & Ổn định tốt & Hội tụ nhanh, không cần tinh chỉnh \\
-Phù hợp thực tế & Tốt & Đáp ứng phù hợp với yêu cầu công nghiệp \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Kết quả mô phỏng cho thấy phương pháp Ziegler-Nichols đã đạt được hiệu năng tốt. Các đặc điểm nổi bật của kết quả mô phỏng:
-
-\begin{itemize}
-    \item \textbf{Độ ổn định tốt}: Hệ thống hội tụ nhanh với độ quá điều chỉnh rất nhỏ ($\approx 3$--$4\%$), phù hợp với yêu cầu điều khiển nhiệt độ trong công nghiệp
-    \item \textbf{Thời gian đáp ứng hợp lý}: Thời gian xác lập khoảng $150$--$200$ s, cân bằng giữa tốc độ đáp ứng và độ ổn định
-    \item \textbf{Sai số xác lập bằng không}: Nhờ khâu tích phân trong bộ điều khiển PID, sai số xác lập được triệt tiêu hoàn toàn
-    \item \textbf{Không cần tinh chỉnh}: Các tham số tính toán từ công thức Ziegler-Nichols đã cho kết quả tốt ngay từ đầu, không cần điều chỉnh thêm
-\end{itemize}
-
-Kết quả này chứng tỏ tầm quan trọng của việc nhận dạng chính xác đối tượng tương đương $G(s) = W_2(s)O_1(s)$ trong thiết kế bộ điều khiển cascade. Việc mô phỏng đáp ứng bước và áp dụng phương pháp tối ưu hóa để nhận dạng các tham số đặc trưng đã giúp tính toán được các tham số bộ điều khiển phù hợp với động học thực tế của hệ thống.
-
-% --- Bắt đầu mục IMC ---
-\subsection{Phương pháp IMC}
-
-Phương pháp điều khiển IMC (Internal Model Control) là một phương pháp thiết kế bộ điều khiển hiện đại dựa trên mô hình toán học của đối tượng. Phương pháp này được phát triển vào những năm 1980 và đã trở thành một trong những phương pháp phổ biến trong điều khiển quá trình công nghiệp nhờ tính trực quan và hiệu quả cao. Ý tưởng cơ bản của IMC là sử dụng mô hình của đối tượng để dự đoán đáp ứng và bù trừ sai lệch giữa dự đoán và thực tế.
-
-Cấu trúc điều khiển IMC bao gồm mô hình đối tượng $\hat{G}(s)$ được đặt song song với đối tượng thực $G(s)$. Bộ điều khiển IMC $Q(s)$ nhận vào sai lệch giữa đầu ra thực tế và đầu ra dự đoán từ mô hình. Nếu mô hình hoàn hảo ($\hat{G}(s) = G(s)$) và không có nhiễu, hệ thống sẽ hoạt động lý tưởng. Trong thực tế, luôn tồn tại sai khác giữa mô hình và đối tượng thực, nhưng cấu trúc IMC có khả năng bù trừ tốt các sai khác này.
-
-Quy trình thiết kế bộ điều khiển IMC cho đối tượng có thời gian trễ được thực hiện theo các bước sau. Đầu tiên, mô hình đối tượng $G(s)$ được phân tích thành hai phần: phần khả nghịch $G_+(s)$ chứa các cực và zero ở nửa mặt phẳng trái, và phần không khả nghịch $G_-(s)$ chứa thời gian trễ và các zero ở nửa mặt phẳng phải. Bộ điều khiển IMC lý tưởng có dạng $Q(s) = G_+^{-1}(s)F(s)$ trong đó $F(s)$ là bộ lọc để đảm bảo tính thực tế và ổn định của bộ điều khiển.
-
-Bộ lọc $F(s)$ thường được chọn có dạng:
-\begin{equation}
-F(s) = \frac{1}{(\lambda s + 1)^n}
-\end{equation}
-trong đó $\lambda$ là tham số chỉnh định duy nhất của phương pháp IMC, $n$ là bậc của bộ lọc được chọn sao cho $Q(s)$ là khả thi (hàm truyền thực hiện được). Tham số $\lambda$ quyết định đáp ứng của hệ thống: giá trị $\lambda$ nhỏ cho đáp ứng nhanh nhưng nhạy cảm với nhiễu và sai số mô hình, giá trị $\lambda$ lớn cho hệ thống chậm hơn nhưng bền vững hơn.
-
-Sau khi thiết kế bộ điều khiển IMC, nó có thể được chuyển đổi về dạng bộ điều khiển PID thông thường thông qua mối quan hệ giữa cấu trúc IMC và cấu trúc phản hồi thông thường. Hàm truyền bộ điều khiển tương đương trong cấu trúc phản hồi được xác định bởi:
-\begin{equation}
-R(s) = \frac{Q(s)}{1 - Q(s)\hat{O}(s)}
-\end{equation}
-trong đó $Q(s)$ là bộ điều khiển IMC và $\hat{O}(s)$ là mô hình đối tượng. Đối với đối tượng Q1T với mô hình $\hat{O}(s) = \dfrac{K}{Ts+1}e^{-\tau s}$ và bộ lọc bậc nhất $F(s) = \dfrac{1}{\lambda s + 1}$, bộ điều khiển IMC là $Q(s) = \dfrac{Ts+1}{K(\lambda s + 1)}$. Sau khi chuyển đổi và xấp xỉ Padé cho thời gian trễ, bộ điều khiển tương đương có dạng PI với các tham số:
-\begin{equation}
-K_p = \frac{T}{K(\lambda + \tau)}, \quad T_i = T
-\end{equation}
-
-Việc chuyển đổi này cho phép triển khai bộ điều khiển IMC trên các hệ thống điều khiển thông thường có sẵn chức năng PID mà không cần thay đổi phần cứng.
-
-Áp dụng phương pháp IMC cho vòng điều khiển bên trong với đối tượng van $O_2(s)$, mô hình van đã nhận dạng có dạng Q1T. Bộ điều khiển IMC được thiết kế với tham số $\lambda_1$ được chọn dựa trên yêu cầu về tốc độ đáp ứng và độ bền vững của vòng trong. Với thời gian trễ $\tau_v = 1,923$ s, một lựa chọn điển hình là $\lambda_1 = \tau_v/3 \approx 0,641$ s.
-
-Việc lựa chọn $\lambda_1 = \tau_v/3$ được thực hiện theo các khuyến nghị trong điều khiển quá trình, nhằm đạt được sự cân bằng giữa tốc độ đáp ứng và độ bền vững, đồng thời đảm bảo vòng trong có tốc độ đủ nhanh so với vòng ngoài trong cấu trúc cascade.
-
-Bộ lọc được chọn có bậc $n = 3$ để đảm bảo $Q(s)$ là khả thi với đối tượng có trễ. Bộ điều khiển IMC sau đó được chuyển đổi về dạng gần đúng PI để triển khai trong hệ thống.
-
-\subsubsection{Tổng hợp IMC cho vòng điều khiển ngoài trong hệ cascade}
-
-Trong cấu trúc điều khiển cascade, bộ điều khiển IMC của vòng ngoài không được thiết kế trực tiếp trên đối tượng bộ quá nhiệt $O_1(s)$ mà phải dựa trên đối tượng tương đương của vòng ngoài, được xác định bởi:
-\begin{equation}
-G(s) = W_2(s)\,O_1(s)
-\end{equation}
-trong đó $W_2(s)$ là hàm truyền vòng kín của vòng điều khiển bên trong sau khi đã được chỉnh định và ổn định. Việc thiết kế IMC trực tiếp cho $O_1(s)$ mà bỏ qua động học của vòng trong sẽ dẫn đến sai lệch nghiêm trọng về dự trữ pha và có thể gây mất ổn định cho hệ thống cascade.
-
-Do $G(s)$ là một đối tượng nhiệt có quán tính lớn và thời gian trễ đáng kể, đối tượng này được xấp xỉ về dạng khâu Q1T dựa trên đáp ứng bậc thang của mô hình tương đương:
-\begin{equation}
-G(s) \approx \frac{K_e}{T_e s + 1}e^{-L_e s}
-\end{equation}
-trong đó các tham số $K_e$, $T_e$ và $L_e$ được xác định thông qua mô phỏng đáp ứng bậc thang và phương pháp tiếp tuyến tại điểm uốn.
-\noindent
-Với mô hình xấp xỉ Q1T, bộ điều khiển IMC cho vòng ngoài có dạng:
-\begin{equation}
-Q_2(s) = \frac{T_e s + 1}{K_e(\lambda_2 s + 1)}
-\end{equation}
-Sau khi chuyển đổi về cấu trúc phản hồi chuẩn, bộ điều khiển tương đương có dạng PI:
-\begin{equation}
-R_1(s) = K_{p2}\left(1 + \frac{1}{T_{i2}s}\right)
-\end{equation}
-với các tham số:
-\begin{equation}
-K_{p2} = \frac{T_e}{K_e(\lambda_2 + L_e)}, \qquad T_{i2} = T_e
-\end{equation}
-
-Việc lựa chọn tham số $\lambda_2$ đóng vai trò quyết định đối với độ ổn định và độ bền vững của hệ thống cascade. Do đối tượng vòng ngoài có thời gian trễ lớn ($L_e \approx 12{,}367$ s) và quán tính nhiệt đáng kể, tham số $\lambda_2$ phải được chọn cùng bậc hoặc lớn hơn thời gian trễ chi phối của đối tượng. Theo các khuyến nghị trong điều khiển quá trình, điều kiện lựa chọn được áp dụng là $\lambda_2 \ge (3\text{--}5)L_e$
-Trong đồ án này, các giá trị $\lambda_2$ trong khoảng 30--60 s được khảo sát nhằm đảm bảo dự trữ pha đủ lớn và tránh hiện tượng dao động tích lũy trong hệ thống cascade.
-Đối với vòng điều khiển ngoài, tham số $\lambda_2$ phải được lựa chọn dựa trên động học của đối tượng vòng ngoài tương đương $G_{\text{outer}}(s) = W_2(s)O_1(s)$, trong đó $W_2(s)$ là hàm truyền vòng trong đã đóng. Do đối tượng bộ quá nhiệt có thời gian trễ lớn ($\tau_{bqn} = 12{,}367$ s) và quán tính nhiệt đáng kể, tham số $\lambda_2$ cần được chọn cùng bậc hoặc lớn hơn thời gian trễ của đối tượng, thường theo khuyến nghị $\lambda_2 \ge (3\text{–}5)\tau_{bqn}$. Trong đồ án này, các giá trị $\lambda_2$ trong khoảng 30–60 s được xem xét nhằm đảm bảo độ bền vững và tránh hiện tượng dao động tích lũy trong hệ thống cascade.
-
-\subsubsection{Tính toán tham số bộ điều khiển}
-
-Với các giá trị $\lambda$ đã chọn ($\lambda_1 \approx 0,641$ s cho vòng trong và $\lambda_2 = 40$ s cho vòng ngoài), bộ điều khiển IMC cho vòng trong được thiết kế trực tiếp trên mô hình van Q1T đã nhận dạng với $T = T_v = 3{,}484$ s, $\tau = \tau_v = 1{,}923$ s, $K = K_v = 1{,}02$. Áp dụng công thức IMC cho mô hình Q1T, ta thu được bộ điều khiển PI tương đương với các tham số:
-\begin{equation}
-K_{p1} = \frac{T_v}{K_v(\lambda_1 + \tau_v)} \approx 1,3322, \quad T_{i1} = T_v = 3,484 \text{ s}
-\end{equation}
-
-Bộ điều khiển cho vòng ngoài được thiết kế với $Q_2(s)$ dựa trên mô hình bộ quá nhiệt và bộ lọc với $\lambda_2$. Để áp dụng công thức IMC dạng Q1T, đối tượng Q2T được xấp xỉ tương đương Q1T với $T_e \approx T_1 + T_2 = 36{,}48$ s, $L_e \approx \tau_{bqn} = 12{,}367$ s, $K_e \approx K_{bqn} = 2,09$. Lưu ý: việc xấp xỉ Q2T về Q1T này chỉ được sử dụng cho mục đích chỉnh định bộ điều khiển theo phương pháp IMC, không làm thay đổi mô hình nhận dạng Q2T của đối tượng bộ quá nhiệt. Các tham số bộ điều khiển được tính như sau:
-\begin{equation}
-K_{p2} = \frac{T_e}{K_e(\lambda_2 + L_e)} = \frac{36,48}{2,09 \times (40 + 12,367)} \approx 0,333
-\end{equation}
-\begin{equation}
-T_{i2} = T_e = 36,48 \text{ s}
-\end{equation}
-
-Các tham số được tổng hợp trong \textbf{Bảng \ref{tab:tham_so_IMC}}.
-
-\begin{table}[htbp]
-\centering
-\caption{Tham số bộ điều khiển theo phương pháp IMC}
-\label{tab:tham_so_IMC}
-\renewcommand{\arraystretch}{1.2}
-\begin{tabular}{lccc}
-\toprule
-\textbf{Tham số} & \textbf{Vòng trong} & \textbf{Vòng ngoài} & \textbf{Ghi chú} \\
-\midrule
-$\lambda$ (s) & 0,641 & 40 & Tham số chỉnh định \\
-\midrule
-$K_p$ & 1,3322 & 0,333 & -- \\
-$T_i$ (s) & 3,484 & 36,48 & -- \\
-$T_d$ (s) & -- & -- & Không sử dụng \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\subsubsection{Kết quả mô phỏng}
-
-Sau khi thiết kế bộ điều khiển theo phương pháp IMC với các tham số đã tính toán, hệ thống điều khiển cascade được triển khai trên MATLAB/Simulink để đánh giá hiệu năng thực tế. Phương pháp IMC được kỳ vọng mang lại đáp ứng mượt mà với độ quá điều chỉnh thấp nhờ tham số chỉnh định $\lambda$ được chọn phù hợp, đồng thời duy trì tốc độ đáp ứng chấp nhận được.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.75\textwidth]{Hinhve/chuong2_ket_qua_IMC.png}
-\caption{Đáp ứng của hệ thống với bộ điều khiển IMC}
-\label{fig:ch2_ket_qua_IMC}
-\end{figure}
-
-\begin{table}[htbp]
-\centering
-\caption{Kết quả mô phỏng với phương pháp IMC}
-\label{tab:ket_qua_IMC}
-\renewcommand{\arraystretch}{1.2}
-\begin{tabular}{lcc}
-\toprule
-\textbf{Chỉ tiêu} & \textbf{Giá trị} & \textbf{Nhận xét} \\
-\midrule
-Thời gian lên $t_r$ (s) & $\approx 75$ & Tốc độ đáp ứng trung bình \\
-Thời gian xác lập $t_s$ (s) & $\approx 190$ & Thời gian ổn định chấp nhận được \\
-Độ quá điều chỉnh $M_p$ (\%) & $< 2$ & Rất nhỏ, gần như không vọt lố \\
-Sai số xác lập $e_{ss}$ ($^{\circ}\mathrm{C}$) & $\approx 0$ & Sai số triệt tiêu nhờ khâu tích phân \\
-\midrule
-\multicolumn{3}{l}{\textit{Đánh giá định tính}} \\
-\midrule
-Đáp ứng quá độ & Mượt mà & Không có dao động đáng kể \\
-Ổn định & Tốt & Hệ thống ổn định vững chắc \\
-Tốc độ & Trung bình & Cân bằng giữa tốc độ và ổn định \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\subsection{Phương pháp tổng hợp bộ điều chỉnh bền vững}
-
-Phương pháp điều chỉnh bền vững dựa trên việc xây dựng cấu trúc vòng kín có đặc tính động học mong muốn, với số tham số chỉnh định tối thiểu và độ bền vững cao đối với bất định mô hình và nhiễu. Nguyên lý cốt lõi của phương pháp là ép hệ thống vòng kín có đặc tính tiệm cận gần với khâu quán tính bậc nhất lý tưởng, thông qua việc lựa chọn bộ điều chỉnh phù hợp dựa trên mô hình danh định của đối tượng.
-
-\subsubsection{Nguyên tắc tổng hợp cơ bản}
-
-Xét đối tượng điều khiển có hàm truyền dạng:
-\begin{equation}
-O(s) = O_{PT}(s)\,e^{-\tau s},
-\end{equation}
-trong đó $O_{PT}(s)$ là phần không chứa trễ. Bộ điều chỉnh bền vững được xác định theo công thức tổng quát:
-\begin{equation}
-R(s) = \frac{1}{\theta s\,O_{PT}(s)},
-\end{equation}
-với $\theta$ là tham số điều chỉnh duy nhất, có thứ nguyên thời gian. Khi đó, hàm truyền vòng kín xấp xỉ:
-\begin{equation}
-W(s) \approx \frac{1}{1 + \theta s},
-\end{equation}
-cho thấy hệ kín có đặc tính của một khâu quán tính bậc nhất, đảm bảo đáp ứng đơn điệu, không dao động và có độ bền vững cao.
-
-Tham số $\theta$ được chọn dựa trên thời gian trễ chi phối $\tau$ của đối tượng theo quan hệ:
-\begin{equation}
-\theta = \theta_c\,\tau,
-\end{equation}
-trong đó $\theta_c$ được xác định từ chỉ số dao động cắt $m_c$ theo \textbf{Bảng \ref{tab:bang_9_2}}.
-
-\begin{table}[htbp]
-    \centering
-    \caption{Các chỉ tiêu chất lượng điều khiển ứng với chỉ số dao động cắt $m_c$}
-    \label{tab:bang_9_1}
-    \renewcommand{\arraystretch}{1.4}
-    \setlength{\tabcolsep}{4pt} % Giảm khoảng cách giữa các cột
-    \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
-    \hline
-    $m_c$ 
-    & 0,221 & 0,367 & 0,461 & 0,71 & 0,743 & 0,972 & 1,252 & 1,47 & 2,18 \\
-    \hline
-    $I_{2c}=\displaystyle\int \varepsilon^2(t)\,dt$
-    & 1,700 & 1,508 & \cellcolor{yellow}1,489 & 1,541 & 1,551 & 1,622 & 1,699 & 1,744 & 1,830 \\
-    \hline
-    $I_{1c}=\displaystyle\int |\varepsilon(t)|\,dt$
-    & 2,970 & 2,352 & 2,199 & \cellcolor{yellow}2,092 & 2,093 & 2,136 & 2,230 & 2,300 & 2,468 \\
-    \hline
-    $T_{qc}(5\%)$
-    & 10,36 & 6,67 & 6,6 & 5,16 & 5,16 & \cellcolor{yellow}3,21 & 3,73 & 3,96 & 4,64 \\
-    \hline
-    $\delta~(\%)$
-    & 52,66 & 33 & 24,47 & 11,11 & 10,01 & 4,86 & 2 & 1 & 0,1 \\
-    \hline
-    \end{tabular}
-\end{table}
-
-\begin{table}[htbp]
-    \centering
-    \caption{Các hệ số tổng hợp bộ điều khiển theo chỉ số $m_c$}
-    \label{tab:bang_9_2}
-    \renewcommand{\arraystretch}{1.4}
-    \setlength{\tabcolsep}{6pt}
-    \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
-    \hline
-    $m_c$
-    & 0,221 & 0,367 & 0,461 & 0,71 & 0,743 & 0,972 & 1,252 & 1,47 & 2,18 \\
-    \hline
-    $\psi_c$
-    & 0,75 & 0,9 & 0,945 & 0,988 & 0,991 & 0,998 & 0,999 & 1 & 1 \\
-    \hline
-    $\theta_c$
-    & 0,973 & 1,205 & 1,348 & 1,683 & 1,721 & 1,95 & 2,153 & 2,266 & 2,476 \\
-    \hline
-    $\omega_c$
-    & 1,353 & 1,219 & 1,139 & 0,953 & 0,932 & 0,80 & 0,674 & 0,597 & 0,43 \\
-    \hline
-    \end{tabular}
-\end{table}
-
-\subsubsection{Tổng hợp bộ điều chỉnh bền vững cho vòng trong}
-
-Đối tượng vòng trong (van điều khiển) có mô hình Q1T:
-\begin{equation}
-O_2(s) = \frac{K_v}{T_v s + 1}e^{-\tau_v s}.
-\end{equation}
-
-Phần không trễ của đối tượng là:
-\begin{equation}
-O_{2PT}(s) = \frac{K_v}{T_v s + 1}.
-\end{equation}
-
-Áp dụng công thức tổng hợp bền vững, bộ điều chỉnh vòng trong thu được:
-\begin{equation}
-R_2(s) = \frac{1}{\theta_1 s\,O_{2PT}(s)} = \frac{T_v s + 1}{K_v\,\theta_1\,s},
-\end{equation}
-là bộ điều chỉnh PI với các tham số:
-\begin{equation}
-T_{i1} = T_v, \qquad K_{p1} = \frac{1}{K_v\,\theta_1}.
-\end{equation}
-
-Tham số $\theta_1$ được chọn theo $\theta_1 = \theta_{c1}\tau_v$, với $\theta_{c1}$ xác định từ chỉ số dao động cắt mong muốn. Sau khi đóng vòng trong, hệ vòng kín được xấp xỉ bởi khâu quán tính bậc nhất:
-\begin{equation}
-W_2(s) \approx \frac{1}{1 + \theta_1 s}.
-\end{equation}
-
-\subsubsection{Tổng hợp bộ điều chỉnh bền vững cho vòng ngoài}
-
-Đối tượng vòng ngoài tương đương là tích của vòng trong đã đóng và đối tượng bộ quá nhiệt:
-\begin{equation}
-V(s) = W_2(s)\,O_1(s).
-\end{equation}
-
-Bỏ qua phần trễ khi tổng hợp, phần không trễ của đối tượng tương đương được viết dưới dạng:
-\begin{equation}
-V_{PT}(s) = \frac{K_V}{(T'_1 s + 1)(T'_2 s + 1)}.
-\end{equation}
-
-Bộ điều chỉnh bền vững vòng ngoài được xác định theo:
-\begin{equation}
-R_1(s) = \frac{1}{\theta_2 s\,V_{PT}(s)} = \frac{(T'_1 s + 1)(T'_2 s + 1)}{K_V\,\theta_2\,s},
-\end{equation}
-có dạng bộ điều chỉnh PID. Khai triển và chuyển về dạng chuẩn, các tham số PID được suy ra như sau:
-\begin{equation}
-K_{p2} = \frac{T'_1 + T'_2}{K_V\,\theta_2}, \qquad
-T_{i2} = T'_1 + T'_2, \qquad
-T_{d2} = \frac{T'_1 T'_2}{T'_1 + T'_2}.
-\end{equation}
-
-Tham số $\theta_2$ được chọn theo quan hệ:
-\begin{equation}
-\theta_2 = \theta_{c2}\tau_V,
-\end{equation}
-trong đó $\tau_V$ là thời gian trễ chi phối của đối tượng tương đương vòng ngoài, còn $\theta_{c2}$ được xác định từ chỉ số dao động cắt $m_c$ phù hợp với yêu cầu chất lượng điều khiển nhiệt độ.
-
-\subsubsection{Lựa chọn chỉ số dao động cắt và tính toán tham số}
-
-Chỉ số dao động cắt $m_c$ quyết định đặc tính động học của hệ thống vòng kín. Dựa trên \textbf{Bảng \ref{tab:bang_9_1}} và yêu cầu điều khiển nhiệt độ hơi quá nhiệt, ta cần đảm bảo:
-\begin{itemize}
-    \item Độ quá điều chỉnh nhỏ để tránh nhiệt độ vượt ngưỡng an toàn
-    \item Thời gian quá độ hợp lý để đáp ứng kịp thời với biến động tải
-    \item Chỉ tiêu tích phân sai số tối ưu để giảm tiêu hao năng lượng
-\end{itemize}
-
-Với yêu cầu độ quá điều chỉnh $\delta < 5\%$ và thời gian quá độ nhỏ, ta lựa chọn $m_c = 0{,}972$. Từ \textbf{Bảng \ref{tab:bang_9_2}}, các hệ số tương ứng là:
-\begin{equation}
-\theta_{c1} = \theta_{c2} = 1{,}95, \quad \omega_c = 0{,}80, \quad \psi_c = 0{,}998
-\end{equation}
-
-\textbf{Tính toán tham số bộ điều khiển vòng trong:}
-
-Với mô hình van $O_2(s)$ có $K_v = 1{,}02$, $T_v = 3{,}484$ s, $\tau_v = 1{,}923$ s, ta có:
-\begin{align}
-\theta_1 &= \theta_{c1}\tau_v = 1{,}95 \times 1{,}923 = 3{,}750~\text{s} \\
-K_{p1} &= \frac{1}{K_v\,\theta_1} = \frac{1}{1{,}02 \times 3{,}750} = 0{,}261 \\
-T_{i1} &= T_v = 3{,}484~\text{s}
-\end{align}
-
-Hàm truyền bộ điều khiển PI vòng trong:
-\begin{equation}
-R_2(s) = 0{,}261\left(1 + \frac{1}{3{,}484s}\right) = 0{,}261\frac{3{,}484s + 1}{3{,}484s}
-\end{equation}
-
-\textbf{Tính toán tham số bộ điều khiển vòng ngoài:}
-
-Để tính toán chính xác đối tượng tương đương vòng ngoài $V(s) = W_2(s)O_1(s)$, trước tiên cần xác định hàm truyền vòng kín của vòng trong $W_2(s)$.
-
-Với bộ điều khiển PI vòng trong $R_2(s) = 0{,}261\dfrac{3{,}484s + 1}{3{,}484s}$ và đối tượng van $O_2(s) = \dfrac{1{,}02}{3{,}484s + 1}e^{-1{,}923s}$, ta có:
-\begin{equation}
-R_2(s)O_2(s) = 0{,}261 \cdot \frac{3{,}484s + 1}{3{,}484s} \cdot \frac{1{,}02}{3{,}484s + 1}e^{-1{,}923s} = \frac{0{,}267}{3{,}484s}e^{-1{,}923s}
-\end{equation}
-
-Hàm truyền vòng kín của vòng trong:
-\begin{equation}
-W_2(s) = \frac{R_2(s)O_2(s)}{1 + R_2(s)O_2(s)} = \frac{\dfrac{0{,}267}{3{,}484s}e^{-1{,}923s}}{1 + \dfrac{0{,}267}{3{,}484s}e^{-1{,}923s}} = \frac{0{,}267e^{-1{,}923s}}{3{,}484s + 0{,}267e^{-1{,}923s}}
-\end{equation}
-
-Đối tượng tương đương vòng ngoài:
-\begin{equation}
-V(s) = W_2(s)O_1(s) = \frac{0{,}267e^{-1{,}923s}}{3{,}484s + 0{,}267e^{-1{,}923s}} \cdot \frac{2{,}09}{(18{,}243s + 1)(18{,}237s + 1)}e^{-12{,}367s}
-\end{equation}
-
-Sau khi khai triển và rút gọn:
-\begin{equation}
-V(s) = \frac{0{,}557e^{-14{,}290s}}{(3{,}484s + 0{,}267e^{-1{,}923s})(18{,}243s + 1)(18{,}237s + 1)}
-\end{equation}
-
-\subsubsection{Nhận dạng các tham số đặc trưng của $V(s)$}
-
-Các tham số đặc trưng của $V(s)$ được xác định tự động bằng cách sử dụng Python để mô phỏng đáp ứng bậc thang của $V(s) = W_2(s)O_1(s)$ với tín hiệu đầu vào là hàm bậc thang đơn vị, thu được đường đặc tính quá độ có dạng đường cong chữ S đặc trưng. Từ đó xác định các tham số tương đương Q2T bằng phương pháp nhận dạng tự động tương tự như phương pháp nhận dạng bộ quá nhiệt đã trình bày tại \textbf{\ref{nhan_dang_bqn}}. Phương pháp này thực hiện bài toán tối ưu hóa phi tuyến với ràng buộc để tìm bộ tham số tối ưu sao cho tổng bình phương sai số giữa đáp ứng mô hình và dữ liệu mô phỏng đạt giá trị cực tiểu.
-
-Quá trình nhận dạng được thực hiện với mô hình Q2T có trễ:
-\begin{equation}
-V(s) = \frac{K_V}{(T'_1 s + 1)(T'_2 s + 1)}e^{-\tau_V s}
-\end{equation}
-
-Kết quả nhận dạng tự động sử dụng phương pháp tối ưu hóa phi tuyến cho thấy mô hình Q2T thể hiện rất sát đặc tính động học của đối tượng tương đương $V(s)$, với hệ số xác định đạt $R^2 = 0{,}9997$. Các tham số tối ưu thu được sau nhận dạng như sau:
-\begin{align}
-K_V   &= 2{,}107 \\
-T'_1     &= 21{,}663~\text{s} \\
-T'_2     &= 21{,}661~\text{s} \\
-\tau_V &= 21{,}741~\text{s}
-\end{align}
-
-Dạng hàm truyền đạt được của đối tượng tương đương vòng ngoài là:
-\begin{equation}
-V(s) = \frac{2{,}107}{(21{,}663s + 1)(21{,}661s + 1)}e^{-21{,}741s}
-\end{equation}
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.7\textwidth]{Hinhve/chuong2_nhan_dang_v1s.png}
-\caption{So sánh đáp ứng mô phỏng (xanh) và mô hình Q2T đã nhận dạng (đỏ) của đối tượng $V(s)$}
-\label{fig:ch2_nhan_dang_v1s}
-\end{figure}
-
-\subsubsection{Mô hình hóa $V(s)$}
-
-Ngoài mô hình Q2T, đối tượng tương đương $V(s)$ cũng có thể được mô hình hóa dưới dạng khâu tích phân có quán tính và có trễ với hàm truyền:
-\begin{equation}
-V(s) = \frac{K_V}{s(T_V s + 1)}e^{-\tau_V s}
-\end{equation}
-trong đó $K_V$ là hệ số khuếch đại tích phân, $T_V$ là hằng số thời gian quán tính, và $\tau_V$ là thời gian trễ. Mô hình khâu tích phân có quán tính và có trễ phù hợp với các đối tượng có đặc tính tích phân rõ rệt, thể hiện qua đáp ứng quá độ tăng tuyến tính sau thời gian trễ ban đầu.
-
-Tuy nhiên, trong trường hợp đồ án này, đối tượng $V(s)$ được mô hình hóa dưới dạng Q2T do đặc tính quá độ có dạng đường cong chữ S rõ rệt, phù hợp với động học của hệ cascade và cho kết quả nhận dạng tốt hơn ($R^2 = 0{,}9997$).
-
-Tham số $\theta_2$ được tính:
-\begin{equation}
-\theta_2 = \theta_{c2}\tau_V = 1{,}95 \times 21{,}741 = 42{,}395~\text{s} \approx 42{,}4~\text{s}
-\end{equation}
-
-Các tham số bộ điều khiển PID vòng ngoài:
-\begin{align}
-K_{p2} &= \frac{T'_1 + T'_2}{K_V\,\theta_2} = \frac{43{,}324}{2{,}107 \times 42{,}395} = \frac{43{,}324}{89{,}325} = 0{,}485 \\
-T_{i2} &= T'_1 + T'_2 = 21{,}663 + 21{,}661 = 43{,}324~\text{s} \approx 43{,}3~\text{s} \\
-T_{d2} &= \frac{T'_1 T'_2}{T'_1 + T'_2} = \frac{21{,}663 \times 21{,}661}{43{,}324} = \frac{468{,}9}{43{,}324} = 10{,}82~\text{s}
-\end{align}
-
-Hàm truyền bộ điều khiển PID vòng ngoài:
-\begin{equation}
-R_1(s) = 0{,}485\left(1 + \frac{1}{43{,}3s} + 10{,}82s\right) = 0{,}485\frac{468{,}8s^2 + 43{,}3s + 1}{43{,}3s}
-\end{equation}
-
-\begin{table}[htbp]
-\centering
-\caption{Tham số bộ điều khiển theo phương pháp bền vững}
-\label{tab:tham_so_ben_vung}
-\renewcommand{\arraystretch}{1.5}
-\begin{tabular}{lccc}
-\toprule
-\textbf{Tham số} & \textbf{Vòng trong} & \textbf{Vòng ngoài} & \textbf{Ghi chú} \\
-\midrule
-Chỉ số $m_c$ & 0,972 & 0,972 & Độ quá điều chỉnh $< 5\%$ \\
-\midrule
-$\theta_c$ & 1,95 & 1,95 & Từ \textbf{Bảng \ref{tab:bang_9_2}} \\
-\midrule
-$\theta$ (s) & 3,75 & 42,4 & $\theta = \theta_c\tau$ \\
-\midrule
-$K_p$ & 0,261 & 0,485 & -- \\
-$T_i$ (s) & 3,48 & 43,3 & -- \\
-$T_d$ (s) & -- & 10,8 & -- \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\subsubsection{Công thức hiệu chỉnh tăng cường kháng nhiễu}
-
-Để cải thiện khả năng kháng nhiễu đo lường, đặc biệt đối với tín hiệu nhiệt độ có thể chứa nhiễu tần số cao, phương pháp bền vững đề xuất hiệu chỉnh các tham số bộ điều khiển theo công thức tăng cường kháng nhiễu. Các hệ số hiệu chỉnh được xác định:
-
-Với tần số cắt $\omega_c = 0{,}80$ từ \textbf{Bảng \ref{tab:bang_9_2}}, các hệ số hiệu chỉnh cho vòng ngoài:
-\begin{align}
-B &= \frac{0{,}12\,\omega_c\,T_{d2}}{1 + 1/T_{i2}} = \frac{0{,}12 \times 0{,}80 \times 10{,}82}{1 + 1/43{,}3} \approx 1{,}004 \\
-A &= \frac{0{,}35(1 + B)\dfrac{\omega_c}{\tau_V}}{1{,}5 + 5/T_{i2} + T_{d2}} = \frac{0{,}35 \times 2{,}004 \times \dfrac{0{,}80}{21{,}741}}{1{,}5 + 5/43{,}3 + 10{,}82} \approx 0{,}002
-\end{align}
-
-Các tham số bộ điều khiển sau khi hiệu chỉnh:
-\begin{align}
-K_{p2}^* &= K_{p2}(1 + B) = 0{,}485 \times 2{,}004 = 0{,}972 \\
-T_{i2}^* &= T_{i2} = 43{,}3~\text{s}~\text{(không thay đổi)} \\
-T_{d2}^* &= T_{d2} = 10{,}82~\text{s}~\text{(không thay đổi)}
-\end{align}
-
-Lưu ý rằng công thức hiệu chỉnh này là tùy chọn và chỉ nên áp dụng khi hệ thống thực tế gặp vấn đề về nhiễu đo lường nghiêm trọng. Trong mô phỏng ban đầu, sử dụng bộ tham số cơ bản không hiệu chỉnh.
-
-\subsubsection{Kết quả mô phỏng}
-
-Để kiểm tra và quan sát đáp ứng của bộ điều khiển bền vững đã thiết kế, hệ thống điều khiển cascade được mô phỏng trên MATLAB/Simulink. Mục đích của mô phỏng là xem xét đặc tính động học của hệ thống với bộ điều khiển bền vững, đặc biệt là đáp ứng quá độ và khả năng ổn định của hệ thống. Đáp ứng của hệ thống với tín hiệu đặt bậc thang được thể hiện trong \textbf{Hình \ref{fig:ch2_ket_qua_ben_vung}}.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.85\textwidth]{Hinhve/chuong2_ket_qua_ben_vung.png}
-\caption{Đáp ứng của hệ thống với bộ điều khiển bền vững}
-\label{fig:ch2_ket_qua_ben_vung}
-\end{figure}
-
-Từ đáp ứng mô phỏng có thể quan sát thấy hệ thống có đặc tính động học tốt: đáp ứng mượt mà, độ quá điều chỉnh nhỏ (khoảng 2\%), và hệ thống hội tụ ổn định về giá trị đặt. Điều này chứng tỏ phương pháp tổng hợp bộ điều khiển bền vững đã đạt được mục tiêu thiết kế với chỉ số dao động cắt $m_c = 0{,}972$, đảm bảo độ quá điều chỉnh nhỏ hơn 5\% như yêu cầu.
-
-\section{Đánh giá kết quả các phương pháp}
-
-Phần này trình bày đánh giá chi tiết kết quả của từng phương pháp tổng hợp bộ điều khiển đã được trình bày trong Section 2.3, bao gồm phân tích các chỉ tiêu chất lượng điều khiển, ưu nhược điểm và khả năng ứng dụng thực tế của từng phương pháp.
-
-\subsection{Kết quả với phương pháp Ziegler--Nichols}
-
-Kết quả mô phỏng cho thấy bộ điều khiển chỉnh định theo phương pháp Ziegler--Nichols với việc nhận dạng chính xác đối tượng tương đương từ đáp ứng bước đã đạt được hiệu năng tốt. Cụ thể, với các tham số được tính toán từ công thức Ziegler--Nichols ($K_{p2} = 0{,}7178$, $T_{i2} = 48{,}3165$ s, $T_{d2} = 12{,}0791$ s), hệ thống đạt được độ quá điều chỉnh $M_p \approx 3$--$4\%$, thời gian xác lập $t_s \approx 150$--$200$ s và thời gian lên $t_r \approx 50$--$60$ s. Đáp ứng quá độ mượt mà với dao động nhẹ và tắt dần nhanh, phù hợp với yêu cầu điều khiển nhiệt độ hơi quá nhiệt.
-
-Điểm khác biệt quan trọng so với phương pháp Ziegler--Nichols truyền thống là việc nhận dạng chính xác đối tượng tương đương $G(s) = W_2(s)O_1(s)$ từ đáp ứng bước thực tế, thay vì sử dụng các xấp xỉ đơn giản. Điều này đã giúp tính toán được các tham số bộ điều khiển phù hợp với động học thực tế của hệ thống cascade, cho phép hệ thống đạt được hiệu năng tốt mà không cần tinh chỉnh tham số. Kết quả này chứng tỏ tầm quan trọng của việc áp dụng đúng phương pháp Ziegler--Nichols với việc xác định chính xác các tham số đặc trưng từ đáp ứng bước.
-
-Tuy nhiên, cần lưu ý rằng phương pháp Ziegler--Nichols truyền thống (khi áp dụng với các xấp xỉ đơn giản) thường cho ra các tham số bộ điều khiển quá tích cực đối với các đối tượng có thời gian trễ lớn, có thể dẫn đến dao động mạnh hoặc mất ổn định. Trong đồ án này, việc nhận dạng chính xác đối tượng tương đương đã khắc phục được hạn chế này, cho phép phương pháp Ziegler--Nichols đạt được hiệu năng tốt và phù hợp với yêu cầu điều khiển nhiệt độ hơi quá nhiệt.
-
-\subsection{Kết quả với phương pháp IMC}
-
-Bộ điều khiển thiết kế theo phương pháp IMC cho đáp ứng êm dịu, độ quá điều chỉnh nhỏ và thời gian xác lập giảm đáng kể so với phương pháp Ziegler--Nichols. Kết quả mô phỏng cho thấy với tham số $\lambda_2 = 40$ s, hệ thống đạt được độ quá điều chỉnh $M_p < 2\%$, thời gian xác lập $t_s \approx 190$ s và thời gian lên $t_r \approx 75$ s. Hệ thống nhanh chóng đạt trạng thái ổn định với sai số xác lập bằng không nhờ khâu tích phân trong bộ điều khiển.
-
-Ưu điểm nổi bật của phương pháp IMC là tính trực quan và dễ điều chỉnh thông qua tham số $\lambda$. Giá trị $\lambda$ lớn cho hệ thống chậm hơn nhưng bền vững hơn, trong khi giá trị $\lambda$ nhỏ cho đáp ứng nhanh hơn nhưng nhạy cảm hơn với nhiễu và sai số mô hình. Trong đồ án này, việc lựa chọn $\lambda_2 = 40$ s (tương đương khoảng 3--4 lần thời gian trễ của đối tượng) đã đảm bảo sự cân bằng tốt giữa tốc độ đáp ứng và độ bền vững.
-
-Đáp ứng quá độ của hệ thống với bộ điều khiển IMC không có dao động đáng kể, phù hợp với yêu cầu điều khiển nhiệt độ hơi quá nhiệt. Tuy nhiên, hiệu năng của IMC phụ thuộc mạnh vào độ chính xác của mô hình đối tượng. Với hệ thống cascade có thời gian trễ lớn, cần thiết kế IMC trên đối tượng tương đương vòng ngoài $G(s) = W_2(s)O_1(s)$ và chọn $\lambda_2$ đủ lớn để đảm bảo dự trữ ổn định. Phương pháp IMC cho kết quả tương đương với Ziegler--Nichols khi cả hai đều được áp dụng đúng cách với việc nhận dạng chính xác đối tượng tương đương.
-
-\subsection{Kết quả với bộ điều khiển bền vững}
-
-Bộ điều khiển bền vững cho chất lượng điều khiển tốt nhất trong ba phương pháp khảo sát. Đáp ứng gần dạng khâu bậc nhất, không dao động rõ rệt, độ quá điều chỉnh rất nhỏ (khoảng 2\%) và thời gian xác lập ngắn ($t_s \approx 260$ s). Hệ thống hội tụ ổn định về giá trị đặt với đặc tính động học mượt mà, phù hợp với yêu cầu điều khiển nhiệt độ hơi quá nhiệt.
-
-Nguyên lý cốt lõi của phương pháp bền vững là ép hệ thống vòng kín có đặc tính tiệm cận gần với khâu quán tính bậc nhất lý tưởng, đảm bảo đáp ứng đơn điệu và không dao động. Với chỉ số dao động cắt $m_c = 0{,}972$ được lựa chọn dựa trên yêu cầu độ quá điều chỉnh $\delta < 5\%$, hệ thống đạt được các chỉ tiêu chất lượng điều khiển tối ưu: chỉ tiêu tích phân sai số $I_{2c} = 1{,}622$ và thời gian quá độ $T_{qc}(5\%) = 3{,}21$ (theo \textbf{Bảng \ref{tab:bang_9_1}}).
-
-Đặc biệt, phương pháp này đảm bảo độ bền vững cao trước sự thay đổi tham số và nhiễu, phù hợp với điều kiện vận hành thực tế của nhà máy nhiệt điện. Cấu trúc bộ điều khiển được thiết kế dựa trên mô hình danh định của đối tượng với số tham số chỉnh định tối thiểu (chỉ số $m_c$), giúp đơn giản hóa quá trình chỉnh định và triển khai. Khả năng kháng nhiễu của phương pháp bền vững được thể hiện qua việc hệ thống duy trì chất lượng điều khiển tốt ngay cả khi có sự thay đổi nhỏ trong tham số đối tượng hoặc tác động của nhiễu đo lường.
-
-\section{So sánh và lựa chọn phương án điều khiển}
-
-Để đưa ra quyết định lựa chọn phương án điều khiển tối ưu, cần so sánh tổng hợp các chỉ tiêu hiệu năng và đặc tính của ba phương pháp đã nghiên cứu. \textbf{Bảng \ref{tab:so_sanh_tong_hop}} tổng hợp các chỉ tiêu chất lượng điều khiển chính của từng phương pháp.
-
-\begin{table}[htbp]
-\centering
-\caption{So sánh tổng hợp các phương pháp tổng hợp bộ điều khiển}
-\label{tab:so_sanh_tong_hop}
-\renewcommand{\arraystretch}{1.5}
-\begin{tabular}{lccc}
-\toprule
-\textbf{Chỉ tiêu} & \textbf{Ziegler--Nichols} & \textbf{IMC} & \textbf{Bền vững} \\
-\midrule
-Độ quá điều chỉnh $M_p$ (\%) & $\approx 3$--$4$ & $< 2$ & $\approx 2$ \\
-Thời gian lên $t_r$ (s) & $\approx 50$--$60$ & $\approx 75$ & $\approx 80$ \\
-Thời gian xác lập $t_s$ (s) & $\approx 150$--$200$ & $\approx 190$ & $\approx 260$ \\
-Sai số xác lập $e_{ss}$ ($^{\circ}\mathrm{C}$) & $\approx 0$ & $\approx 0$ & $\approx 0$ \\
-Độ dao động & Nhẹ, tắt dần nhanh & Không đáng kể & Không đáng kể \\
-Độ bền vững & Thấp & Trung bình & Cao \\
-Độ phức tạp thiết kế & Thấp & Trung bình & Trung bình \\
-Số tham số chỉnh định & 3 ($K_p$, $T_i$, $T_d$) & 1 ($\lambda$) & 1 ($m_c$) \\
-Phù hợp thực tế & Tốt & Tốt & Tốt nhất \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-So sánh tổng hợp cho thấy:
-
-\begin{itemize}
-    \item \textbf{Ziegler--Nichols:} Với việc nhận dạng chính xác đối tượng tương đương từ đáp ứng bước, phương pháp Ziegler--Nichols đạt được chất lượng điều khiển tốt với độ quá điều chỉnh nhỏ ($\approx 3$--$4\%$), thời gian xác lập hợp lý ($\approx 150$--$200$ s) và đáp ứng mượt mà. Phương pháp này đơn giản về mặt thiết kế và không cần tinh chỉnh tham số khi áp dụng đúng cách với việc nhận dạng chính xác đối tượng tương đương. Điểm quan trọng là cần mô phỏng đáp ứng bước và nhận dạng các tham số đặc trưng một cách chính xác, thay vì sử dụng các xấp xỉ đơn giản có thể dẫn đến kết quả không chính xác.
-    
-    \item \textbf{IMC:} Chất lượng điều khiển tốt với độ quá điều chỉnh rất nhỏ ($< 2\%$), đáp ứng mượt mà và thời gian xác lập tương đương với Ziegler--Nichols ($\approx 190$ s). Phương pháp này có cấu trúc đơn giản, dễ triển khai với chỉ một tham số chỉnh định ($\lambda$), và phù hợp với các hệ thống có mô hình chính xác. Tuy nhiên, hiệu năng của IMC phụ thuộc mạnh vào độ chính xác của mô hình đối tượng và cần thiết kế cẩn thận trên đối tượng tương đương vòng ngoài trong cấu trúc cascade.
-    
-    \item \textbf{Điều khiển bền vững:} Chất lượng điều khiển cao nhất với độ quá điều chỉnh rất nhỏ ($\approx 2\%$), đáp ứng gần dạng khâu bậc nhất, không dao động và có độ bền vững cao trước sự thay đổi tham số và nhiễu. Phương pháp này đảm bảo đáp ứng tốt các yêu cầu về an toàn và ổn định, phù hợp với điều kiện vận hành thực tế của nhà máy nhiệt điện. Với chỉ một tham số chỉnh định ($m_c$), quá trình thiết kế và triển khai được đơn giản hóa đáng kể.
-\end{itemize}
-
-Trong phạm vi nghiên cứu của đồ án, bộ điều khiển bền vững được lựa chọn là phương án tối ưu để triển khai và đề xuất ứng dụng. Quyết định này dựa trên các lý do sau:
-
-\begin{enumerate}
-    \item \textbf{Chất lượng điều khiển vượt trội:} Bộ điều khiển bền vững đạt được các chỉ tiêu chất lượng tốt nhất, đặc biệt là độ quá điều chỉnh rất nhỏ và đáp ứng mượt mà, phù hợp với yêu cầu an toàn của hệ thống điều khiển nhiệt độ hơi quá nhiệt.
-    
-    \item \textbf{Độ bền vững cao:} Phương pháp bền vững đảm bảo hệ thống duy trì chất lượng điều khiển tốt ngay cả khi có sự thay đổi nhỏ trong tham số đối tượng hoặc tác động của nhiễu, phù hợp với điều kiện vận hành thực tế của nhà máy nhiệt điện.
-    
-    \item \textbf{Đơn giản trong thiết kế và triển khai:} Với chỉ một tham số chỉnh định ($m_c$), quá trình thiết kế và chỉnh định được đơn giản hóa, giảm thiểu thời gian và chi phí triển khai.
-    
-    \item \textbf{Phù hợp với đặc tính động học:} Phương pháp bền vững được thiết kế đặc biệt cho các đối tượng có trễ lớn và quán tính cao, phù hợp với đặc tính của hệ thống nghiên cứu.
-\end{enumerate}
-
-\section{Kết luận chương}
-
-Chương này đã trình bày đầy đủ quá trình nhận dạng đối tượng, thiết kế cấu trúc điều khiển cascade và đánh giá chất lượng hệ thống thông qua mô phỏng số. Các kết quả chính đạt được bao gồm:
-
-\begin{enumerate}
-    \item \textbf{Nhận dạng đối tượng điều khiển:} Đã xác định thành công mô hình toán học của hai đối tượng chính trong hệ thống cascade. Đối tượng van điều khiển được mô hình hóa bằng mô hình Q1T với hệ số xác định $R^2 = 0{,}9965$, trong khi đối tượng bộ quá nhiệt được mô hình hóa bằng mô hình Q2T với hệ số xác định $R^2 = 0{,}9986$. Các mô hình này phản ánh chính xác đặc tính động học của đối tượng thực và đủ tin cậy để phục vụ tổng hợp bộ điều khiển.
-    
-    \item \textbf{Thiết kế hệ thống điều khiển cascade:} Đã thiết kế thành công cấu trúc điều khiển cascade hai vòng phù hợp với đặc tính động học của các đối tượng. Sự chênh lệch lớn về tốc độ đáp ứng giữa vòng trong (van) và vòng ngoài (bộ quá nhiệt) với tỷ lệ tốc độ $(T_1+T_2)/T_v \approx 10{,}47$ vượt xa yêu cầu tối thiểu 3--5, tạo điều kiện lý tưởng cho việc áp dụng cấu trúc cascade. Kết quả cho thấy việc lựa chọn cấu trúc cascade là hoàn toàn phù hợp với đặc tính động học của hệ thống điều khiển nhiệt độ hơi quá nhiệt.
-    
-    \item \textbf{Tổng hợp và đánh giá bộ điều khiển:} Đã nghiên cứu và so sánh ba phương pháp tổng hợp bộ điều khiển: Ziegler--Nichols, IMC và điều khiển bền vững. Kết quả mô phỏng cho thấy cả ba phương pháp đều đạt được chất lượng điều khiển tốt. Phương pháp Ziegler--Nichols với việc nhận dạng chính xác đối tượng tương đương đạt độ quá điều chỉnh nhỏ ($\approx 3$--$4\%$) và thời gian xác lập hợp lý ($\approx 150$--$200$ s). Phương pháp IMC cho đáp ứng mượt mà với độ quá điều chỉnh rất nhỏ ($< 2\%$). Phương pháp bền vững đạt chất lượng điều khiển tốt nhất với độ quá điều chỉnh rất nhỏ ($\approx 2\%$), đáp ứng mượt mà và độ bền vững cao. So sánh các phương pháp cho thấy bộ điều khiển bền vững có chất lượng điều khiển vượt trội, đáp ứng tốt các yêu cầu về ổn định, độ chính xác và an toàn vận hành.
-    
-    \item \textbf{Lựa chọn phương án tối ưu:} Dựa trên kết quả so sánh tổng hợp, bộ điều khiển bền vững được lựa chọn là phương án tối ưu để triển khai và đề xuất ứng dụng trong thực tế. Quyết định này được biện minh bởi chất lượng điều khiển vượt trội, độ bền vững cao và tính đơn giản trong thiết kế và triển khai.
-\end{enumerate}
-
-Các kết quả đạt được trong chương này là cơ sở để đề xuất triển khai hệ thống điều khiển trong thực tế và làm tiền đề cho các nghiên cứu mở rộng trong các chương tiếp theo. Hệ thống điều khiển cascade với bộ điều khiển bền vững đã được thiết kế và đánh giá đầy đủ, sẵn sàng cho việc triển khai thực tế và các nghiên cứu tiếp theo về tối ưu hóa và mở rộng ứng dụng.
+Bảng số liệu thực nghiệm này cung cấp đầy đủ thông tin để thực hiện nhận dạng đối tượng bằng phương pháp đồ họa kẻ-vẽ tiếp tuyến tại điểm uốn, là cơ sở trực tiếp cho quá trình mô hình hóa và tổng hợp bộ điều khiển được trình bày chi tiết trong Chương 3.
 
 \end{document}

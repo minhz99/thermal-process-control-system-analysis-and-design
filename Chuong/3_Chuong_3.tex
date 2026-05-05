@@ -3,187 +3,115 @@
 \documentclass[../main.tex]{subfiles}
 \begin{document}
 
-Chương này trình bày quá trình thiết kế và xây dựng chương trình điều khiển trên PLC Siemens S7-1200 cho bài toán điều khiển nhiệt độ hơi quá nhiệt trên phần mềm TIA Portal V15. Nội dung tập trung vào cấu hình phần cứng ở mức logic (khai báo kênh vào/ra tương tự, ánh xạ địa chỉ I/O và biến), xây dựng các network chương trình điều khiển, xử lý chế độ vận hành, cảnh báo, và tích hợp khối PID\_Compact.
+\section{Phương pháp nhận dạng đối tượng}
 
-\section{Sơ đồ thiết bị điều khiển}
+Nhận dạng hệ thống (system identification) là quá trình xác định mô hình toán học của đối tượng điều khiển dựa trên dữ liệu thực nghiệm thu thập từ quá trình vận hành. Đây là bước khởi đầu bắt buộc và có tầm quan trọng quyết định đến chất lượng của toàn bộ quá trình thiết kế bộ điều khiển: một mô hình đối tượng không chính xác sẽ dẫn đến bộ điều khiển không phù hợp, bất kể phương pháp thiết kế bộ điều khiển có tinh vi đến đâu.
 
-Phần này mô tả mô hình chức năng và luồng tín hiệu logic của hệ thống điều khiển nhiệt độ hơi quá nhiệt trên PLC S7-1200. Mục tiêu là làm rõ các khối chức năng cùng cách trao đổi dữ liệu giữa chúng, nhằm phục vụ cho việc thiết kế biến, cấu hình I/O ở mức logic và tổ chức chương trình điều khiển trong TIA Portal. Do phạm vi chương tập trung vào lập trình và mô phỏng, nội dung không đề cập đến phương án lắp đặt/đấu nối và chi tiết phần cứng hiện trường.
+Trong phạm vi bài tập lớn này, đối tượng điều khiển được nghiên cứu là vòng điều chỉnh lưu lượng dầu nhiên liệu, trong đó tín hiệu vào là độ mở van điều chỉnh FCV (biểu diễn qua phần trăm độ mở van, \%) và tín hiệu ra là lưu lượng dầu đo được bởi lưu lượng kế FT (đơn vị t/h). Phương pháp thực nghiệm hàm quá độ (transient response method) được áp dụng để nhận dạng: một tín hiệu vào dạng hàm bậc thang với biên độ $u_0 = 5{,}1$ được tác động lên đối tượng và đáp ứng đầu ra $y(t)$ được ghi lại theo thời gian cho đến khi hệ thống đạt trạng thái xác lập. Đồ thị đáp ứng quá độ $h(t)$ thu được là cơ sở để phân tích và xác định các thông số mô hình.
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.9\textwidth]{Hinhve/chuong3_so_do_thiet_bi.png}
-\caption{Sơ đồ thiết bị điều khiển hệ thống nhiệt độ hơi quá nhiệt}
-\label{fig:ch3_so_do_thiet_bi}
+\section{Phân tích và biến đổi sơ đồ cấu trúc}
+
+Sơ đồ cấu trúc của vòng điều khiển thực tế bao gồm nhiều khâu nối tiếp: khâu khuếch đại của van FCV, đặc tính truyền dẫn của hệ thống đường ống và khâu trễ đo lường của cảm biến. Trong quá trình nhận dạng, toàn bộ các thành phần này được gộp lại thành một đối tượng tổng hợp duy nhất (lumped parameter model), phản ánh đặc tính tổng thể của đường truyền từ tín hiệu điều khiển đến tín hiệu đầu ra đo được.
+
+Quan sát đồ thị đáp ứng quá độ $h(t)$ của hệ thống, có thể nhận thấy đường cong đáp ứng có dạng chữ S đặc trưng (S-shaped response), cho thấy đây là một đối tượng có quán tính bậc cao (bậc từ 2 trở lên) với tự cân bằng. Đặc điểm quan trọng là điểm bắt đầu tăng của đáp ứng bị trễ so với thời điểm tác động tín hiệu vào, phản ánh thời gian trễ thuần $\tau$ do chiều dài đường ống và quán tính cơ học của van. Sau khoảng thời gian trễ này, đáp ứng tăng dần và hội tụ về giá trị xác lập hữu hạn, xác nhận đặc tính tự cân bằng của đối tượng.
+
+Đối với các đối tượng có đặc tính quán tính bậc cao nhưng có tự cân bằng, mô hình quán tính bậc hai có trễ (Second-Order Plus Dead Time – SOPDT) là lựa chọn phổ biến vì cho phép biểu diễn đủ chính xác đặc tính động học của hệ thống mà không làm phức tạp quá mức quá trình tính toán bộ điều khiển. Hàm truyền của mô hình SOPDT có dạng:
+\begin{equation}
+    O(s) = \frac{K \cdot e^{-\tau s}}{(1 + T_1 s)(1 + T_2 s)}
+    \label{eq:ham_truyen_doi_tuong}
+\end{equation}
+trong đó $K$ là hệ số truyền tĩnh (static gain), $T_1$ và $T_2$ là các hằng số thời gian quán tính và $\tau$ là thời gian trễ thuần. Hàm quá độ tương ứng là:
+\begin{equation}
+    h_M(t) = K \cdot x_0 \left[1 - \frac{T_1}{T_1 - T_2} e^{-(t-\tau)/T_1} + \frac{T_2}{T_1 - T_2} e^{-(t-\tau)/T_2}\right]
+    \label{eq:ham_qua_do}
+\end{equation}
+
+\section{Mô hình hóa đối tượng tương đương}
+
+Phương pháp kẻ-vẽ tiếp tuyến tại điểm uốn (tangent method at inflection point) là phương pháp đồ họa kinh điển để xác định các tham số của mô hình SOPDT từ đồ thị đáp ứng quá độ thực nghiệm. Phương pháp này được thực hiện qua ba bước tuần tự.
+
+\textbf{Bước 1: Xác định điểm uốn và kẻ đường tiếp tuyến.} Từ đồ thị đáp ứng quá độ $h(t)$, điểm uốn U là điểm tại đó tốc độ tăng của đáp ứng đạt cực đại, tức là $h''(t_u) = 0$. Tiếp tuyến được kẻ qua điểm U, cắt đường nằm ngang $y = y(0)$ tại điểm A và cắt đường tiệm cận $y = y(\infty)$ tại điểm B. Từ dữ liệu thực nghiệm đã thu thập ở Chương 2, các tọa độ các điểm đặc trưng được xác định là: điểm A$(2{,}579;\; 1{,}3)$, điểm B$(11{,}74;\; 2{,}8)$, điểm C$(11{,}744;\; 1{,}3)$ (hình chiếu vuông góc của B), và điểm uốn U$(6{,}2;\; 1{,}88)$. Từ đó xác định được: giá trị xác lập $y(\infty) = 2{,}8 - 1{,}3 = 1{,}5$; chiều cao điểm uốn $y_u = 1{,}88 - 1{,}3 = 0{,}58$; thời gian tại điểm uốn $t_u = 6{,}2\,\text{s}$; và khoảng thời gian đặc trưng $T_{AC} = 11{,}744 - 2{,}579 = 9{,}165\,\text{s}$.
+
+\textbf{Bước 2: Xác định hệ số truyền K và phân loại mô hình.} Hệ số truyền tĩnh được tính theo:
+\begin{equation}
+    K = \frac{y(\infty)}{u_0} = \frac{1{,}5}{5{,}1} = 0{,}294
+\end{equation}
+Độ cao tương đối của điểm uốn được tính theo:
+\begin{equation}
+    g = \frac{y_u}{y(\infty)} = \frac{0{,}58}{1{,}5} = 0{,}386
+\end{equation}
+Vì $g = 0{,}386 > g_m = 0{,}2642$, điểm uốn nằm ở vị trí cao hơn điểm uốn chuẩn của mô hình SOPDT thông thường. Do đó đối tượng thuộc loại mô hình SOPDT với $T_1 = T_2$, tức là hai hằng số thời gian quán tính bằng nhau.
+
+\textbf{Bước 3: Xác định các tham số mô hình theo công thức điểm uốn cao.} Độ vượt ngưỡng được tính là $\delta = g - g_m = 0{,}386 - 0{,}2642 = 0{,}1218$. Hằng số quán tính $T = T_1 = T_2$ được xác định theo:
+\begin{equation}
+    T = \frac{T_{AC}(1 - 0{,}8\delta)}{e} = \frac{9{,}165 \times (1 - 0{,}8 \times 0{,}1218)}{e} = 3{,}04\,\text{s}
+\end{equation}
+Thời gian trễ thuần được xác định theo:
+\begin{equation}
+    \tau = t_u - \frac{T_{AC}(1 + 2{,}4\delta)}{e} = 6{,}2 - \frac{9{,}165 \times (1 + 2{,}4 \times 0{,}1218)}{e} = 1{,}84\,\text{s}
+\end{equation}
+
+Kết quả nhận dạng cho bộ tham số đặc trưng gồm: hệ số truyền $K = 0{,}294$, hằng số thời gian quán tính $T_1 = T_2 = 3{,}04\,\text{s}$, và thời gian trễ thuần $\tau = 1{,}84\,\text{s}$. Hàm truyền hoàn chỉnh của đối tượng sau nhận dạng là:
+\begin{equation}
+    O(s) = \frac{0{,}294}{(1 + 3{,}04s)^2} \cdot e^{-1{,}84s}
+    \label{eq:ham_truyen_nhan_dang}
+\end{equation}
+
+\section{Phương pháp tổng hợp bộ điều khiển bền vững tối ưu}
+
+Để đảm bảo hệ thống điều khiển hoạt động ổn định không chỉ tại điểm làm việc danh định mà còn khi có nhiễu loạn và sai lệch mô hình (model mismatch), phương pháp tổng hợp bộ điều khiển bền vững (robust controller design) được áp dụng. Tiêu chí tối ưu được lựa chọn là cực tiểu hóa tích phân bình phương sai số điều chỉnh (integral square error – ISE):
+\begin{equation}
+    I = \int_0^{\infty} \varepsilon^2(t)\,dt \rightarrow \min
+\end{equation}
+
+Phương pháp tổng hợp $R_1$ được áp dụng với điều kiện ràng buộc về biên độ bền vững $m_c$. Kết quả tính toán tối ưu hóa cho giá trị tích phân sai số cực tiểu $I_{\min} = 1{,}489$ tương ứng với hệ số bền vững tối ưu:
+\begin{equation}
+    m_c = 0{,}461;\qquad \theta_c = 1{,}348 \;\Rightarrow\; \theta = \theta_c \cdot \tau = 1{,}348 \times 1{,}84 = 2{,}48\,\text{s}
+\end{equation}
+
+Bộ điều khiển bền vững tối ưu $R_1(s)$ được xác định bằng cách nghịch đảo hàm truyền đối tượng không trễ $O_{PT}(s)$ và bổ sung thành phần tích phân nhằm đảm bảo sai lệch tĩnh bằng không:
+\begin{align}
+    R_1(s) &= \frac{1}{\theta s} \cdot [O_{PT}(s)]^{-1} = \frac{1}{2{,}48s} \cdot \frac{(1 + 3{,}04s)^2}{0{,}294} \notag \\
+    &= \frac{9{,}2416s^2 + 6{,}08s + 1}{0{,}294 \times 2{,}48s} = 8{,}33 + 12{,}67s + \frac{1{,}372}{s} \notag \\
+    &= 8{,}33\left(1 + \frac{1}{6{,}073s} + 1{,}52s\right)
+    \label{eq:bo_dieu_khien}
+\end{align}
+
+Như vậy, bộ PID được tổng hợp có các tham số: hệ số tỷ lệ $K_p = 8{,}33$, hằng số thời gian tích phân $T_i = 6{,}073\,\text{s}$, và hằng số thời gian vi phân $T_d = 1{,}52\,\text{s}$. Giá trị $T_i$ khá lớn phản ánh đặc tính quán tính và trễ của đối tượng, giúp tránh dao động quá mạnh trong khi vẫn triệt tiêu sai lệch tĩnh. Thành phần vi phân $T_d$ phụ trợ cải thiện tốc độ đáp ứng trong giai đoạn quá độ ban đầu.
+
+\section{Các chỉ tiêu đánh giá chất lượng}
+
+Chất lượng của hệ thống điều khiển vòng kín được đánh giá toàn diện qua bốn chỉ tiêu trong miền thời gian, rút ra từ đường cong đáp ứng bậc thang (step response) của hệ kín.
+
+Thời gian quá độ (settling time, $T_s$) là khoảng thời gian từ khi có tín hiệu đặt đến khi đáp ứng ra bám vào dải $\pm 5\%$ xung quanh giá trị xác lập và không ra khỏi dải này nữa. Kết quả mô phỏng cho thấy $T_s \approx 26\,\text{s}$, giá trị này hoàn toàn chấp nhận được trong bối cảnh vận hành lò hơi, nơi quán tính nhiệt lớn và thay đổi tải thường diễn ra từ từ.
+
+Thời gian đạt đỉnh (peak time, $T_p$) là thời gian để đáp ứng đạt giá trị cực đại đầu tiên, $T_p \approx 4\,\text{s}$. Tốc độ đáp ứng này được đánh giá là tốt so với hằng số thời gian quán tính $T = 3{,}04\,\text{s}$ của đối tượng.
+
+Độ vọt lố (percent overshoot, $O_s$) phản ánh mức độ đáp ứng vượt quá giá trị xác lập, được tính theo:
+\begin{equation}
+    O_s = \frac{y_{\max} - y_\infty}{y_\infty} \times 100\% \approx 21\%
+\end{equation}
+Giá trị $O_s \approx 21\%$ nằm trong giới hạn cho phép dưới 25\%, đủ để hệ thống phản ứng nhanh với thay đổi tải mà không gây ra dao động lớn tại đầu đốt.
+
+Sai lệch tĩnh (steady-state error, $e_{ss}$) phản ánh độ lệch giữa giá trị đặt và giá trị thực sau khi hệ thống ổn định. Nhờ thành phần tích phân $I$ trong bộ điều khiển PID, sai lệch tĩnh bị triệt tiêu hoàn toàn, $e_{ss} \approx 0$.
+
+\section{Đánh giá chất lượng hệ thống đạt được}
+
+Bên cạnh các chỉ tiêu trong miền thời gian, chất lượng bền vững của hệ thống còn được đánh giá thông qua biên độ dự trữ (gain margin – GM) và pha dự trữ (phase margin – PM) trong miền tần số. Phân tích đồ thị Bode của hàm truyền hở $G_{OL}(j\omega) = R_1(j\omega) \cdot O(j\omega)$ sau khi tối ưu hóa cho thấy hệ thống đạt được biên độ dự trữ $GM > 6\,\text{dB}$ và pha dự trữ $PM > 30^\circ$, thỏa mãn hoàn toàn các yêu cầu bền vững theo tiêu chuẩn thiết kế hệ thống điều khiển công nghiệp.
+
+Kết quả phân tích cho thấy bộ điều khiển PID đã tổng hợp đáp ứng đầy đủ các yêu cầu chất lượng của hệ thống điều khiển lưu lượng dầu nhiên liệu: thời gian quá độ chấp nhận được, độ vọt lố trong giới hạn an toàn, sai lệch tĩnh bằng không, và độ bền vững đảm bảo khả năng hoạt động ổn định khi có sự thay đổi về điều kiện vận hành.
+
+\section{Nhận dạng đối tượng và tổng hợp bộ điều khiển sử dụng phần mềm MATLAB}
+
+Để kiểm chứng kết quả lý thuyết, phần mềm MATLAB/Simulink được sử dụng để mô hình hóa hàm truyền đối tượng với xấp xỉ Padé bậc 1 cho khâu trễ $e^{-\tau s}$, tổng hợp bộ điều khiển PID và mô phỏng đáp ứng hệ thống. Mã nguồn MATLAB chi tiết được trình bày trong Phụ lục A. Kết quả mô phỏng đáp ứng bậc thang của hệ kín được thể hiện trong Hình~\ref{fig:dap_ung_bac_thang}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{Hinhve/step_response.png}
+    \caption{Đáp ứng bậc thang của hệ thống điều khiển vòng kín (mô phỏng MATLAB)}
+    \label{fig:dap_ung_bac_thang}
 \end{figure}
 
-\subsection{Các thành phần chính trong hệ thống}
-
-Hệ thống điều khiển được mô tả bởi các khối chức năng chính, mỗi khối đảm nhiệm một vai trò trong vòng điều khiển và giám sát. Khối thứ nhất là HMI (Human Machine Interface), đóng vai trò giao diện tương tác giữa người vận hành và chương trình PLC. HMI cho phép nhập các thông số như giá trị đặt nhiệt độ, chế độ vận hành (Manual/Auto), các tham số bộ điều khiển, đồng thời hiển thị các biến công nghệ (giá trị đo, giá trị điều khiển, trạng thái cảnh báo). Trong phạm vi chương này, HMI được xem như nguồn/đích dữ liệu trao đổi với PLC qua các biến và vùng nhớ đã khai báo.
-
-Khối thứ hai là PLC Siemens S7-1200, đóng vai trò thực thi thuật toán điều khiển và logic liên động. PLC đọc tín hiệu đo (đã được ánh xạ từ kênh analog input), xử lý chuẩn hóa/tỷ lệ hóa, thực hiện điều khiển (cascade và PID\_Compact), sau đó ghi lệnh điều khiển ra kênh analog output ở dạng phần trăm hoặc dạng giá trị số nguyên theo chuẩn module.
-
-Khối thứ ba là các kênh tín hiệu tương tự (analog input/analog output) ở mức \textbf{cấu hình logic} trong TIA Portal. Các kênh này được khai báo loại tín hiệu, dải đo/dải phát và được ánh xạ địa chỉ I/O để chương trình PLC có thể đọc/ghi dưới dạng giá trị số nguyên chuẩn hóa theo module (ví dụ 0--27648) hoặc chuyển đổi sang đơn vị kỹ thuật phục vụ tính toán điều khiển.
-
-Khối cuối cùng là đối tượng quá trình và phần tử tác động, được quy ước như một khối \textbf{nhận lệnh điều khiển} (tín hiệu điều khiển) và tạo ra \textbf{đáp ứng công nghệ} (nhiệt độ hơi). Trong chương này, đối tượng được xem dưới góc nhìn mô hình/biến quá trình để phục vụ lập trình và mô phỏng, không phân tích cấu tạo hay phương án truyền động phần cứng.
-
-\subsection{Nguyên lý vận hành của sơ đồ}
-
-Quy trình điều khiển được mô tả theo luồng tín hiệu logic trong vòng kín tự động. Giai đoạn đầu tiên là thiết lập lệnh: người vận hành thao tác trên HMI để nhập các thông số như giá trị đặt nhiệt độ, chế độ vận hành và tham số bộ điều khiển. Các giá trị này được cập nhật vào các biến/khối dữ liệu (DB) và được PLC sử dụng trực tiếp trong thuật toán điều khiển.
-
-Giai đoạn thứ hai là xử lý tín hiệu: PLC đọc giá trị đo từ kênh analog input (dạng số nguyên theo chuẩn module), thực hiện chuẩn hóa và tỷ lệ hóa về đơn vị kỹ thuật, so sánh với giá trị đặt để tính sai lệch, sau đó thực hiện thuật toán điều khiển (PID/cascade). Kết quả điều khiển được biểu diễn theo dạng phần trăm và/hoặc quy đổi về dạng giá trị số nguyên để ghi ra kênh analog output.
-
-Giai đoạn thứ ba là xuất lệnh điều khiển: chương trình PLC ghi giá trị điều khiển ra kênh analog output theo định dạng đã cấu hình. Ở mức logic, việc ``điều khiển phần tử tác động'' được hiểu là cập nhật biến điều khiển/giá trị xuất I/O; chi tiết phần cứng nhận tín hiệu và cơ chế tác động không được xét trong chương này.
-
-Giai đoạn cuối cùng là phản hồi: đối tượng quá trình tạo ra đáp ứng (nhiệt độ), tín hiệu đo được cập nhật về PLC thông qua kênh analog input, khép kín vòng điều khiển. PLC tiếp tục tính toán và hiệu chỉnh lệnh điều khiển nhằm đưa nhiệt độ về giá trị đặt theo yêu cầu.
-
-\subsection{Đặc điểm của sơ đồ}
-
-Mô hình chức năng được trình bày với ba đặc điểm nhằm phục vụ cho lập trình và mô phỏng logic điều khiển. Đặc điểm thứ nhất là tính mô-đun: các khối chức năng (HMI--PLC--I/O--đối tượng) được phân tách rõ ràng, thuận tiện cho việc thiết kế biến, mở rộng chức năng và tái sử dụng chương trình.
-
-Đặc điểm thứ hai là nhất quán về biểu diễn tín hiệu: giá trị đo/giá trị điều khiển được quy đổi giữa miền số nguyên của module và miền đơn vị kỹ thuật/phần trăm, giúp các network xử lý, PID\_Compact và giao diện HMI làm việc đồng nhất.
-
-Đặc điểm thứ ba là hỗ trợ giám sát/vận hành ở mức logic thông qua HMI: các biến quan trọng (giá trị đặt, giá trị đo, giá trị điều khiển, trạng thái Manual/Auto, trạng thái cảnh báo) được tổ chức để quan sát và thao tác thuận tiện trong quá trình mô phỏng và vận hành thử nghiệm chương trình.
-
-\section{Thiết lập dự án trên TIA Portal}
-
-Quá trình thiết lập dự án trên môi trường lập trình TIA Portal V15 bao gồm việc tạo dự án mới, cấu hình phần cứng PLC và các module mở rộng, thiết lập các tham số truyền thông và cấu hình các kênh tín hiệu analog. Các bước thiết lập được thực hiện theo trình tự logic, đảm bảo hệ thống được cấu hình đúng và sẵn sàng cho việc lập trình điều khiển.
-
-Quá trình tạo dự án mới được thực hiện theo các bước sau:
-
-\begin{itemize}
-    \item \textbf{Bước 1:} Khởi động phần mềm TIA Portal V15 từ màn hình desktop bằng cách nhấp đúp vào biểu tượng ứng dụng.
-    \item \textbf{Bước 2:} Chọn tùy chọn "Create new project" từ màn hình khởi động để tạo dự án mới.
-    \item \textbf{Bước 3:} Nhập tên dự án vào trường "Project name" và nhấn nút "Create" để xác nhận. Tên dự án nên được đặt có ý nghĩa, phản ánh mục đích và nội dung của dự án để dễ dàng quản lý và tra cứu sau này.
-    \item \textbf{Bước 4:} Chọn mục "Devices \& Networks" từ thanh công cụ, sau đó chọn "Add new device" để mở hộp thoại chọn thiết bị.
-    \item \textbf{Bước 5:} Trong danh mục "Controllers", chọn "SIMATIC S7-1200", sau đó chọn loại CPU cụ thể là "CPU 1215C DC/DC/DC". CPU 1215C được lựa chọn do có đủ số lượng cổng digital và analog cần thiết cho ứng dụng điều khiển nhiệt độ, đồng thời hỗ trợ đầy đủ các chức năng truyền thông và xử lý tín hiệu analog.
-    \item \textbf{Bước 6:} Thêm module analog input/output vào hệ thống. Trong mục "Catalog", tìm đến phần "AI/AQ" (Analog Input/Analog Output) và chọn module "AI4x13 BIT/AQ 2x14" với mã sản phẩm "6ES7 234-4HE32-0". Module này cung cấp bốn kênh analog input và hai kênh analog output, đủ để đáp ứng yêu cầu của hệ thống điều khiển cascade.
-\end{itemize}
-
-Sau khi thêm module vào dự án, người dùng cấu hình các kênh analog input và output để sử dụng tín hiệu 4-20mA, đây là chuẩn tín hiệu phổ biến trong công nghiệp và phù hợp với hầu hết các cảm biến nhiệt độ và thiết bị điều khiển van. Việc cấu hình module analog bao gồm thiết lập loại tín hiệu (dòng điện hoặc điện áp), dải đo (4-20mA, 0-10V, v.v.), và đơn vị đo lường. Đối với kênh analog input, người dùng chọn loại tín hiệu là "Current" và dải đo là "4 to 20mA", sau đó thiết lập đơn vị đo lường phù hợp với cảm biến nhiệt độ. Đối với kênh analog output, người dùng cũng chọn loại tín hiệu là "Current" và dải đo là "4 to 20mA" để tương thích với thiết bị điều khiển van.
-
-Các tham số cấu hình được lưu trong bảng khai báo (Configuration table), cho phép người dùng xem lại và chỉnh sửa khi cần thiết. Bảng khai báo hiển thị đầy đủ thông tin về các module đã cấu hình, bao gồm địa chỉ I/O, loại tín hiệu, dải đo và các tham số khác, tạo điều kiện thuận lợi cho việc quản lý và bảo trì hệ thống.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.85\textwidth]{Hinhve/chuong3_bang_khai_bao.png}
-\caption{Bảng khai báo cấu hình module}
-\label{fig:ch3_bang_khai_bao}
-\end{figure}
-
-\section{Chương trình điều khiển trong PLC}
-
-Chương trình điều khiển được xây dựng trong khối chương trình chính OB1 (Organization Block 1), đây là khối chương trình được gọi tuần tự và liên tục bởi hệ điều hành của PLC. Chương trình được tổ chức thành các network (mạng lệnh) logic, mỗi network thực hiện một chức năng cụ thể trong hệ thống điều khiển. Cấu trúc này giúp chương trình dễ đọc, dễ bảo trì và dễ mở rộng khi cần thiết.
-
-\subsection{Network 1: Đọc giá trị cảm biến nhiệt độ}
-
-Network đầu tiên thực hiện nhiệm vụ đọc và chuyển đổi giá trị từ cảm biến nhiệt độ. Module analog input đọc giá trị từ cảm biến dưới dạng số nguyên trong phạm vi từ 0 đến 27648, tương ứng với dải tín hiệu 4-20mA. Giá trị này cần được chuyển đổi thành giá trị nhiệt độ thực tế có đơn vị độ Celsius để sử dụng trong các phép tính điều khiển.
-
-Quá trình chuyển đổi được thực hiện thông qua hai lệnh chuẩn của TIA Portal là NORM và SCALE. Lệnh NORM (Normalize) thực hiện chuẩn hóa giá trị số nguyên từ module analog input về phạm vi từ 0.0 đến 1.0, dựa trên giá trị tối thiểu và tối đa của tín hiệu đầu vào. Lệnh SCALE (Scale) sau đó chuyển đổi giá trị đã được chuẩn hóa thành giá trị nhiệt độ thực tế trong phạm vi hoạt động của cảm biến, ví dụ từ 0$^{\circ}$C đến 600$^{\circ}$C. Kết quả chuyển đổi được lưu vào biến \%MD200 "hiển thị nhiệt độ", đây là giá trị nhiệt độ thực tế được sử dụng trong các phép tính điều khiển và hiển thị trên HMI.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.85\textwidth]{Hinhve/chuong3_network_1.png}
-\caption{Network 1: Đọc và chuyển đổi giá trị cảm biến nhiệt độ}
-\label{fig:ch3_network_1}
-\end{figure}
-
-Việc sử dụng hai lệnh NORM và SCALE tách biệt thay vì một lệnh chuyển đổi trực tiếp mang lại tính linh hoạt cao hơn, cho phép dễ dàng điều chỉnh dải đo của cảm biến mà không cần thay đổi toàn bộ logic chuyển đổi. Điều này đặc biệt hữu ích khi thay thế cảm biến hoặc khi cần mở rộng dải đo của hệ thống.
-
-\subsection{Network 2: Chuyển đổi chế độ vận hành}
-
-Network thứ hai thực hiện chức năng chuyển đổi và duy trì trạng thái giữa hai chế độ vận hành là chế độ thủ công (Manual) và chế độ tự động (Auto). Đây là một mạch tự giữ (self-holding circuit) cơ bản trong lập trình PLC, sử dụng logic rơ-le để duy trì trạng thái sau khi tín hiệu kích hoạt đã được gỡ bỏ.
-
-Mạch tự giữ hoạt động dựa trên nguyên lý sau. Khi người vận hành nhấn nút "chọn man" (biến \%M5.0), tiếp điểm thường mở \%M5.0 đóng lại, đồng thời tiếp điểm thường đóng \%M5.1 "chọn auto" vẫn đóng, cho phép dòng logic đi qua và kích hoạt cuộn dây đầu ra \%M5.2 "auto man". Ngay khi \%M5.2 được kích hoạt, tiếp điểm thường mở \%M5.2 ở nhánh song song cũng đóng lại, tạo thành đường dẫn logic thay thế. Khi người vận hành buông nút nhấn \%M5.0, tiếp điểm này mở ra nhưng dòng logic vẫn tiếp tục đi qua nhánh tự giữ thông qua tiếp điểm \%M5.2, duy trì trạng thái kích hoạt của \%M5.2.
-
-Để chuyển sang chế độ tự động, người vận hành nhấn nút "chọn auto" (biến \%M5.1), làm cho tiếp điểm thường đóng \%M5.1 mở ra. Điều này ngắt cả hai đường dẫn logic (đường kích hoạt ban đầu và đường tự giữ), làm cho cuộn dây \%M5.2 mất điện và hệ thống chuyển về chế độ tự động. Mạch tự giữ đảm bảo rằng hệ thống chỉ có thể ở một trong hai chế độ tại một thời điểm, tránh xung đột giữa các chế độ điều khiển.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.85\textwidth]{Hinhve/chuong3_network_2.png}
-\caption{Network 2: Chuyển đổi chế độ vận hành (Manual/Auto)}
-\label{fig:ch3_network_2}
-\end{figure}
-
-\subsection{Network 3: Gán giá trị điều khiển theo chế độ}
-
-Network thứ ba thực hiện việc gán giá trị điều khiển khác nhau tùy thuộc vào chế độ vận hành hiện tại. Trong chế độ thủ công, người vận hành có thể nhập trực tiếp giá trị điều khiển van thông qua HMI, cho phép điều khiển thủ công độ mở van mà không cần thông qua bộ điều khiển PID. Trong chế độ tự động, giá trị điều khiển được tính toán tự động bởi bộ điều khiển PID dựa trên sai lệch giữa giá trị đặt và giá trị thực tế.
-
-Lệnh MOVE được sử dụng để gán giá trị từ nguồn đến đích tùy thuộc vào trạng thái của biến chế độ. Khi hệ thống ở chế độ thủ công (\%M5.2 = 1), lệnh MOVE gán giá trị điều khiển thủ công từ HMI vào biến điều khiển van. Khi hệ thống ở chế độ tự động (\%M5.2 = 0), lệnh MOVE gán giá trị điều khiển từ đầu ra của bộ điều khiển PID vào biến điều khiển van. Việc sử dụng lệnh MOVE đơn giản và hiệu quả, đảm bảo giá trị điều khiển được cập nhật kịp thời và chính xác theo chế độ vận hành.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.85\textwidth]{Hinhve/chuong3_network_3.png}
-\caption{Network 3: Gán giá trị điều khiển theo chế độ vận hành}
-\label{fig:ch3_network_3}
-\end{figure}
-
-\subsection{Network 4: Xử lý cảnh báo và dừng hệ thống}
-
-Network thứ tư thực hiện chức năng an toàn quan trọng là dừng hệ thống khi nhận được cảnh báo. Khi có bất kỳ cảnh báo nào được kích hoạt, hệ thống sẽ tự động dừng hoạt động để bảo vệ thiết bị và đảm bảo an toàn vận hành. Logic này sử dụng tiếp điểm thường đóng của biến cảnh báo, khi cảnh báo được kích hoạt, tiếp điểm mở ra và ngắt tín hiệu điều khiển, làm cho van đóng lại và hệ thống dừng hoạt động.
-
-Việc tích hợp chức năng dừng khẩn cấp vào chương trình điều khiển là yêu cầu bắt buộc trong các hệ thống điều khiển công nghiệp, đảm bảo hệ thống có thể được dừng ngay lập tức khi phát hiện các tình huống bất thường. Điều này đặc biệt quan trọng trong hệ thống điều khiển nhiệt độ, nơi nhiệt độ quá cao có thể gây hư hỏng thiết bị hoặc mất an toàn.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.85\textwidth]{Hinhve/chuong3_network_4.png}
-\caption{Network 4: Xử lý cảnh báo và dừng hệ thống}
-\label{fig:ch3_network_4}
-\end{figure}
-
-\subsection{Network 5: Phát hiện và xử lý cảnh báo nhiệt độ}
-
-Network thứ năm thực hiện chức năng phát hiện cảnh báo khi nhiệt độ vượt quá ngưỡng cho phép trong một khoảng thời gian nhất định. Logic này sử dụng lệnh so sánh để kiểm tra xem giá trị nhiệt độ hiển thị (\%MD200) có lớn hơn giá trị ngưỡng cảnh báo (\%DB2.DBD4 "setting trị") hay không. Khi điều kiện này được thỏa mãn, lệnh TON (Timer On Delay) bắt đầu đếm thời gian.
-
-Lệnh TON sẽ kích hoạt đầu ra sau khi thời gian đếm đạt đến giá trị đặt trước, trong trường hợp này là 3 giây. Điều này có nghĩa là cảnh báo chỉ được kích hoạt khi nhiệt độ vượt quá ngưỡng trong liên tục 3 giây, tránh các cảnh báo giả do nhiễu tín hiệu hoặc dao động tạm thời. Khi cảnh báo được kích hoạt, hệ thống sẽ dừng hoạt động thông qua logic trong Network 4, và cảnh báo sẽ được duy trì cho đến khi người vận hành xử lý và reset cảnh báo.
-
-Việc sử dụng timer delay trong phát hiện cảnh báo là một kỹ thuật quan trọng trong lập trình PLC, giúp loại bỏ các tín hiệu nhiễu và đảm bảo chỉ các sự cố thực sự mới được phát hiện. Điều này nâng cao độ tin cậy của hệ thống và giảm thiểu các lần dừng máy không cần thiết.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.85\textwidth]{Hinhve/chuong3_network_5.png}
-\caption{Network 5: Phát hiện và xử lý cảnh báo nhiệt độ}
-\label{fig:ch3_network_5}
-\end{figure}
-
-\subsection{Network 6: Nhập thông số bộ điều khiển PID}
-
-Network thứ sáu thực hiện việc nhập và lưu trữ các thông số của bộ điều khiển PID từ HMI vào bộ nhớ dữ liệu của PLC. Các thông số này bao gồm hệ số khuếch đại tỷ lệ $K_p$, thời gian tích phân $T_i$, thời gian vi phân $T_d$, và các tham số khác như giới hạn đầu ra và tốc độ thay đổi. Các giá trị này được người vận hành nhập thông qua HMI và được lưu trữ trong các biến dữ liệu cụ thể, sau đó được sử dụng để cấu hình bộ điều khiển PID trong Network tiếp theo.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.85\textwidth]{Hinhve/chuong3_network_6.png}
-\caption{Network 6: Nhập thông số bộ điều khiển PID}
-\label{fig:ch3_network_6}
-\end{figure}
-
-Bảng nhập thông số PID cho phép người vận hành cấu hình các tham số điều khiển một cách trực quan và dễ dàng. Bảng này hiển thị các trường nhập liệu cho từng tham số, kèm theo các giá trị mặc định và phạm vi cho phép, giúp người vận hành nhập đúng các giá trị hợp lệ.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.7\textwidth]{Hinhve/chuong3_bang_nhap_PID.png}
-\caption{Bảng nhập thông số bộ điều khiển PID}
-\label{fig:ch3_bang_nhap_PID}
-\end{figure}
-
-Việc cho phép người vận hành thay đổi tham số bộ điều khiển từ HMI tạo tính linh hoạt cao cho hệ thống, cho phép điều chỉnh tham số mà không cần sửa đổi chương trình PLC. Điều này đặc biệt hữu ích trong quá trình vận hành và bảo trì, khi cần điều chỉnh tham số để tối ưu hóa hiệu năng điều khiển hoặc đáp ứng các thay đổi trong điều kiện vận hành.
-
-\subsection{Khối hàm PID\_Compact}
-
-Khối hàm PID\_Compact là khối chức năng chuẩn của TIA Portal được sử dụng để thực hiện điều khiển vòng kín tự động với thuật toán PID. Khối này được thiết kế đặc biệt cho các ứng dụng điều khiển quá trình công nghiệp, cung cấp các tính năng tiên tiến như tự động chỉnh định, bảo vệ tích phân và giới hạn tốc độ thay đổi đầu ra.
-
-Các chân đầu vào của khối PID\_Compact bao gồm các tín hiệu điều khiển và cấu hình cần thiết. Chân EN (Enable) được kích hoạt bởi tiếp điểm \%M6.2 "bắt đầu", đây là điều kiện để khối PID bắt đầu hoạt động. Khi chân EN ở mức logic 0, khối PID ngừng tính toán và giữ nguyên giá trị đầu ra cuối cùng. Chân Setpoint nhận giá trị đặt từ biến \%DB2.DBD0 "cài đặt nhiệt độ", đây là mức nhiệt độ mà hệ thống cần đạt được và duy trì. Chân Input nhận giá trị phản hồi thực tế đã qua xử lý từ biến \%MD200 "hiển thị nhiệt độ", đây là giá trị nhiệt độ đo được từ cảm biến đã được chuyển đổi về đơn vị độ Celsius. Chân Input\_PER nhận giá trị phản hồi trực tiếp từ module analog input dưới dạng số nguyên từ 0 đến 27648, cho phép khối PID sử dụng giá trị thô từ cảm biến nếu cần thiết.
-
-Các chân đầu ra của khối PID\_Compact cung cấp các tín hiệu điều khiển ở các định dạng khác nhau để phù hợp với nhu cầu xử lý và giám sát trong chương trình. Chân Output\_PER cung cấp đầu ra điều khiển trực tiếp qua module analog output, được kết nối với biến \%QW96 "điều khiển độ mở van". Giá trị này là số nguyên trong phạm vi từ 0 đến 27648, tương ứng với dải tín hiệu đã cấu hình cho module analog output. Chân Output cung cấp giá trị đầu ra dạng số thực (Real) từ 0.0 đến 100.0\%, biểu diễn phần trăm của dải điều khiển, hữu ích cho việc hiển thị và tính toán nội bộ. Chân Output\_PWM cung cấp đầu ra dạng PWM phục vụ một số phương án điều khiển theo chu kỳ; trong phạm vi bài toán và mô phỏng logic của đề tài, ngõ ra này không được sử dụng.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.85\textwidth]{Hinhve/chuong3_khoi_PID_Compact.png}
-\caption{Khối hàm PID\_Compact và các kết nối}
-\label{fig:ch3_khoi_PID_Compact}
-\end{figure}
-
-Nguyên lý hoạt động của khối PID\_Compact dựa trên thuật toán điều khiển PID cổ điển, được tối ưu hóa cho môi trường PLC. Khối PID thực hiện các bước tính toán sau. Đầu tiên, khối đọc giá trị nhiệt độ hiện tại từ cảm biến thông qua chân Input hoặc Input\_PER. Tiếp theo, khối so sánh giá trị này với giá trị đặt từ chân Setpoint để tính toán sai lệch (error). Sau đó, khối áp dụng thuật toán PID để tính toán giá trị điều khiển, trong đó thành phần tỷ lệ (P) phản ứng với sai lệch hiện tại, thành phần tích phân (I) loại bỏ sai số xác lập, và thành phần vi phân (D) cải thiện độ ổn định và giảm độ quá điều chỉnh. Cuối cùng, khối xuất tín hiệu điều khiển qua chân Output\_PER đến module analog output, từ đó điều khiển độ mở van để điều chỉnh lưu lượng nước phun giảm ôn, đưa nhiệt độ thực tế về mức cài đặt một cách ổn định và chính xác.
-
-Khối PID\_Compact cung cấp các tính năng bổ sung như tự động chỉnh định (auto-tuning), cho phép khối tự động xác định các tham số PID tối ưu dựa trên đáp ứng của hệ thống. Tính năng bảo vệ tích phân (integral windup protection) ngăn chặn hiện tượng tích lũy sai số khi đầu ra đạt giới hạn, đảm bảo hệ thống phục hồi nhanh khi điều kiện thay đổi. Các tính năng này làm cho khối PID\_Compact trở thành công cụ mạnh mẽ và linh hoạt cho các ứng dụng điều khiển quá trình công nghiệp.
+Kết quả mô phỏng xác nhận các tham số chất lượng đã tính toán: thời gian quá độ $T_s \approx 26\,\text{s}$, độ vọt lố $O_s \approx 21\%$ và sai lệch tĩnh $e_{ss} \approx 0$. Các thông số PID $K_p = 8{,}33$, $T_i = 6{,}073\,\text{s}$, $T_d = 1{,}52\,\text{s}$ được nạp trực tiếp vào khối hàm công nghệ PID Compact (FB41) của PLC Siemens S7-1200 thông qua môi trường lập trình TIA Portal V17, hoạt động ở chu kỳ ngắt OB $100\,\text{ms}$. Giải pháp triển khai trên PLC số mang lại khả năng giám sát và chỉnh định tham số từ xa qua giao diện HMI, đồng thời hỗ trợ chức năng tự chỉnh định (auto-tune) khi đặc tính đối tượng thay đổi theo thời gian do mài mòn thiết bị.
 
 \end{document}

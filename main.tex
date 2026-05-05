@@ -313,18 +313,6 @@
 % ===================================================
 \pagenumbering{roman}
 
-% \newpage
-% \pagenumbering{gobble}
-% \subfile{Chuong/0_0_Loi_cam_doan.tex}
-
-\cleardoublepage
-\pagenumbering{gobble}
-\subfile{Chuong/0_1_Loi_cam_on.tex}
-
-\cleardoublepage
-\pagenumbering{gobble}
-\subfile{Chuong/0_2_Tom_tat_noi_dung.tex}
-
 \cleardoublepage
 \pagenumbering{gobble}
 \subfile{Chuong/0_3_Loi_noi_dau.tex}
@@ -407,14 +395,14 @@
 
 % ===================================================
 
-
+    
 \cleardoublepage
 \pagenumbering{arabic}
 
 \pagestyle{fancy}
 \fancyhf{}
 \renewcommand{\headrulewidth}{0.4pt}
-\setlength{\headheight}{14pt}
+\setlength{\headheight}{35pt}
 \makeatletter
 \renewcommand{\chaptermark}[1]{\markboth{CHƯƠNG \thechapter.\ #1}{}}
 \makeatother
@@ -424,25 +412,25 @@
 \renewcommand{\sectionmark}[1]{}
 
 \newpage
-\chapter{CƠ SỞ CÔNG NGHỆ VÀ XÂY DỰNG MÔ HÌNH ĐIỀU KHIỂN PID}
+\chapter{TỎNG QUAN VỀ ĐỐI TƯỢNG CÔNG NGHỆ}
 \label{chuong1}
 \subfile{Chuong/1_Chuong_1.tex} % Phần mở đầu
 
 \newpage
 % \pagestyle{fancy} % Áp dụng header và footer
-\chapter{NHẬN DẠNG ĐỐI TƯỢNG, THIẾT KẾ VÀ CHỈNH ĐỊNH BỘ ĐIỀU KHIỂN}
+\chapter{THIẾT KẾ VÒNG ĐIỀU KHIỂN CHO ĐỐI TƯỢNG}
 \label{chuong2}
 \subfile{Chuong/2_Chuong_2.tex}
 
 \newpage
 % \pagestyle{fancy} % Áp dụng header và footer
-\chapter{THIẾT KẾ VÀ XÂY DỰNG HỆ THỐNG ĐIỀU KHIỂN TRÊN PLC SIEMENS S7-1200}
+\chapter{PHÂN TÍCH VÀ TỔNG HỢP HỆ THỐNG}
 \label{chuong3}
 \subfile{Chuong/3_Chuong_3.tex}
 
 \newpage
 % \pagestyle{fancy} % Áp dụng header và footer
-\chapter{KẾT LUẬN}
+\chapter{KẾT LUẬN VÀ KIẾN NGHỊ}
 \label{chuong4}
 \subfile{Chuong/4_Chuong_4.tex}
 
