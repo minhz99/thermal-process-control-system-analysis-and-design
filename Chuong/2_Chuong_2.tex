@@ -7,13 +7,13 @@
 
 \subsection{Thiết kế sơ đồ cấu trúc điều khiển hệ thống}
 
-Sơ đồ đường ống và công cụ điều khiển (P\&ID – Piping and Instrumentation Diagram) là tài liệu kỹ thuật nền tảng định hình toàn bộ cấu trúc điều khiển của hệ thống cấp dầu nhiên liệu. Khác với sơ đồ công nghệ PFD chỉ mô tả luồng vật chất, P\&ID thể hiện đầy đủ các vòng điều chỉnh, thiết bị đo lường, cơ cấu chấp hành và mối liên hệ tín hiệu giữa chúng. Hệ thống điều khiển cung cấp dầu nhiên liệu khởi động cho lò than phun được tổ chức thành bốn mạch vòng điều chỉnh có quan hệ phân cấp và phối hợp chặt chẽ với nhau, bao gồm mạch vòng lưu lượng (FIC), mạch vòng áp suất (PIC), mạch vòng nhiệt độ (TIC) và mạch vòng mức (LIC).
+Sơ đồ P\&ID là tài liệu kỹ thuật nền tảng định hình toàn bộ cấu trúc điều khiển của hệ thống cấp dầu nhiên liệu. Khác với sơ đồ PFD chỉ mô tả luồng vật chất, P\&ID thể hiện đầy đủ các vòng điều chỉnh, thiết bị đo lường, cơ cấu chấp hành và mối liên hệ tín hiệu giữa chúng. Hệ thống điều khiển cung cấp dầu nhiên liệu khởi động cho lò than phun được tổ chức thành bốn mạch vòng điều chỉnh có quan hệ phân cấp và phối hợp chặt chẽ với nhau, bao gồm mạch vòng lưu lượng (FIC), mạch vòng áp suất (PIC), mạch vòng nhiệt độ (TIC) và mạch vòng mức (LIC).
 
 Mạch vòng điều chỉnh lưu lượng (FIC) và mạch vòng điều chỉnh áp suất (PIC) được tích hợp trong cùng một sơ đồ P\&ID vì hai mạch vòng này có quan hệ vật lý mật thiết: áp suất và lưu lượng của dòng dầu trong đường ống phụ thuộc lẫn nhau qua đặc tính thủy lực của hệ thống. Lưu lượng kế FT đo lưu lượng thực tế và truyền tín hiệu về bộ điều khiển FIC; bộ điều khiển FIC xuất tín hiệu điều khiển đến van điều chỉnh FCV trên đường dầu cấp cho lò. Đồng thời, mạch vòng áp suất với cảm biến PT và bộ điều khiển PIC duy trì áp suất đường phân phối ổn định thông qua van bypass hồi lưu, nhằm cải thiện tính tuyến tính của van FCV và đảm bảo chất lượng phun sương tại đầu đốt.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
-    \resizebox{0.95\textwidth}{!}{%
+    \resizebox{1\textwidth}{!}{%
     \begin{tikzpicture}[>=stealth, thick]
     % Main pipe
     \draw[line width=1.5pt, ->] (0,0) node[left, align=right] {Từ bộ\\gia nhiệt} -- (3,0);
@@ -75,13 +75,13 @@ Mạch vòng điều chỉnh lưu lượng (FIC) và mạch vòng điều chỉn
 
 Mạch vòng điều chỉnh nhiệt độ (TIC) kiểm soát nhiệt độ dầu tại đầu ra bộ gia nhiệt thông qua vòng điều khiển kín: cảm biến nhiệt độ TT đo nhiệt độ thực tế của dầu, tín hiệu phản hồi về bộ điều khiển TIC, và bộ điều khiển phát lệnh đến van điều chỉnh hơi (steam control valve) có bộ truyền động khí nén để tăng hoặc giảm lưu lượng hơi nước cấp vào bộ gia nhiệt.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
-    \resizebox{0.85\textwidth}{!}{%
+    \resizebox{1\textwidth}{!}{%
     \begin{tikzpicture}[>=stealth, thick]
     % Heater box
     \draw[thick, fill=gray!10] (4,-1.5) rectangle (6,1.5);
-    \node[align=center] at (5,0) {Bộ gia nhiệt\\(Heater)};
+    \node[align=center] at (5,0) {Heater};
     
     % Oil line
     \draw[line width=1.5pt, ->] (0,-0.5) node[left, align=right] {Dầu HFO\\từ bơm} -- (4,-0.5);
@@ -119,11 +119,11 @@ Mạch vòng điều chỉnh nhiệt độ (TIC) kiểm soát nhiệt độ dầ
     \label{fig:pid_nhiet_do}
 \end{figure}
 
-Mạch vòng điều chỉnh mức (LIC) đảm bảo duy trì mức dầu trong bể chứa ở phạm vi an toàn bằng cách điều chỉnh van nạp, đồng thời đóng vai trò bảo vệ hệ thống bơm thông qua cơ chế khóa liên động (interlock) theo các báo động giới hạn thấp thấp (LL) và cao cao (HH). Khi mức dầu đạt ngưỡng LL, hệ thống sẽ tự động dừng bơm để tránh chạy khô; khi đạt ngưỡng HH, van nạp sẽ bị đóng khẩn cấp để ngăn ngừa tràn bể.
+Mạch vòng điều chỉnh mức (LIC) đảm bảo duy trì mức dầu trong bể chứa ở phạm vi an toàn bằng cách điều chỉnh van nạp, đồng thời đóng vai trò bảo vệ hệ thống bơm thông qua cơ chế khóa liên động (interlock) theo các báo động giới hạn thấp (LL) và cao (HH). Khi mức dầu đạt ngưỡng LL, hệ thống sẽ tự động dừng bơm để tránh chạy khô; khi đạt ngưỡng HH, van nạp sẽ bị đóng khẩn cấp để ngăn ngừa tràn bể.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
-    \resizebox{0.85\textwidth}{!}{%
+    \resizebox{1\textwidth}{!}{%
     \begin{tikzpicture}[>=stealth, thick]
     % Tank (Cylinder)
     \draw[thick, fill=gray!10] (4,2) arc (180:0:1 and 0.3) -- (6,-2) arc (360:180:1 and 0.3) -- cycle;
@@ -176,8 +176,8 @@ Mạch vòng điều chỉnh mức (LIC) đảm bảo duy trì mức dầu trong
     \draw[dashed, ->] (5.5,3.5) -- (5.5, 3.2) -- (8.5, 3.2) -- (8.5, -2.5) -- (pump_ctrl); % LL to Pump
     
     \node[above] at (4.5, 5.5) {Tín hiệu điều chỉnh mức (PID)};
-    % \node[above] at (3.5, 4.0) {HH (Đóng khẩn cấp)};
-    % \node[above] at (7.8, 3.2) {LL (Dừng bơm)};
+    \node[above] at (3.5, 4.0) {HH};
+    \node[above] at (7.8, 3.2) {LL};
     \end{tikzpicture}%
     }
     \caption{Sơ đồ P\&ID mạch vòng điều chỉnh mức}
@@ -188,19 +188,19 @@ Mạch vòng điều chỉnh mức (LIC) đảm bảo duy trì mức dầu trong
 
 Mỗi mạch vòng điều chỉnh khép kín được cấu thành từ ba phần tử cốt lõi, mỗi phần tử đảm nhận một chức năng không thể thay thế trong toàn bộ chuỗi điều khiển.
 
-Thiết bị đo lường (Transmitter) là phần tử đầu tiên trong vòng điều khiển, có chức năng thu thập trạng thái vật lý thực của thông số quá trình (lưu lượng FT, nhiệt độ TT, áp suất PT, mức LT) và chuẩn hóa thành tín hiệu điện chuẩn 4–20\,mA để truyền về bộ điều khiển. Đây là cơ sở dữ liệu thực nghiệm duy nhất để bộ điều khiển đối chiếu với giá trị đặt và đưa ra quyết định điều khiển; sai số của thiết bị đo trực tiếp ảnh hưởng đến độ chính xác của toàn bộ hệ thống.
+Thiết bị đo lường là phần tử đầu tiên trong vòng điều khiển, có chức năng thu thập trạng thái vật lý thực của thông số quá trình (lưu lượng FT, nhiệt độ TT, áp suất PT, mức LT) và chuẩn hóa thành tín hiệu điện chuẩn 4–20\,mA để truyền về bộ điều khiển. Đây là cơ sở dữ liệu thực nghiệm duy nhất để bộ điều khiển đối chiếu với giá trị đặt và đưa ra quyết định điều khiển; sai số của thiết bị đo trực tiếp ảnh hưởng đến độ chính xác của toàn bộ hệ thống.
 
-Bộ điều khiển trung tâm (Controller) nhận tín hiệu sai số (sai lệch giữa giá trị đặt và giá trị đo thực) và tính toán tín hiệu đầu ra điều khiển dựa trên thuật toán PID. Thành phần tỷ lệ P đảm bảo tốc độ phản hồi nhanh; thành phần tích phân I khử sai lệch tĩnh và đảm bảo bám theo giá trị đặt; thành phần vi phân D cải thiện tốc độ đáp ứng và giảm vọt lố. Sự phối hợp hài hòa của ba thành phần này quyết định chất lượng điều chỉnh của vòng kín.
+Bộ điều khiển nhận tín hiệu sai số (sai lệch giữa giá trị đặt và giá trị đo thực) và tính toán tín hiệu điều khiển dựa trên thuật toán PID. Thành phần tỷ lệ P đảm bảo tốc độ phản hồi nhanh; thành phần tích phân I khử sai lệch tĩnh và đảm bảo bám theo giá trị đặt; thành phần vi phân D cải thiện tốc độ đáp ứng và giảm vọt lố. Sự phối hợp hài hòa của ba thành phần này quyết định chất lượng điều chỉnh của vòng kín.
 
-Cơ cấu chấp hành (Final Control Element) là phần tử tác động vật lý trở lại đối tượng điều khiển để khử sai số. Đối với mạch vòng nhiệt độ, cơ cấu chấp hành là van cấp hơi; với mạch vòng lưu lượng, đó là van tuyến tính FCV; với mạch vòng mức, đó là van nạp hoặc bơm chuyển. Chất lượng và độ chính xác của cơ cấu chấp hành, đặc biệt là đặc tính tuyến tính của van, có ảnh hưởng lớn đến khả năng điều chỉnh chính xác của toàn bộ vòng kín.
+Cơ cấu chấp hành là phần tử tác động vật lý trở lại đối tượng điều khiển để khử sai số. Đối với mạch vòng nhiệt độ, cơ cấu chấp hành là van cấp hơi; với mạch vòng lưu lượng, đó là van tuyến tính FCV; với mạch vòng mức, đó là van nạp hoặc bơm chuyển. Chất lượng và độ chính xác của cơ cấu chấp hành, đặc biệt là đặc tính tuyến tính của van, có ảnh hưởng lớn đến khả năng điều chỉnh chính xác của toàn bộ vòng kín.
 
 \subsection{Phân tích ưu điểm của sơ đồ cấu trúc và sự phù hợp với yêu cầu công nghệ}
 
 Thiết kế cấu trúc phân mảnh theo P\&ID, trong đó mỗi thông số công nghệ có một vòng điều chỉnh PID độc lập, mang lại những ưu điểm rõ rệt so với các phương án điều khiển tập trung phức tạp hơn. Trước hết, về độ tin cậy cục bộ, các mạch vòng điều chỉnh hoạt động độc lập với nhau, không phụ thuộc lẫn nhau về mặt phần mềm. Nếu mạch vòng nhiệt độ TIC gặp sự cố, mạch vòng lưu lượng FIC vẫn có thể tiếp tục hoạt động với thiết lập áp suất bơm mặc định, đảm bảo lò hơi không bị ngắt hoàn toàn. Điều này rất quan trọng trong môi trường vận hành liên tục của nhà máy nhiệt điện, nơi mọi sự cố dừng máy không kế hoạch đều gây tổn thất kinh tế lớn.
 
-Ngoài ra, thuật toán PID kinh điển phù hợp với bản chất tuyến tính hóa cục bộ của các đối tượng nhiệt điện, vốn được đặc trưng bởi quán tính lớn và thời gian trễ vừa phải, và có thể được mô hình hóa tốt bằng hàm truyền bậc nhất hoặc bậc hai có trễ. Bên cạnh đó, việc mỗi phần tử trong sơ đồ có ký hiệu định danh thẻ (tagging) rõ ràng theo chuẩn ISA, chẳng hạn như PT-101, FCV-201, TT-301, giúp công tác bảo trì, hiệu chuẩn và khắc phục sự cố được khoanh vùng chính xác mà không ảnh hưởng đến các vòng điều khiển khác.
+Ngoài ra, thuật toán PID kinh điển phù hợp với bản chất tuyến tính hóa cục bộ của các đối tượng nhiệt điện, vốn được đặc trưng bởi quán tính lớn và thời gian trễ vừa phải, và có thể được mô hình hóa tốt bằng hàm truyền bậc nhất hoặc bậc hai có trễ. Bên cạnh đó, việc mỗi phần tử trong sơ đồ có ký hiệu định danh rõ ràng theo chuẩn ISA, chẳng hạn như PT-101, FCV-201, TT-301, giúp công tác bảo trì, hiệu chuẩn và khắc phục sự cố được khoanh vùng chính xác mà không ảnh hưởng đến các vòng điều khiển khác.
 
-\section{Luận chứng lựa chọn thiết bị}
+\section{Lựa chọn thiết bị}
 
 \subsection{Dải làm việc của thông số quá trình, mức cảnh báo và bảo vệ}
 
