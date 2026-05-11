@@ -7,7 +7,7 @@
 
 Nhận dạng hệ thống (system identification) là quá trình xác định mô hình toán học của đối tượng điều khiển dựa trên dữ liệu thực nghiệm thu thập từ quá trình vận hành. Đây là bước khởi đầu bắt buộc và có tầm quan trọng quyết định đến chất lượng của toàn bộ quá trình thiết kế bộ điều khiển: một mô hình đối tượng không chính xác sẽ dẫn đến bộ điều khiển không phù hợp, bất kể phương pháp thiết kế bộ điều khiển có tinh vi đến đâu.
 
-Trong phạm vi bài tập lớn này, đối tượng điều khiển được nghiên cứu là vòng điều chỉnh lưu lượng dầu nhiên liệu, trong đó tín hiệu vào là độ mở van điều chỉnh FCV (biểu diễn qua phần trăm độ mở van, \%) và tín hiệu ra là lưu lượng dầu đo được bởi lưu lượng kế FT (đơn vị t/h). Phương pháp thực nghiệm hàm quá độ (transient response method) được áp dụng để nhận dạng: một tín hiệu vào dạng hàm bậc thang với biên độ $u_0 = 5{,}1$ được tác động lên đối tượng và đáp ứng đầu ra $y(t)$ được ghi lại theo thời gian cho đến khi hệ thống đạt trạng thái xác lập. Đồ thị đáp ứng quá độ $h(t)$ thu được là cơ sở để phân tích và xác định các thông số mô hình.
+Trong phạm vi bài tập lớn này, đối tượng điều khiển được nghiên cứu là vòng điều chỉnh lưu lượng dầu nhiên liệu khởi động cho lò than phun, trong đó tín hiệu vào là độ mở van điều chỉnh FCV (biểu diễn qua phần trăm độ mở van, \%) và tín hiệu ra là lưu lượng dầu đo được bởi lưu lượng kế FT (đơn vị t/h). Phương pháp thực nghiệm hàm quá độ (transient response method) được áp dụng để nhận dạng: một tín hiệu vào dạng hàm bậc thang với biên độ $u_0 = 5{,}1$ được tác động lên đối tượng và đáp ứng đầu ra $y(t)$ được ghi lại theo thời gian cho đến khi hệ thống đạt trạng thái xác lập. Đồ thị đáp ứng quá độ $h(t)$ thu được là cơ sở để phân tích và xác định các thông số mô hình.
 
 \section{Phân tích và biến đổi sơ đồ cấu trúc}
 
@@ -99,7 +99,7 @@ Sai lệch tĩnh (steady-state error, $e_{ss}$) phản ánh độ lệch giữa 
 
 Bên cạnh các chỉ tiêu trong miền thời gian, chất lượng bền vững của hệ thống còn được đánh giá thông qua biên độ dự trữ (gain margin – GM) và pha dự trữ (phase margin – PM) trong miền tần số. Phân tích đồ thị Bode của hàm truyền hở $G_{OL}(j\omega) = R_1(j\omega) \cdot O(j\omega)$ sau khi tối ưu hóa cho thấy hệ thống đạt được biên độ dự trữ $GM > 6\,\text{dB}$ và pha dự trữ $PM > 30^\circ$, thỏa mãn hoàn toàn các yêu cầu bền vững theo tiêu chuẩn thiết kế hệ thống điều khiển công nghiệp.
 
-Kết quả phân tích cho thấy bộ điều khiển PID đã tổng hợp đáp ứng đầy đủ các yêu cầu chất lượng của hệ thống điều khiển lưu lượng dầu nhiên liệu: thời gian quá độ chấp nhận được, độ vọt lố trong giới hạn an toàn, sai lệch tĩnh bằng không, và độ bền vững đảm bảo khả năng hoạt động ổn định khi có sự thay đổi về điều kiện vận hành.
+Kết quả phân tích cho thấy bộ điều khiển PID đã tổng hợp đáp ứng đầy đủ các yêu cầu chất lượng của hệ thống điều khiển lưu lượng dầu nhiên liệu khởi động cho lò than phun: thời gian quá độ chấp nhận được, độ vọt lố trong giới hạn an toàn, sai lệch tĩnh bằng không, và độ bền vững đảm bảo khả năng hoạt động ổn định khi có sự thay đổi về điều kiện vận hành.
 
 \section{Nhận dạng đối tượng và tổng hợp bộ điều khiển sử dụng phần mềm MATLAB}
 

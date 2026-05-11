@@ -7,13 +7,68 @@
 
 \subsection{Thiết kế sơ đồ cấu trúc điều khiển hệ thống}
 
-Sơ đồ đường ống và công cụ điều khiển (P\&ID – Piping and Instrumentation Diagram) là tài liệu kỹ thuật nền tảng định hình toàn bộ cấu trúc điều khiển của hệ thống cấp dầu nhiên liệu. Khác với sơ đồ công nghệ PFD chỉ mô tả luồng vật chất, P\&ID thể hiện đầy đủ các vòng điều chỉnh, thiết bị đo lường, cơ cấu chấp hành và mối liên hệ tín hiệu giữa chúng. Hệ thống điều khiển cung cấp dầu nhiên liệu được tổ chức thành bốn mạch vòng điều chỉnh có quan hệ phân cấp và phối hợp chặt chẽ với nhau, bao gồm mạch vòng lưu lượng (FIC), mạch vòng áp suất (PIC), mạch vòng nhiệt độ (TIC) và mạch vòng mức (LIC).
+Sơ đồ đường ống và công cụ điều khiển (P\&ID – Piping and Instrumentation Diagram) là tài liệu kỹ thuật nền tảng định hình toàn bộ cấu trúc điều khiển của hệ thống cấp dầu nhiên liệu. Khác với sơ đồ công nghệ PFD chỉ mô tả luồng vật chất, P\&ID thể hiện đầy đủ các vòng điều chỉnh, thiết bị đo lường, cơ cấu chấp hành và mối liên hệ tín hiệu giữa chúng. Hệ thống điều khiển cung cấp dầu nhiên liệu khởi động cho lò than phun được tổ chức thành bốn mạch vòng điều chỉnh có quan hệ phân cấp và phối hợp chặt chẽ với nhau, bao gồm mạch vòng lưu lượng (FIC), mạch vòng áp suất (PIC), mạch vòng nhiệt độ (TIC) và mạch vòng mức (LIC).
 
 Mạch vòng điều chỉnh lưu lượng (FIC) và mạch vòng điều chỉnh áp suất (PIC) được tích hợp trong cùng một sơ đồ P\&ID vì hai mạch vòng này có quan hệ vật lý mật thiết: áp suất và lưu lượng của dòng dầu trong đường ống phụ thuộc lẫn nhau qua đặc tính thủy lực của hệ thống. Lưu lượng kế FT đo lưu lượng thực tế và truyền tín hiệu về bộ điều khiển FIC; bộ điều khiển FIC xuất tín hiệu điều khiển đến van điều chỉnh FCV trên đường dầu cấp cho lò. Đồng thời, mạch vòng áp suất với cảm biến PT và bộ điều khiển PIC duy trì áp suất đường phân phối ổn định thông qua van bypass hồi lưu, nhằm cải thiện tính tuyến tính của van FCV và đảm bảo chất lượng phun sương tại đầu đốt.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{Hinhve/hinh4.png}
+    \resizebox{0.95\textwidth}{!}{%
+    \begin{tikzpicture}[>=stealth, thick]
+    % Main pipe
+    \draw[line width=1.5pt, ->] (0,0) node[left, align=right] {Từ bộ\\gia nhiệt} -- (3,0);
+    \draw[line width=1.5pt, ->] (3,0) -- (6.7,0);
+    \draw[line width=1.5pt, ->] (7.3,0) -- (10,0) node[right, align=left] {Đến đầu đốt\\(Burners)};
+    
+    % Branch pipe
+    \draw[line width=1.5pt] (2,0) -- (2,-2);
+    \draw[line width=1.5pt, ->] (2,-2) -- (3.7,-2);
+    \draw[line width=1.5pt, ->] (4.3,-2) -- (10,-2) node[right, align=left] {Hồi lưu về bể chứa\\(Recirculation)};
+    
+    % PCV on branch
+    \draw[thick] (3.7,-1.7) -- (4.3,-2.3) -- (4.3,-1.7) -- (3.7,-2.3) -- cycle;
+    \draw[thick] (4.0,-2) -- (4.0,-1.2);
+    \draw[thick] (3.7,-1.2) -- (4.3,-1.2);
+    \draw[thick] (3.7,-1.2) arc (180:0:0.3);
+    \coordinate (pcv_act) at (4.0,-0.9);
+    \node[below] at (4.0,-2.4) {PCV};
+    
+    % PT 101
+    \draw[thin] (1,0) -- (1,2.4);
+    \draw[thick, fill=white] (1,3) circle (0.6);
+    \node at (1,3.25) {PT}; \node at (1,2.75) {101};
+    
+    % PIC 101
+    \draw[thick, fill=white] (4.0,3) circle (0.6);
+    \draw[thin] (3.4,3) -- (4.6,3);
+    \node at (4.0,3.25) {PIC}; \node at (4.0,2.75) {101};
+    
+    % FT 201
+    \draw[thick] (5.5,0.3) -- (5.5,-0.3);
+    \draw[thin] (5.5,0) -- (5.5,2.4);
+    \draw[thick, fill=white] (5.5,3) circle (0.6);
+    \node at (5.5,3.25) {FT}; \node at (5.5,2.75) {201};
+    
+    % FCV 201
+    \draw[thick] (6.7,0.3) -- (7.3,-0.3) -- (7.3,0.3) -- (6.7,-0.3) -- cycle;
+    \draw[thick] (7.0,0) -- (7.0,0.8);
+    \draw[thick] (6.7,0.8) -- (7.3,0.8);
+    \draw[thick] (6.7,0.8) arc (180:0:0.3);
+    \coordinate (fcv_act) at (7.0,1.1);
+    \node[below] at (7.0,-0.4) {FCV};
+    
+    % FIC 201
+    \draw[thick, fill=white] (7.0,3) circle (0.6);
+    \draw[thin] (6.4,3) -- (7.6,3);
+    \node at (7.0,3.25) {FIC}; \node at (7.0,2.75) {201};
+    
+    % Signals (dashed)
+    \draw[dashed, ->] (1.6,3) -- (3.4,3); % PT to PIC
+    \draw[dashed, ->] (4.0,2.4) -- (pcv_act); % PIC to PCV
+    \draw[dashed, ->] (6.1,3) -- (6.4,3); % FT to FIC
+    \draw[dashed, ->] (7.0,2.4) -- (fcv_act); % FIC to FCV
+    \end{tikzpicture}%
+    }
     \caption{Sơ đồ P\&ID mạch vòng điều chỉnh lưu lượng và áp suất}
     \label{fig:pid_luu_luong_ap_suat}
 \end{figure}
@@ -22,7 +77,44 @@ Mạch vòng điều chỉnh nhiệt độ (TIC) kiểm soát nhiệt độ dầ
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{Hinhve/hinh3.png}
+    \resizebox{0.85\textwidth}{!}{%
+    \begin{tikzpicture}[>=stealth, thick]
+    % Heater box
+    \draw[thick, fill=gray!10] (4,-1.5) rectangle (6,1.5);
+    \node[align=center] at (5,0) {Bộ gia nhiệt\\(Heater)};
+    
+    % Oil line
+    \draw[line width=1.5pt, ->] (0,-0.5) node[left, align=right] {Dầu HFO\\từ bơm} -- (4,-0.5);
+    \draw[line width=1.5pt, ->] (6,-0.5) -- (10,-0.5) node[right, align=left] {Dầu HFO ra\\(đến lò)};
+    
+    % Steam line
+    \draw[line width=1.5pt, ->] (0,2) node[left, align=right] {Hơi nước\\cấp} -- (2.2,2);
+    \draw[line width=1.5pt, ->] (2.8,2) -- (5,2) -- (5,1.5);
+    \draw[line width=1.5pt, ->] (5,-1.5) -- (5,-2.5) node[below] {Nước ngưng (Condensate)};
+    
+    % TCV 301 on horizontal Steam line
+    \draw[thick] (2.2,2.3) -- (2.8,1.7) -- (2.8,2.3) -- (2.2,1.7) -- cycle;
+    \draw[thick] (2.5,2) -- (2.5,2.8);
+    \draw[thick] (2.2,2.8) -- (2.8,2.8);
+    \draw[thick] (2.2,2.8) arc (180:0:0.3);
+    \coordinate (tcv_act) at (2.5,3.1);
+    \node[below] at (2.5,1.6) {TCV};
+    
+    % TT 301 on Oil outlet
+    \draw[thin] (8,-0.5) -- (8,1.4);
+    \draw[thick, fill=white] (8,2) circle (0.6);
+    \node at (8,2.25) {TT}; \node at (8,1.75) {301};
+    
+    % TIC 301
+    \draw[thick, fill=white] (8,4) circle (0.6);
+    \draw[thin] (7.4,4) -- (8.6,4);
+    \node at (8,4.25) {TIC}; \node at (8,3.75) {301};
+    
+    % Signals
+    \draw[dashed, ->] (8,2.6) -- (8,3.4); % TT to TIC
+    \draw[dashed, ->] (7.4,4) -- (2.5,4) -- (tcv_act); % TIC to TCV
+    \end{tikzpicture}%
+    }
     \caption{Sơ đồ P\&ID mạch vòng điều chỉnh nhiệt độ}
     \label{fig:pid_nhiet_do}
 \end{figure}
@@ -31,7 +123,63 @@ Mạch vòng điều chỉnh mức (LIC) đảm bảo duy trì mức dầu trong
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\textwidth]{Hinhve/hinh5.png}
+    \resizebox{0.85\textwidth}{!}{%
+    \begin{tikzpicture}[>=stealth, thick]
+    % Tank (Cylinder)
+    \draw[thick, fill=gray!10] (4,2) arc (180:0:1 and 0.3) -- (6,-2) arc (360:180:1 and 0.3) -- cycle;
+    \draw[thick] (4,2) arc (180:360:1 and 0.3);
+    \node[align=center] at (5,0) {Bể chứa dầu\\(Tank)};
+    
+    % Inlet pipe (Top)
+    \draw[line width=1.5pt, ->] (0,1.5) node[left, align=right] {Dầu HFO\\từ nguồn} -- (1.7,1.5);
+    \draw[line width=1.5pt, ->] (2.3,1.5) -- (4,1.5);
+    
+    % LCV on inlet
+    \draw[thick] (1.7,1.8) -- (2.3,1.2) -- (2.3,1.8) -- (1.7,1.2) -- cycle;
+    \draw[thick] (2.0,1.5) -- (2.0,2.3);
+    \draw[thick] (1.7,2.3) -- (2.3,2.3);
+    \draw[thick] (1.7,2.3) arc (180:0:0.3);
+    \coordinate (lcv_act) at (2.0,2.6);
+    \node[below] at (2.0,1.1) {LCV};
+    
+    % Outlet pipe (Bottom)
+    \draw[line width=1.5pt, ->] (5,-2) -- (5,-3) -- (7.5,-3);
+    \draw[line width=1.5pt, ->] (8.5,-3) -- (10,-3) node[right, align=left] {Đến hệ thống\\bơm cấp};
+    
+    % Pump on outlet
+    \draw[thick, fill=white] (8,-3) circle (0.5);
+    \draw[thick] (7.7,-2.6) -- (7.7,-3.4) -- (8.4,-3) -- cycle;
+    \node[below] at (8,-3.6) {Bơm};
+    \coordinate (pump_ctrl) at (8,-2.5);
+    
+    % LT 401
+    \draw[thin] (6,-1) -- (7,-1) -- (7,1.4); 
+    \draw[thick, fill=white] (7,2) circle (0.6);
+    \node at (7,2.25) {LT}; \node at (7,1.75) {401};
+    
+    % LIC 401
+    \draw[thick, fill=white] (7,4) circle (0.6);
+    \draw[thin] (6.4,4) -- (7.6,4);
+    \node at (7,4.25) {LIC}; \node at (7,3.75) {401};
+    
+    % Interlock Block (I)
+    \draw[thick, fill=white] (4.2, 3.5) rectangle (5.8, 4.5);
+    \node[align=center] at (5, 4) {Khóa\\liên động};
+    
+    % Signals
+    \draw[dashed, ->] (7,2.6) -- (7,3.4); % LT to LIC
+    \draw[dashed, ->] (6.4,4) -- (5.8,4); % LIC to Interlock
+    \draw[dashed, ->] (7,4.6) -- (7, 5.5) -- (2.0, 5.5) -- (lcv_act); % Normal control LIC to LCV
+    
+    % Interlock Signals
+    \draw[dashed, ->] (4.2,4) -- (2.7,4) -- (2.7, 3) -- (2.2, 2.7); % HH to LCV
+    \draw[dashed, ->] (5.5,3.5) -- (5.5, 3.2) -- (8.5, 3.2) -- (8.5, -2.5) -- (pump_ctrl); % LL to Pump
+    
+    \node[above] at (4.5, 5.5) {Tín hiệu điều chỉnh mức (PID)};
+    % \node[above] at (3.5, 4.0) {HH (Đóng khẩn cấp)};
+    % \node[above] at (7.8, 3.2) {LL (Dừng bơm)};
+    \end{tikzpicture}%
+    }
     \caption{Sơ đồ P\&ID mạch vòng điều chỉnh mức}
     \label{fig:pid_muc}
 \end{figure}

@@ -9,7 +9,7 @@
 
 Trong các nhà máy nhiệt điện hiện đại, quá trình đốt cháy nhiên liệu trong lò hơi đóng vai trò trung tâm trong toàn bộ quy trình sản xuất điện năng. Chất lượng của quá trình đốt cháy này phụ thuộc trực tiếp vào khả năng cung cấp nhiên liệu một cách liên tục, ổn định và chính xác theo nhu cầu tải thực tế của tổ máy. Dầu nhiên liệu nặng (heavy fuel oil – HFO), hay còn gọi là dầu mazut, được sử dụng rộng rãi trong giai đoạn khởi động lò hoặc làm nhiên liệu dự phòng tại nhiều nhà máy nhiệt điện trên thế giới cũng như tại Việt Nam. Do đặc tính độ nhớt cao ở nhiệt độ thường, loại dầu này đòi hỏi phải được gia nhiệt trước khi đưa vào buồng đốt, tạo nên sự phức tạp đặc trưng trong thiết kế hệ thống điều khiển.
 
-Hệ thống điều khiển lưu lượng dầu nhiên liệu là tập hợp các thiết bị và giải pháp kỹ thuật có chức năng đo lường, xử lý tín hiệu và điều tiết lượng dầu cấp vào buồng đốt một cách tự động, nhằm đảm bảo quá trình cháy luôn diễn ra trong điều kiện tối ưu. Hệ thống này hoạt động theo nguyên lý vòng kín (closed-loop control), trong đó giá trị lưu lượng thực đo được liên tục so sánh với giá trị đặt (setpoint) và sai lệch giữa hai đại lượng này sẽ được bộ điều khiển xử lý để tạo ra tín hiệu hiệu chỉnh tác động lên cơ cấu chấp hành. Theo tiêu chuẩn ISA-5.1 và các quy chuẩn thiết kế nhà máy điện, hệ thống được yêu cầu đáp ứng các tiêu chí khắt khe về độ chính xác, khả năng phản ứng nhanh và tính sẵn sàng hoạt động cao.
+Hệ thống điều khiển lưu lượng dầu nhiên liệu khởi động cho lò than phun là tập hợp các thiết bị và giải pháp kỹ thuật có chức năng đo lường, xử lý tín hiệu và điều tiết lượng dầu cấp vào buồng đốt một cách tự động, nhằm đảm bảo quá trình khởi động lò diễn ra an toàn và quá trình cháy luôn ở điều kiện tối ưu. Hệ thống này hoạt động theo nguyên lý vòng kín (closed-loop control), trong đó giá trị lưu lượng thực đo được liên tục so sánh với giá trị đặt (setpoint) và sai lệch giữa hai đại lượng này sẽ được bộ điều khiển xử lý để tạo ra tín hiệu hiệu chỉnh tác động lên cơ cấu chấp hành. Theo tiêu chuẩn ISA-5.1 và các quy chuẩn thiết kế nhà máy điện, hệ thống được yêu cầu đáp ứng các tiêu chí khắt khe về độ chính xác, khả năng phản ứng nhanh và tính sẵn sàng hoạt động cao.
 
 \begin{figure}[htbp]
     \centering
@@ -20,7 +20,7 @@ Hệ thống điều khiển lưu lượng dầu nhiên liệu là tập hợp c
 
 \subsection{Mô tả đối tượng công nghệ}
 
-Hệ thống điều khiển lưu lượng dầu nhiên liệu trong nhà máy nhiệt điện được thiết kế theo cấu trúc nhiều tầng, từ khâu tiếp nhận và lưu trữ dầu thô đến khâu phân phối và đốt cháy trong buồng lò. Mỗi tầng công nghệ đảm nhận một chức năng cụ thể và được kết nối chặt chẽ thông qua hệ thống đường ống, van và thiết bị điều khiển.
+Hệ thống điều khiển lưu lượng dầu nhiên liệu khởi động cho lò than phun trong nhà máy nhiệt điện được thiết kế theo cấu trúc nhiều tầng, từ khâu tiếp nhận và lưu trữ dầu thô đến khâu phân phối và đốt cháy trong buồng lò. Mỗi tầng công nghệ đảm nhận một chức năng cụ thể và được kết nối chặt chẽ thông qua hệ thống đường ống, van và thiết bị điều khiển.
 
 Dầu nhiên liệu được tiếp nhận từ nguồn cung bên ngoài (tàu bơm, xà lan) và lưu trữ tạm thời trong bể đệm (buffer tank). Từ bể đệm, bơm chuyển (transfer pump) vận chuyển dầu đến các bể chứa chính (Tank 1 và Tank 2), đây là nguồn dự trữ dầu trực tiếp cấp cho quá trình đốt. Mức dầu trong các bể này được giám sát liên tục bằng cảm biến mức (LT) để đảm bảo hệ thống luôn có đủ nguồn cung.
 
@@ -28,13 +28,13 @@ Từ các bể chứa chính, bơm dầu nhiên liệu (fuel oil pump) hút dầ
 
 Sau khi đạt nhiệt độ yêu cầu, dầu nóng được dẫn đến manifold phân phối (fuel oil supply manifold). Đây là điểm phân chia dòng dầu thành các nhánh nhỏ hơn để cung cấp riêng biệt cho từng nhóm đầu đốt (burner group) của lò hơi. Lưu lượng dầu trên mỗi nhánh được điều tiết bởi một van điều khiển lưu lượng (FCV) riêng biệt hoạt động theo tín hiệu từ bộ điều khiển FIC tương ứng. Một đặc điểm quan trọng của hệ thống là đường hồi lưu dầu (fuel oil recirculation line): khi nhu cầu cấp dầu cho buồng đốt giảm, một phần dầu sẽ được hồi lưu về bể chứa nhằm duy trì dầu trong trạng thái tuần hoàn liên tục để tránh hiện tượng dầu bị làm nguội và tăng độ nhớt trong đường ống, đồng thời bảo vệ bơm khỏi tình trạng chạy không tải.
 
-\subsection{Phân loại hệ thống điều khiển lưu lượng dầu}
+\subsection{Phân loại hệ thống điều khiển lưu lượng dầu nhiên liệu khởi động}
 
-Dựa trên cấu trúc đường dòng và mức độ tự động hóa, hệ thống điều khiển lưu lượng dầu nhiên liệu có thể được phân thành ba loại chính. Hệ thống hở (open-loop system) là loại đơn giản nhất, trong đó dầu tuần hoàn theo một chiều từ bể chứa đến các đầu đốt mà không có đường hồi lưu; dạng hệ thống này thường áp dụng trong các nhà máy quy mô nhỏ sử dụng dầu nhẹ, nơi yêu cầu điều khiển không quá phức tạp. Hệ thống kín (closed-loop circulation system) có thêm đường hồi lưu dầu thừa về bể chứa, cho phép duy trì nhiệt độ dầu ổn định trong toàn bộ hệ thống ngay cả khi nhu cầu đốt thấp, phù hợp với các nhà máy lớn sử dụng dầu nặng HFO cần được gia nhiệt liên tục. Hệ thống tự động hóa hoàn toàn (fully automated system) là dạng tiên tiến nhất, trong đó toàn bộ quá trình đo lường, xử lý tín hiệu và điều chỉnh được thực hiện bởi PLC/DCS tích hợp với hệ thống giám sát trung tâm SCADA/HMI; đây là loại hệ thống phổ biến tại các nhà máy nhiệt điện hiện đại, cho phép vận hành linh hoạt, giám sát từ xa và phản ứng nhanh trước các thay đổi về tải. Phân loại tổng hợp được trình bày trong Bảng~\ref{tab:phan_loai_he_thong}.
+Dựa trên cấu trúc đường dòng và mức độ tự động hóa, hệ thống điều khiển lưu lượng dầu nhiên liệu khởi động cho lò than phun có thể được phân thành ba loại chính. Hệ thống hở (open-loop system) là loại đơn giản nhất, trong đó dầu tuần hoàn theo một chiều từ bể chứa đến các đầu đốt mà không có đường hồi lưu; dạng hệ thống này thường áp dụng trong các nhà máy quy mô nhỏ sử dụng dầu nhẹ, nơi yêu cầu điều khiển không quá phức tạp. Hệ thống kín (closed-loop circulation system) có thêm đường hồi lưu dầu thừa về bể chứa, cho phép duy trì nhiệt độ dầu ổn định trong toàn bộ hệ thống ngay cả khi nhu cầu đốt thấp, phù hợp với các nhà máy lớn sử dụng dầu nặng HFO cần được gia nhiệt liên tục. Hệ thống tự động hóa hoàn toàn (fully automated system) là dạng tiên tiến nhất, trong đó toàn bộ quá trình đo lường, xử lý tín hiệu và điều chỉnh được thực hiện bởi PLC/DCS tích hợp với hệ thống giám sát trung tâm SCADA/HMI; đây là loại hệ thống phổ biến tại các nhà máy nhiệt điện hiện đại, cho phép vận hành linh hoạt, giám sát từ xa và phản ứng nhanh trước các thay đổi về tải. Phân loại tổng hợp được trình bày trong Bảng~\ref{tab:phan_loai_he_thong}.
 
 \begin{table}[htbp]
     \centering
-    \caption{Phân loại các hệ thống điều khiển lưu lượng dầu nhiên liệu}
+    \caption{Phân loại các hệ thống điều khiển lưu lượng dầu nhiên liệu khởi động}
     \label{tab:phan_loai_he_thong}
     \resizebox{\textwidth}{!}{%
     \begin{tabular}{|p{3.5cm}|p{6cm}|p{4.5cm}|}
@@ -53,7 +53,7 @@ Dựa trên cấu trúc đường dòng và mức độ tự động hóa, hệ 
 
 \section{Các thông số điều khiển, giám sát của hệ thống}
 
-Trong hệ thống điều khiển lưu lượng dầu nhiên liệu, có bốn nhóm thông số vật lý cần được theo dõi và điều chỉnh liên tục để đảm bảo hệ thống vận hành an toàn và hiệu quả.
+Trong hệ thống điều khiển lưu lượng dầu nhiên liệu khởi động cho lò than phun, có bốn nhóm thông số vật lý cần được theo dõi và điều chỉnh liên tục để đảm bảo hệ thống vận hành an toàn và hiệu quả.
 
 Lưu lượng dòng chất (Flow) là đối tượng điều khiển chính, quyết định trực tiếp năng lượng cung cấp cho đầu đốt. Giá trị lưu lượng tính theo đơn vị m³/h hoặc kg/h phụ thuộc vào độ mở của van điều chỉnh FCV, tốc độ bơm phân phối và áp suất hệ thống. Đây là biến điều khiển cần được duy trì bám sát theo giá trị đặt từ hệ thống điều phối tải cấp trên (Boiler Master).
 
@@ -67,7 +67,7 @@ Mức dầu trong bể chứa (Level) phản ánh trữ lượng dầu sẵn có
 
 \subsection{Vai trò của hệ thống điều khiển}
 
-Hệ thống điều khiển lưu lượng dầu nhiên liệu giữ vai trò then chốt trong hoạt động vận hành của nhà máy nhiệt điện, thể hiện trên ba phương diện chính.
+Hệ thống điều khiển lưu lượng dầu nhiên liệu khởi động cho lò than phun giữ vai trò then chốt trong quá trình khởi động và vận hành của nhà máy nhiệt điện, thể hiện trên ba phương diện chính.
 
 Về điều tiết cung cấp nhiên liệu, hệ thống điều khiển lưu lượng đảm bảo lượng dầu được cấp vào buồng đốt luôn phù hợp với nhu cầu tải thực tế. Khi phụ tải điện tăng cao, hệ thống điều khiển cấp trên sẽ yêu cầu tăng lưu lượng dầu để tăng cường độ đốt cháy, sinh thêm hơi và tăng công suất tua-bin; ngược lại, khi phụ tải giảm, lưu lượng dầu sẽ được điều chỉnh giảm tương ứng nhằm tránh lãng phí nhiên liệu và nguy cơ quá nhiệt lò hơi.
 
@@ -81,7 +81,7 @@ Bên cạnh các yếu tố điều khiển chủ động, sự vận hành ổn
 
 \section{Sơ đồ hệ thống đo lường, điều khiển giám sát cho đối tượng}
 
-Sơ đồ công nghệ tổng quan (Process Flow Diagram – PFD) của hệ thống điều khiển lưu lượng dầu nhiên liệu được xây dựng nhằm mô tả trực quan toàn bộ luồng vật chất và năng lượng đi qua hệ thống, đồng thời thể hiện mối liên hệ giữa các thiết bị công nghệ chính (Hình~\ref{fig:so_do_cong_nghe}).
+Sơ đồ công nghệ tổng quan (Process Flow Diagram – PFD) của hệ thống điều khiển lưu lượng dầu nhiên liệu khởi động cho lò than phun được xây dựng nhằm mô tả trực quan toàn bộ luồng vật chất và năng lượng đi qua hệ thống, đồng thời thể hiện mối liên hệ giữa các thiết bị công nghệ chính (Hình~\ref{fig:so_do_cong_nghe}).
 
 \begin{figure}[H]
     \centering
