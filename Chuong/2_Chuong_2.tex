@@ -247,34 +247,34 @@ Bộ điều khiển trung tâm là PLC Siemens S7-1200, được lựa chọn d
 
 Để nhận dạng đặc tính động học của đối tượng điều khiển, phương pháp thực nghiệm hàm quá độ (Transient Response Method) được áp dụng. Phương pháp này có ưu điểm là không cần biết trước cấu trúc bên trong của hệ thống, chỉ cần quan sát phản ứng đầu ra khi có kích thích đầu vào xác định, từ đó xác định các tham số của mô hình toán học. Trong điều kiện lò đốt vận hành ổn định tại điểm làm việc danh định, một tín hiệu kích thích dạng hàm bậc thang với biên độ $\Delta U$ được áp đặt lên van điều tiết FCV trong khi giữ nguyên các điều kiện vận hành khác. Đáp ứng lưu lượng thực tế $y(t)$ được ghi lại từ phần mềm HMI của DCS với tần số lấy mẫu đủ cao cho đến khi hệ thống đạt trạng thái xác lập mới. Từ đường cong đáp ứng này, tiến hành xác định điểm uốn và kẻ tiếp tuyến để khai thác các tham số đặc trưng của mô hình SOPDT (Second-Order Plus Dead Time), bao gồm hệ số truyền $K$, các hằng số thời gian quán tính $T_1$, $T_2$ và thời gian trễ thuần $\tau$.
 
-\subsection{Bảng số liệu thực nghiệm}
+% \subsection{Bảng số liệu thực nghiệm}
 
-Thí nghiệm được thực hiện bằng cách áp đặt tín hiệu bậc thang mở van $u(t) = 5{,}1 \cdot \mathbf{1}(t)$ (biên độ kích thích 5,1 đơn vị) lên đối tượng trong điều kiện lò hơi đang vận hành ổn định. Dữ liệu đáp ứng lưu lượng được trích xuất từ phần mềm HMI và các tọa độ đặc trưng phục vụ nhận dạng mô hình được tổng hợp trong Bảng~\ref{tab:thong_so_thuc_nghiem}.
+% Thí nghiệm được thực hiện bằng cách áp đặt tín hiệu bậc thang mở van $u(t) = 5{,}1 \cdot \mathbf{1}(t)$ (biên độ kích thích 5,1 đơn vị) lên đối tượng trong điều kiện lò hơi đang vận hành ổn định. Dữ liệu đáp ứng lưu lượng được trích xuất từ phần mềm HMI và các tọa độ đặc trưng phục vụ nhận dạng mô hình được tổng hợp trong Bảng~\ref{tab:thong_so_thuc_nghiem}.
 
-\begin{table}[H]
-    \centering
-    \caption{Các điểm đặc trưng của đáp ứng quá độ thực nghiệm}
-    \label{tab:thong_so_thuc_nghiem}
-    \begin{tabular}{|l|c|c|}
-        \hline
-        \textbf{Điểm đồ thị / Thông số} & \textbf{Thời gian t (s)} & \textbf{Biên độ y(t)} \\
-        \hline
-        Nền ban đầu ($y(0)$) & $0{,}0$ & $1{,}30$ \\
-        \hline
-        Giao điểm tiếp tuyến / Trục hoành (A) & $2{,}579$ & $1{,}30$ \\
-        \hline
-        Điểm uốn (U) & $6{,}20$ & $1{,}88$ \\
-        \hline
-        Giao điểm tiếp tuyến / Trục tiệm cận (B) & $11{,}74$ & $2{,}80$ \\
-        \hline
-        Giá trị xác lập mới ($y(\infty)$) & $\infty$ & $2{,}80$ \\
-        \hline
-        \textbf{Biên độ tín hiệu kích $u_0$} & \multicolumn{2}{c|}{$5{,}1$} \\
-        \hline
-    \end{tabular}
-\end{table}
+% \begin{table}[H]
+%     \centering
+%     \caption{Các điểm đặc trưng của đáp ứng quá độ thực nghiệm}
+%     \label{tab:thong_so_thuc_nghiem}
+%     \begin{tabular}{|l|c|c|}
+%         \hline
+%         \textbf{Điểm đồ thị / Thông số} & \textbf{Thời gian t (s)} & \textbf{Biên độ y(t)} \\
+%         \hline
+%         Nền ban đầu ($y(0)$) & $0{,}0$ & $1{,}30$ \\
+%         \hline
+%         Giao điểm tiếp tuyến / Trục hoành (A) & $2{,}579$ & $1{,}30$ \\
+%         \hline
+%         Điểm uốn (U) & $6{,}20$ & $1{,}88$ \\
+%         \hline
+%         Giao điểm tiếp tuyến / Trục tiệm cận (B) & $11{,}74$ & $2{,}80$ \\
+%         \hline
+%         Giá trị xác lập mới ($y(\infty)$) & $\infty$ & $2{,}80$ \\
+%         \hline
+%         \textbf{Biên độ tín hiệu kích $u_0$} & \multicolumn{2}{c|}{$5{,}1$} \\
+%         \hline
+%     \end{tabular}
+% \end{table}
 
-Bảng số liệu thực nghiệm này cung cấp đầy đủ thông tin để thực hiện nhận dạng đối tượng bằng phương pháp đồ họa kẻ-vẽ tiếp tuyến tại điểm uốn, là cơ sở trực tiếp cho quá trình mô hình hóa và tổng hợp bộ điều khiển được trình bày chi tiết trong Chương 3.
+% Bảng số liệu thực nghiệm này cung cấp đầy đủ thông tin để thực hiện nhận dạng đối tượng bằng phương pháp đồ họa kẻ-vẽ tiếp tuyến tại điểm uốn, là cơ sở trực tiếp cho quá trình mô hình hóa và tổng hợp bộ điều khiển được trình bày chi tiết trong Chương 3.
 
 %Đây là thay đổi.
 %Đây là thay đổi 2.

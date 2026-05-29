@@ -83,9 +83,117 @@ Bên cạnh các yếu tố điều khiển chủ động, sự vận hành ổn
 
 Sơ đồ công nghệ tổng quan (Process Flow Diagram – PFD) của hệ thống điều khiển lưu lượng dầu nhiên liệu khởi động cho lò than phun được xây dựng nhằm mô tả trực quan toàn bộ luồng vật chất và năng lượng đi qua hệ thống, đồng thời thể hiện mối liên hệ giữa các thiết bị công nghệ chính (Hình~\ref{fig:so_do_cong_nghe}).
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.95\textwidth]{Hinhve/so-do-cong-nghe.png}
+    \begin{tikzpicture}[
+        scale=0.95,
+        every node/.style={transform shape},
+        equipment/.style={draw, rectangle, minimum width=2.2cm, minimum height=1.0cm, align=center, thick, fill=white, font=\sffamily\small},
+        valve h/.pic={
+            \draw[thick, fill=white] (-0.2, 0.15) -- (-0.2, -0.15) -- (0,0) -- cycle;
+            \draw[thick, fill=white] (0.2, 0.15) -- (0.2, -0.15) -- (0,0) -- cycle;
+        },
+        valve v/.pic={
+            \draw[thick, fill=white] (-0.15, 0.2) -- (0.15, 0.2) -- (0,0) -- cycle;
+            \draw[thick, fill=white] (-0.15, -0.2) -- (0.15, -0.2) -- (0,0) -- cycle;
+        },
+        control valve v/.pic={
+            \draw[thick, fill=white] (-0.15, 0.2) -- (0.15, 0.2) -- (0,0) -- cycle;
+            \draw[thick, fill=white] (-0.15, -0.2) -- (0.15, -0.2) -- (0,0) -- cycle;
+            \draw[thick] (0,0) -- (0.25, 0);
+            \node[right, font=\sffamily\scriptsize, inner sep=1pt] at (0.25, 0) {D};
+        },
+        control valve h/.pic={
+            \draw[thick, fill=white] (-0.2, 0.15) -- (-0.2, -0.15) -- (0,0) -- cycle;
+            \draw[thick, fill=white] (0.2, 0.15) -- (0.2, -0.15) -- (0,0) -- cycle;
+            \draw[thick] (0,0) -- (0, 0.25);
+            \node[above, font=\sffamily\scriptsize, inner sep=1pt] at (0, 0.25) {D};
+        },
+        pump/.pic={
+            \draw[thick, fill=white] (0,0) circle (0.35);
+            \draw[thick] (0,0.35) -- (0,-0.35);
+            \draw[thick] (-0.25, 0.25) -- (0,-0.35);
+            \draw[thick] (0.25, 0.25) -- (0,-0.35);
+        },
+        pipe/.style={thick, draw=cyan!70!black},
+        arrow/.style={-Latex, thick, draw=cyan!70!black}
+    ]
+        % Equipment Nodes
+        \node[equipment, minimum width=2.2cm] (buffer) at (0, 5) {Bể chứa\\đệm};
+        \node[equipment, minimum width=1.8cm] (tank1) at (4, 5) {Tank 1};
+        \node[equipment, minimum width=1.8cm] (tank2) at (8, 5) {Tank 2};
+        
+        \node[equipment, minimum width=2.2cm] (heater1) at (4, 1.2) {Gia nhiệt\\dầu};
+        \node[equipment, minimum width=2.2cm] (heater2) at (8, 1.2) {Gia nhiệt\\dầu};
+
+        % Return line at top
+        \draw[pipe] (3.8, 7) -- (8.2, 7);
+        \node[above, font=\sffamily\small] at (6, 7) {Dầu từ lò hơi hồi về};
+        \draw[pipe] (6, 7) -- (6, 5);
+        
+        % Connection between Tank 1 & Tank 2
+        \draw[pipe] (tank1.east) -- (tank2.west);
+        \pic at (5.3, 5) {valve h};
+        \pic at (6.7, 5) {valve h};
+
+        % Buffer tank to Tank 1
+        \draw[arrow] (buffer.east) -- (tank1.west);
+
+        % Column 1 (Under Tank 1)
+        \draw[arrow] (tank1.south) -- (4, 4.1);
+        \pic at (4, 3.9) {valve v};
+        \draw[arrow] (4, 3.7) -- (4, 3.35);
+        \pic at (4, 3.0) {pump};
+        \draw[arrow] (4, 2.65) -- (4, 2.4);
+        \pic at (4, 2.2) {valve v};
+        \draw[arrow] (4, 2.0) -- (heater1.north);
+        
+        \draw[arrow] (heater1.south) -- (4, 0.15);
+        \pic at (4, -0.2) {pump};
+        \draw[arrow] (4, -0.55) -- (4, -0.8);
+        \pic at (4, -1.0) {valve v};
+        \draw[pipe] (4, -1.2) -- (4, -1.8);
+
+        % Column 2 (Under Tank 2)
+        \draw[arrow] (tank2.south) -- (8, 4.1);
+        \pic at (8, 3.9) {valve v};
+        \draw[arrow] (8, 3.7) -- (8, 3.35);
+        \pic at (8, 3.0) {pump};
+        \draw[arrow] (8, 2.65) -- (8, 2.4);
+        \pic at (8, 2.2) {valve v};
+        \draw[arrow] (8, 2.0) -- (heater2.north);
+        
+        \draw[arrow] (heater2.south) -- (8, 0.15);
+        \pic at (8, -0.2) {pump};
+        \draw[arrow] (8, -0.55) -- (8, -0.8);
+        \pic at (8, -1.0) {valve v};
+        \draw[pipe] (8, -1.2) -- (8, -1.8);
+
+        % Bottom junction
+        \draw[pipe] (4, -1.8) -- (8, -1.8);
+        \draw[pipe] (6, -1.8) -- (6, -2.6);
+        \draw[pipe] (6, -2.6) -- (1.3, -2.6);
+        \pic at (3.65, -2.6) {valve h};
+        
+        % Left side rise
+        \draw[pipe] (1.3, -2.6) -- (1.3, -1.2);
+        \pic at (1.3, -1.9) {control valve v};
+        
+        % Parallel branches split
+        \draw[pipe] (1.3, -1.2) -- (0.5, -1.2) -- (0.5, 0);
+        \draw[pipe] (1.3, -1.2) -- (2.1, -1.2) -- (2.1, 0);
+        \pic at (0.5, -0.6) {control valve v};
+        \pic at (2.1, -0.6) {control valve v};
+        
+        % Parallel branches merge
+        \draw[pipe] (0.5, 0) -- (2.1, 0);
+        \draw[pipe] (1.3, 0) -- (1.3, 1.0);
+        
+        % Outlet header
+        \draw[thick, draw=cyan!70!black, {Latex}-{Latex}] (0.0, 1.0) -- (2.6, 1.0);
+        \node[above, font=\sffamily\small] at (1.3, 1.0) {Đi đến vòi phun};
+
+    \end{tikzpicture}
     \caption{Sơ đồ công nghệ tổng quan hệ thống cấp dầu nhiên liệu}
     \label{fig:so_do_cong_nghe}
 \end{figure}
