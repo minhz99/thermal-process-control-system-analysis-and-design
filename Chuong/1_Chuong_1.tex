@@ -5,13 +5,13 @@
 
 \section{Tổng quan về đối tượng công nghệ}
 
-\subsection{Giới thiệu chung về hệ thống cấp dầu nhiên liệu khởi động}
+\subsection{Sơ lược về công nghệ và hệ thống}
 
-Trong các nhà máy nhiệt điện đốt than, dầu nhiên liệu khởi động được sử dụng trong giai đoạn khởi động lò, duy trì ngọn lửa mồi, hỗ trợ bắt cháy khi phụ tải thấp và làm nguồn dự phòng khi hệ thống cấp than chưa sẵn sàng hoặc khi điều kiện vận hành yêu cầu chuyển đổi chế độ cháy. Đối tượng công nghệ của bài tập lớn là hệ thống cấp và điều khiển lưu lượng dầu nhiên liệu khởi động cho lò than phun. Đây là một hệ thống công nghệ có tính liên tục, làm việc trong điều kiện nhiệt độ cao, dầu có độ nhớt lớn và yêu cầu an toàn cháy nổ nghiêm ngặt.
+Trong dây chuyền sản xuất điện năng của các nhà máy nhiệt điện, quá trình cháy nhiên liệu đóng vai trò cốt lõi nhằm chuyển hóa năng lượng hóa học thành nhiệt năng để sinh hơi. Đối với các lò hơi đốt than phun (Pulverized Coal - PC), hệ thống cấp dầu nhiên liệu (Fuel Oil System) là một phân hệ công nghệ phụ trợ nhưng mang tính sống còn, đặc biệt trong các giai đoạn vận hành then chốt. Cụ thể, dầu nhiên liệu (thường là dầu FO hoặc DO) được sử dụng để mồi lửa khi khởi động lò từ trạng thái lạnh, hỗ trợ quá trình bắt cháy của than khi phụ tải của tổ máy xuống thấp, hoặc đóng vai trò nhiên liệu dự phòng khẩn cấp khi hệ thống cấp than gặp sự cố.
 
-Về bản chất, hệ thống này thực hiện nhiệm vụ tiếp nhận, lưu trữ, gia nhiệt, tuần hoàn, đo lường và phân phối dầu đến các đầu đốt của lò hơi. Trong chu trình đó, lưu lượng dầu cấp là đại lượng có ảnh hưởng trực tiếp đến cường độ cháy, nhiệt lượng sinh ra trong buồng lửa và khả năng duy trì trạng thái cháy ổn định. Do đó, bài toán điều khiển lưu lượng dầu không chỉ là bài toán tự động hóa đơn thuần mà còn là một khâu kỹ thuật quan trọng quyết định độ tin cậy của toàn bộ quá trình khởi động lò.
+Về mặt cấu tạo và vận hành, hệ thống cấp dầu nhiên liệu bao gồm các khâu công nghệ nối tiếp nhau: tiếp nhận dầu từ các bồn chứa dung tích lớn, sử dụng bơm chuyển để đưa dầu qua các bộ gia nhiệt nhằm giảm độ nhớt động học, đảm bảo khả năng điền đầy và phun sương tại vòi đốt. Dòng dầu sau khi đạt các tiêu chuẩn về nhiệt độ và áp suất sẽ đi qua cụm van điều khiển lưu lượng (Control Valve) trước khi được phân phối vào buồng lửa. Quá trình đốt cháy lưu lượng dầu này sinh ra một lượng nhiệt năng tương ứng, truyền qua các bề mặt hấp thụ nhiệt của lò hơi để gia nhiệt cho nước cấp, từ đó hình thành hơi nước ở trạng thái nhiệt độ và áp suất cao, sẵn sàng cung cấp cho tuabin sinh công. 
 
-Hình~\ref{fig:hmi_fuel_oil} là giao diện giám sát điển hình của hệ thống cấp dầu nhiên liệu trên DCS. Hình này cho thấy các cụm bể chứa, đường hồi lưu, bộ gia nhiệt và các nhánh cấp cho đầu đốt được tích hợp trong một cấu trúc công nghệ khép kín.
+Như vậy, toàn bộ chu trình từ lúc cấp dầu đến khi sinh hơi tạo thành một quá trình nhiệt động học phức tạp. Bất kỳ sự thay đổi nào về lưu lượng dầu nhiên liệu tại vòi đốt đều trực tiếp làm thay đổi cường độ bức xạ nhiệt trong buồng lửa, qua đó tác động mạnh mẽ đến các thông số nhiệt động của hơi nước đầu ra, mà tiêu biểu nhất là thông số áp suất hơi mới. Hình~\ref{fig:hmi_fuel_oil} trình bày một giao diện giám sát điển hình của hệ thống cấp dầu nhiên liệu trên hệ thống điều khiển phân tán (DCS), cho thấy tính quy mô và sự liên kết chặt chẽ của các thiết bị công nghệ trong hệ thống.
 
 \begin{figure}[htbp]
     \centering
@@ -20,15 +20,41 @@ Hình~\ref{fig:hmi_fuel_oil} là giao diện giám sát điển hình của hệ
     \label{fig:hmi_fuel_oil}
 \end{figure}
 
-\subsection{Mô tả đối tượng công nghệ}
+\subsection{Các thông số điều khiển và giám sát của hệ thống}
 
-Hệ thống cấp dầu nhiên liệu khởi động thường bao gồm các khâu chính: tiếp nhận dầu, lưu trữ trong bể, bơm chuyển, gia nhiệt, tuần hoàn hồi lưu và phân phối đến các đầu đốt. Dầu sau khi tiếp nhận từ nguồn ngoài được đưa vào bể đệm, sau đó bơm chuyển dầu đến các bể chứa chính. Tại đây, mức dầu được giám sát liên tục nhằm bảo đảm nguồn cấp ổn định cho hệ thống bơm hút.
+Để hệ thống cấp dầu nhiên liệu hoạt động an toàn và đạt hiệu suất cao, quá trình vận hành đòi hỏi sự giám sát và điều khiển liên tục các thông số kỹ thuật trọng yếu. Dựa trên đặc tính vật lý và yêu cầu của quá trình cháy, các thông số này được phân loại thành biến điều khiển chính, biến điều khiển phụ và các biến giám sát an toàn.
 
-Từ các bể chứa chính, dầu được bơm qua tuyến công nghệ chính đến bộ gia nhiệt. Mục đích của gia nhiệt là giảm độ nhớt động học của dầu xuống mức phù hợp với điều kiện vận chuyển qua đường ống và phun tơi tại đầu đốt. Đối với dầu HFO hoặc mazut, nhiệt độ làm việc thường phải được duy trì trong vùng đủ cao để bảo đảm tính chảy và tính phun sương, đồng thời không vượt quá giới hạn gây phân hủy nhiệt hoặc tạo cặn bám.
+Áp suất hơi mới (Main Steam Pressure) là biến công nghệ quan trọng nhất, đóng vai trò là thông số điều khiển vòng ngoài trong cấu trúc tự động hóa của tổ máy. Áp suất hơi phản ánh trực tiếp trạng thái cân bằng giữa năng lượng nhiệt cung cấp vào lò hơi (thông qua nhiên liệu) và năng lượng nhiệt tiêu thụ bởi tuabin. Khi áp suất hơi được duy trì ổn định tại giá trị định mức, tuabin sẽ hoạt động ở hiệu suất nhiệt động cao nhất, đồng thời tránh được các ứng suất cơ học nguy hiểm do dao động áp suất gây ra trên hệ thống đường ống dẫn hơi áp lực cao.
 
-Sau bộ gia nhiệt, dầu nóng được dẫn đến manifold phân phối để chia đến các nhóm đầu đốt. Lưu lượng trên từng nhánh được điều tiết bởi van điều khiển lưu lượng. Một phần dòng dầu còn được hồi lưu về bể chứa nhằm duy trì tuần hoàn, tránh lắng cặn và bảo đảm dầu luôn ở trạng thái nhiệt ổn định. Đường hồi lưu cũng có vai trò bảo vệ bơm khỏi làm việc trong điều kiện thiếu tải hoặc lưu lượng quá nhỏ.
+Lưu lượng dầu nhiên liệu (Fuel Oil Flow) là thông số điều khiển vòng trong, đóng vai trò là biến thao tác trực tiếp để thay đổi áp suất hơi. Bằng cách điều chỉnh độ mở của van điều khiển tuyến tính, lượng dầu phun vào buồng đốt thay đổi, kéo theo sự thay đổi về lượng nhiệt giải phóng. Việc đo lường và điều khiển chính xác lưu lượng dầu không chỉ quyết định chất lượng điều khiển áp suất hơi mà còn đảm bảo tỷ lệ hòa trộn tối ưu giữa nhiên liệu và không khí cháy, giảm thiểu tổn thất nhiệt do cháy không hoàn toàn.
 
-Sơ đồ công nghệ tổng quan được trình bày trong Hình~\ref{fig:so_do_cong_nghe}. Sơ đồ này chỉ ra mối quan hệ giữa khâu lưu trữ, gia nhiệt, điều tiết và hồi lưu; đồng thời là cơ sở để xây dựng sơ đồ đo lường và cấu trúc điều khiển ở các phần sau.
+Ngoài hai thông số điều khiển cốt lõi nêu trên, nhiệt độ và áp suất dầu cấp trên đường ống cũng là những thông số giám sát mang tính bắt buộc. Nhiệt độ dầu quyết định độ nhớt động học; nếu nhiệt độ quá thấp, dầu sẽ khó tơi hóa khi phun, gây ra hiện tượng nhỏ giọt và khói đen. Ngược lại, nhiệt độ quá cao có thể gây đóng cặn carbon trong ống và béc phun. Áp suất dầu cấp cần được giữ ổn định ở đầu vào của van điều khiển nhằm tạo ra động năng đủ lớn để xé tơi màng dầu, đồng thời tránh hiện tượng xâm thực (cavitation) làm hư hỏng cấu trúc van.
+
+\subsection{Vai trò, ý nghĩa của hệ thống và thông số quá trình}
+
+Hệ thống điều khiển cấp dầu nhiên liệu mang ý nghĩa quyết định đối với tính linh hoạt và độ tin cậy của toàn bộ nhà máy nhiệt điện. Trong bối cảnh vận hành thực tế, khi tổ máy nhận lệnh thay đổi phụ tải từ trung tâm điều độ hệ thống điện, lò hơi phải lập tức đáp ứng bằng cách thay đổi lượng hơi cung cấp. Thông số áp suất hơi chính là thước đo độ chênh lệch giữa công suất sinh hơi của lò và công suất tiêu thụ của tuabin. Do đó, việc duy trì áp suất hơi luôn bám sát giá trị đặt đảm bảo cho tổ máy vận hành an toàn, ngăn ngừa sự cố nhảy lò do áp suất vượt ngưỡng tác động của van an toàn.
+
+Mặt khác, việc chọn lưu lượng dầu làm thông số điều khiển phụ mang lại khả năng kháng nhiễu vượt trội cho hệ thống. Thay vì chờ đợi áp suất hơi biến thiên (thường mất thời gian dài do quán tính nhiệt của lò hơi rất lớn) mới tiến hành bù trừ lượng nhiên liệu, hệ thống đo lường lưu lượng dầu cho phép phát hiện tức thời những biến động bên trong hệ thống thủy lực, chẳng hạn như dao động áp lực bơm cấp dầu hoặc hiện tượng kẹt cơ khí của van điều khiển. Nhờ đó, thao tác điều chỉnh được thực hiện ngay lập tức, triệt tiêu nhiễu từ trong trứng nước trước khi chúng có cơ hội lan truyền và gây ảnh hưởng lên áp suất hơi của vòng ngoài.
+
+\subsection{Các yếu tố ảnh hưởng đến thông số quá trình}
+
+Hệ thống hoạt động trong môi trường công nghiệp phức tạp, do đó thường xuyên chịu sự tác động của nhiều loại nhiễu loạn khác nhau, ảnh hưởng trực tiếp đến chất lượng điều khiển. Có thể chia các yếu tố nhiễu thành hai nhóm chính dựa trên vị trí tác động của chúng: nhiễu tác động lên vòng ngoài (áp suất hơi) và nhiễu tác động lên vòng trong (lưu lượng dầu).
+
+Đối với áp suất hơi, nhiễu tải (Load Disturbance) là yếu tố tác động thường xuyên và mạnh mẽ nhất. Khi van điều chỉnh hơi vào tuabin mở rộng hoặc thu hẹp theo nhu cầu công suất phát điện, lưu lượng hơi thoát ra khỏi lò thay đổi đột ngột, làm phá vỡ cân bằng vật chất và năng lượng trong bao hơi, dẫn đến sự sụt giảm hoặc gia tăng áp suất hơi một cách nhanh chóng. Thêm vào đó, những biến động trong quá trình cháy, chẳng hạn như chất lượng gió cấp không ổn định, hàm lượng nhiệt của bản thân nhiên liệu thay đổi, hay bức xạ nhiệt bị suy giảm do hiện tượng đóng xỉ trên bề mặt ống sinh hơi, đều làm thay đổi khả năng truyền nhiệt và tác động chậm lên áp suất hơi.
+
+Đối với lưu lượng dầu nhiên liệu, các yếu tố nhiễu chủ yếu mang tính chất thủy lực và cơ học. Sự sụt áp trên đường ống cấp dầu do rò rỉ hoặc do bơm dầu vận hành không ổn định sẽ làm thay đổi chênh lệch áp suất qua van điều khiển (pressure drop). Theo đặc tính thủy lực, khi chênh áp qua van thay đổi, lưu lượng dầu thực tế sẽ dao động ngay cả khi độ mở của van vẫn được giữ nguyên. Ngoài ra, sự biến thiên nhiệt độ của dầu nhiên liệu làm thay đổi độ nhớt, gây ảnh hưởng trực tiếp đến hệ số lưu lượng ($C_v$) của van và tạo ra sự phi tuyến trong đặc tính tĩnh của đối tượng vòng trong.
+
+\subsection{Sơ đồ hệ thống đo lường và điều khiển giám sát}
+
+Xuất phát từ phân tích về sự chênh lệch lớn trong đặc tính động học giữa quá trình thủy lực của lưu lượng dầu (nhanh) và quá trình nhiệt động của áp suất hơi (chậm, có trễ), cấu trúc điều khiển đơn vòng (Single Loop) kinh điển sẽ không thể đáp ứng được các tiêu chuẩn khắt khe về chất lượng điều khiển. Việc sử dụng bộ điều khiển phản hồi duy nhất cho một đối tượng có quán tính và trễ lớn thường dẫn đến hiện tượng trượt quá mức (overshoot) và dao động kéo dài, gây nguy cơ mất an toàn vận hành.
+
+Để khắc phục nhược điểm này, hệ thống đo lường và điều khiển được thiết kế theo cấu trúc điều khiển Cascade (cấp tầng), bao gồm hai vòng điều khiển lồng ghép vào nhau:
+\begin{itemize}
+    \item \textbf{Vòng ngoài (Vòng chính - Master Loop):} Nhận nhiệm vụ giám sát và điều khiển áp suất hơi mới. Cảm biến áp suất (PT) liên tục đo lường áp suất hơi tại đầu ra của lò, truyền tín hiệu về bộ điều khiển áp suất. Bộ điều khiển này so sánh giá trị thực tế với giá trị đặt (Setpoint) và tính toán ra một tín hiệu đầu ra. Tín hiệu này không đi trực tiếp đến cơ cấu chấp hành mà đóng vai trò là giá trị đặt về lưu lượng dầu nhiên liệu cho vòng trong.
+    \item \textbf{Vòng trong (Vòng phụ - Slave Loop):} Đảm nhận việc điều khiển lưu lượng dầu nhiên liệu. Bộ điều khiển lưu lượng nhận giá trị đặt từ vòng ngoài, so sánh nó với lưu lượng thực tế đo được từ cảm biến lưu lượng (FT) lắp trên đường ống cấp dầu. Từ đó, bộ điều khiển tính toán và xuất tín hiệu thao tác trực tiếp đến van điều khiển lưu lượng (FCV) nhằm thay đổi tiết diện lưu thông, điều tiết chính xác lượng dầu đi vào lò hơi.
+\end{itemize}
+
+Sơ đồ công nghệ tổng quan của hệ thống được minh họa trên Hình~\ref{fig:so_do_cong_nghe}, thể hiện rõ mối quan hệ vật lý giữa các thiết bị lưu trữ, gia nhiệt, đo lường và phân phối.
 
 \begin{figure}[htbp]
     \centering
@@ -39,62 +65,43 @@ Sơ đồ công nghệ tổng quan được trình bày trong Hình~\ref{fig:so_
         pipe/.style={thick, draw=cyan!70!black},
         arrow/.style={-Latex, thick, draw=cyan!70!black}
     ]
-        \node[equipment] (buffer) at (0, 5) {Bể chứa\đệm};
+        \node[equipment] (buffer) at (0, 5) {Bể chứa đệm};
         \node[equipment, minimum width=1.8cm] (tank1) at (4, 5) {Tank 1};
         \node[equipment, minimum width=1.8cm] (tank2) at (8, 5) {Tank 2};
-        \node[equipment] (heater1) at (4, 1.2) {Gia nhiệt\dầu};
-        \node[equipment] (heater2) at (8, 1.2) {Gia nhiệt\dầu};
+        \node[equipment] (heater1) at (4, 1.2) {Gia nhiệt dầu};
+        \node[equipment] (heater2) at (8, 1.2) {Gia nhiệt dầu};
+        
         \draw[pipe] (3.8, 7) -- (8.2, 7);
         \node[above, font=\sffamily\small] at (6, 7) {Dầu hồi lưu từ lò};
         \draw[pipe] (6, 7) -- (6, 5);
+        
         \draw[pipe] (tank1.east) -- (tank2.west);
         \draw[arrow] (buffer.east) -- (tank1.west);
+        
         \draw[arrow] (tank1.south) -- (4, 4.1) -- (4, 2.0) -- (heater1.north);
         \draw[arrow] (heater1.south) -- (4, -1.2);
+        
         \draw[arrow] (tank2.south) -- (8, 4.1) -- (8, 2.0) -- (heater2.north);
         \draw[arrow] (heater2.south) -- (8, -1.2);
+        
         \draw[pipe] (4, -1.2) -- (8, -1.2);
+        
         \draw[pipe] (6, -1.2) -- (6, -2.2) -- (1.3, -2.2) -- (1.3, -1.2);
         \draw[pipe] (1.3, -2.2) -- (1.3, -0.8);
+        
         \draw[pipe] (1.3, -0.8) -- (0.5, -0.8) -- (0.5, 0);
         \draw[pipe] (1.3, -0.8) -- (2.1, -0.8) -- (2.1, 0);
+        
         \draw[pipe] (0.5, 0) -- (2.1, 0);
         \draw[pipe] (1.3, 0) -- (1.3, 1.0);
+        
         \draw[thick, draw=cyan!70!black, {Latex}-{Latex}] (0.0, 1.0) -- (2.6, 1.0);
-        \node[above, font=\sffamily\small] at (1.3, 1.0) {Đến đầu đốt};
+        \node[above, font=\sffamily\small] at (1.3, 1.0) {Đến cụm van điều khiển (Lò hơi)};
     \end{tikzpicture}
     \caption{Sơ đồ công nghệ tổng quan hệ thống cấp dầu nhiên liệu}
     \label{fig:so_do_cong_nghe}
 \end{figure}
 
-\subsection{Các thông số điều khiển và giám sát}
-
-Trong hệ thống cấp dầu nhiên liệu, các thông số cần được theo dõi và điều khiển liên tục gồm lưu lượng, áp suất, nhiệt độ và mức dầu. Lưu lượng là biến công nghệ trọng tâm, phản ánh trực tiếp lượng nhiên liệu được đưa tới đầu đốt. Ở chế độ vận hành ổn định, lưu lượng phải bám theo giá trị đặt của hệ thống điều phối để bảo đảm cường độ cháy phù hợp với yêu cầu phụ tải.
-
-Áp suất đường ống phân phối có vai trò duy trì điều kiện vận chuyển và phun tơi ổn định. Nếu áp suất quá thấp, lưu lượng tại đầu đốt dao động mạnh và quá trình phun sương suy giảm; nếu áp suất quá cao, nguy cơ rò rỉ và hư hỏng thiết bị tăng lên. Vì vậy, áp suất thường được giữ trong một dải làm việc hẹp để tối ưu hóa tính ổn định động lực học của hệ thống.
-
-Nhiệt độ dầu ảnh hưởng trực tiếp đến độ nhớt, khả năng bơm và chất lượng phun. Đối với dầu nặng, khi nhiệt độ thấp, độ nhớt tăng mạnh khiến tổn thất thủy lực tăng và quá trình phun bị xấu đi. Khi nhiệt độ quá cao, dầu có thể lão hóa nhiệt, tạo cặn và ảnh hưởng tới độ bền thiết bị. Do đó, nhiệt độ là thông số vừa mang tính công nghệ vừa mang tính bảo vệ đối với toàn bộ tuyến dầu.
-
-Mức dầu trong bể chứa là biến giám sát quan trọng để bảo đảm bơm làm việc trong điều kiện hút ổn định. Mức quá thấp có thể gây xâm thực và làm mất áp hút, còn mức quá cao làm tăng nguy cơ tràn và mất an toàn cháy nổ. Các tín hiệu mức vì vậy thường gắn với cơ chế cảnh báo và liên động bảo vệ.
-
-\subsection{Vai trò của hệ thống và các yếu tố ảnh hưởng}
-
-Hệ thống điều khiển lưu lượng dầu khởi động có ba vai trò chính. Thứ nhất, nó bảo đảm cung cấp nhiên liệu đúng theo nhu cầu của quá trình cháy, giúp lò hơi khởi động tin cậy và duy trì ngọn lửa ổn định trong các chế độ tải khác nhau. Thứ hai, hệ thống góp phần nâng cao hiệu suất cháy bằng cách duy trì lưu lượng cấp và áp suất phân phối ở vùng tối ưu, từ đó hỗ trợ quá trình hòa trộn nhiên liệu với không khí diễn ra hiệu quả hơn. Thứ ba, hệ thống là một phần của cơ chế bảo vệ an toàn, vì mọi sai lệch lớn về lưu lượng, áp suất hoặc mức dầu đều có thể dẫn tới mất ổn định cháy hoặc sự cố cháy nổ.
-
-Chất lượng vận hành của hệ thống chịu ảnh hưởng bởi nhiều nguồn nhiễu. Trước hết là biến thiên độ nhớt của dầu do thay đổi nhiệt độ môi trường hoặc điều kiện gia nhiệt. Tiếp theo là dao động áp suất đầu ra của bơm và tổn thất trên tuyến ống, làm đặc tính lưu lượng thay đổi theo thời gian. Ngoài ra, sự mài mòn của van điều khiển và cặn bẩn trong dầu có thể làm thay đổi đặc tính tuyến tính hóa của cơ cấu chấp hành. Đây là những nguyên nhân dẫn đến sai lệch động học cần được xem xét khi mô hình hóa và thiết kế điều khiển.
-
-\subsection{Thiết bị công nghệ chính}
-
-Hệ thống được cấu thành từ các thiết bị đo lường, chấp hành và điều khiển. Thiết bị đo lưu lượng đóng vai trò cung cấp tín hiệu phản hồi chính cho vòng điều khiển. Trong các ứng dụng dầu nặng, cảm biến lưu lượng kiểu Coriolis hoặc oval gear thường được ưu tiên nhờ khả năng đo ổn định trong môi trường có độ nhớt biến thiên. Van điều khiển lưu lượng là cơ cấu chấp hành trực tiếp, có nhiệm vụ thay đổi độ mở để điều tiết lưu lượng cấp đến đầu đốt. Bộ điều khiển trung tâm, thường là PLC hoặc DCS, thực hiện xử lý tín hiệu, so sánh sai lệch và phát lệnh điều chỉnh cho van. Bên cạnh đó, các thiết bị phụ trợ như cảm biến áp suất, cảm biến nhiệt độ, công tắc mức và hệ thống báo động liên động bảo đảm hệ thống vận hành an toàn trong toàn bộ dải công nghệ.
-
-\subsection{Sơ đồ đo lường, điều khiển và giám sát}
-
-Từ đặc điểm công nghệ nêu trên, sơ đồ đo lường và điều khiển của hệ thống có thể tổ chức theo cấu trúc vòng kín cơ bản. Cảm biến lưu lượng FT đo lưu lượng thực tế trên tuyến cấp dầu và gửi tín hiệu về bộ điều khiển FIC. Bộ điều khiển so sánh giá trị đo với giá trị đặt, sau đó phát tín hiệu điều khiển đến van FCV để điều chỉnh độ mở. Khi lưu lượng thay đổi, quá trình cháy trong lò cũng biến đổi tương ứng; vì vậy, hệ thống giám sát trung tâm phải liên kết thông số lưu lượng với áp suất, nhiệt độ và mức dầu để bảo đảm điều kiện vận hành đồng bộ.
-
-Bên cạnh vòng lưu lượng chính, các vòng phụ như điều khiển áp suất và nhiệt độ dầu có vai trò hỗ trợ làm ổn định trạng thái vật lý của lưu chất. Các tín hiệu báo mức thấp thấp, mức cao cao, áp suất cao hoặc nhiệt độ vượt ngưỡng được đưa vào logic bảo vệ liên động. Cấu trúc đo lường và điều khiển như vậy vừa đáp ứng yêu cầu điều hành vận hành, vừa tạo cơ sở rõ ràng cho việc mô hình hóa và tổng hợp bộ điều khiển ở các chương sau.
-
-\subsection{Kết luận chương}
-
-Chương này đã làm rõ cấu trúc công nghệ, các thông số vận hành chủ yếu và vai trò kỹ thuật của hệ thống cấp dầu nhiên liệu khởi động cho lò than phun. Qua phân tích có thể thấy đối tượng là một hệ quá trình có quán tính lớn, chịu ảnh hưởng mạnh của nhiệt độ, áp suất và đặc tính lưu chất, đồng thời đòi hỏi độ tin cậy cao về an toàn. Những đặc điểm đó là cơ sở để lựa chọn thiết bị đo, cơ cấu chấp hành và triết lý điều khiển phù hợp trong các chương tiếp theo.
+Việc áp dụng triệt để nguyên lý phân cấp trong đo lường và điều khiển là nền tảng cốt lõi giúp hệ thống vượt qua các thách thức về đặc tính trễ và nhiễu loạn của lò hơi. Sơ đồ cấu trúc điều khiển Cascade này sẽ tiếp tục được phân tích chuyên sâu về mặt triết lý thiết kế và làm cơ sở cho quá trình mô hình hóa toán học, tổng hợp thuật toán điều khiển ở các Chương 2 và Chương 3.
 
 \end{document}

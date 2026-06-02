@@ -3,196 +3,133 @@
 \documentclass[../main.tex]{subfiles}
 \begin{document}
 
-\section{Phân tích và tổng hợp hệ thống điều khiển}
+\section{Phân tích và tổng hợp hệ thống}
 
-\subsection{Tổng quan mục tiêu thiết kế}
+\subsection{Phương pháp nhận dạng đối tượng}
 
-Trong hệ thống cấp dầu nhiên liệu khởi động cho lò hơi PC, đại lượng cần điều khiển chính là lưu lượng dầu cấp đến các đầu đốt. Đây là biến quá trình có ảnh hưởng trực tiếp đến khả năng hình thành và duy trì ngọn lửa, đặc biệt trong các chế độ khởi động, tải thấp hoặc khi cần hỗ trợ cháy ổn định cho lò. Vì vậy, bài toán điều khiển phải bảo đảm ba yêu cầu đồng thời: bám chính xác giá trị đặt, đáp ứng đủ nhanh trước biến động tải, và vận hành bền vững trước các nhiễu công nghệ như thay đổi nhiệt độ dầu, áp suất đường ống và độ nhớt của lưu chất.
+Trong điều khiển tự động hóa hiện đại, quá trình tổng hợp và chỉnh định bộ điều khiển phụ thuộc hoàn toàn vào mức độ chính xác của mô hình toán học đại diện cho đối tượng thực tế. Phương pháp nhận dạng đối tượng được lựa chọn trong đồ án này dựa trên việc phân tích đáp ứng bậc thang (Step Response) của hệ thống trong miền thời gian. Về mặt toán học, quá trình nhận dạng được định hình thành một bài toán tối ưu hóa phi tuyến: tìm kiếm tập tham số $A$ của mô hình sao cho hàm mục tiêu sai số toàn phương $J$ đạt giá trị cực tiểu.
 
-Từ các kết quả nhận dạng ở Chương 2, đối tượng điều khiển được xấp xỉ bởi mô hình quán tính bậc nhất có trễ (FOPDT):
-
+Hàm mục tiêu $J$ được định nghĩa như sau:
 \begin{equation}
-    G_p(s) = \frac{K_p}{T_p s + 1} e^{-\tau_p s}
+    J = \sum_{i=1}^{N} \left( y_{data}(t_i) - y_{model}(t_i, A) \right)^2
+\end{equation}
+Trong đó, $y_{data}(t_i)$ là chuỗi giá trị đáp ứng thực nghiệm thu thập được tại thời điểm $t_i$, và $y_{model}(t_i, A)$ là đáp ứng do hàm truyền toán học sinh ra dựa trên tập tham số $A$. Thuật toán Nelder-Mead được triển khai bằng ngôn ngữ Python để giải quyết bài toán cực đại/cực tiểu hóa này.
+
+Với cấu trúc điều khiển Cascade đã đề xuất, hai khâu động học cần được nhận dạng độc lập bao gồm đối tượng vòng trong (cụm van điều khiển lưu lượng dầu) và đối tượng vòng ngoài (quá trình sinh áp suất hơi của lò).
+
+\subsubsection{Nhận dạng đối tượng van (Vòng trong)}
+
+Đối tượng van điều khiển có đặc tính động học tương đối nhanh nhưng vẫn tồn tại độ trễ do cơ khí và ma sát đường ống dẫn. Do đó, mô hình xấp xỉ quán tính bậc nhất có trễ (First-Order Plus Dead Time - FOPDT) được lựa chọn vì tính đơn giản và phản ánh đủ bản chất động lực học của hệ thống cơ - lưu chất. Hàm truyền của mô hình FOPDT có dạng:
+\begin{equation}
+    G_v(s) = \frac{K_v}{T_v s + 1} e^{-L_v s}
 \end{equation}
 
-trong đó $K_p$, $T_p$ và $\tau_p$ là hệ số khuếch đại, hằng số thời gian và thời gian trễ của tuyến cấp dầu. Mô hình này là cơ sở để tổng hợp các bộ điều khiển theo hai phương pháp IMC và bộ điều khiển bền vững tối ưu.
-
-\subsection{Phân tích cấu trúc hệ thống điều khiển}
-
-\subsubsection{Cấu trúc vòng kín một vòng}
-
-Cấu trúc cơ bản của hệ thống điều khiển lưu lượng dầu là cấu trúc phản hồi âm một vòng. Bộ điều khiển nhận tín hiệu sai lệch giữa lưu lượng đặt và lưu lượng đo được, sau đó phát lệnh điều chỉnh đến van điều khiển. Sơ đồ khối rút gọn được mô tả bởi:
-
-\begin{equation}
-    W(s) = \frac{R(s)G_p(s)}{1 + R(s)G_p(s)}
-\end{equation}
-
-Trong đó $R(s)$ là bộ điều khiển và $G_p(s)$ là đối tượng công nghệ. Cấu trúc phản hồi đơn giản, dễ triển khai và phù hợp với yêu cầu điều khiển lưu lượng trong thực tế. Tuy nhiên, vì đối tượng có trễ và quán tính tương đối lớn nên việc lựa chọn phương pháp chỉnh định bộ điều khiển là yếu tố quyết định chất lượng hệ thống.
-
-\subsubsection{Vai trò các phần tử trong hệ thống}
-
-Các phần tử chính của hệ thống gồm:
-
+Tiến hành đưa dữ liệu thực nghiệm từ tệp \texttt{van-dap-ung-xung-1,6t.csv} (với biên độ tín hiệu bậc thang đầu vào là $1.6$) vào thuật toán tối ưu hóa trên Python, hệ thống đã hội tụ và xuất ra bộ thông số động học tối ưu như sau:
 \begin{itemize}
-    \item \textbf{Cảm biến lưu lượng}: đo lưu lượng dầu thực tế và cung cấp tín hiệu phản hồi.
-    \item \textbf{Bộ điều khiển}: tính toán tín hiệu điều khiển dựa trên sai lệch giữa giá trị đặt và giá trị đo.
-    \item \textbf{Van điều khiển}: cơ cấu chấp hành thay đổi độ mở để hiệu chỉnh lưu lượng.
-    \item \textbf{Đối tượng công nghệ}: tuyến ống và cụm phân phối dầu có trễ và quán tính thủy lực.
+    \item Hệ số khuếch đại tĩnh: $K_v = 0.8776$
+    \item Hằng số thời gian quán tính: $T_v = 4.9646$ s
+    \item Thời gian trễ vận chuyển: $L_v = 0.8649$ s
 \end{itemize}
 
-Trong bối cảnh phụ tải lò hơi PC đốt dầu hỗ trợ, chất lượng điều khiển tốt giúp ngọn lửa ổn định hơn khi khởi động, tránh cháy không hoàn toàn hoặc dao động nhiệt gây ảnh hưởng tới an toàn tổ máy.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{Hinhve/nhan_dang_van.png}
+    \caption{Đồ thị so sánh kết quả nhận dạng đối tượng van điều khiển theo mô hình FOPDT}
+    \label{fig:nhan_dang_van}
+\end{figure}
 
-\subsection{Nhận dạng và mô hình hóa đối tượng}
+Biểu đồ tại Hình~\ref{fig:nhan_dang_van} cho thấy đường cong mô phỏng bám sát hoàn toàn với tập dữ liệu thực nghiệm, minh chứng cho tính đúng đắn và độ chính xác của cấu trúc FOPDT đối với phân hệ van lưu lượng.
 
-\subsubsection{Mô hình toán học của đối tượng}
+\subsubsection{Nhận dạng đối tượng áp suất hơi (Vòng ngoài)}
 
-Từ dữ liệu thực nghiệm đã xử lý ở Chương 2, tuyến điều khiển lưu lượng dầu được biểu diễn bởi mô hình FOPDT:
-
+Quá trình sinh hơi trong lò mang bản chất tích lũy năng lượng và trao đổi nhiệt phức tạp qua nhiều bề mặt kim loại. Đáp ứng của áp suất hơi đối với sự thay đổi nhiên liệu diễn ra chậm chạp và có đặc tính quá độ hình chữ S rất rõ rệt. Vì vậy, mô hình quán tính bậc hai có trễ (Second-Order Plus Dead Time - SOPDT) là mô hình chuẩn mực và phù hợp nhất để xấp xỉ đối tượng nhiệt động này. Hàm truyền của mô hình SOPDT có dạng:
 \begin{equation}
-    G_p(s) = \frac{K_p}{T_p s + 1} e^{-\tau_p s}
+    G_p(s) = \frac{K_p}{(T_{1p} s + 1)(T_{2p} s + 1)} e^{-L_p s}
 \end{equation}
 
-Mô hình này đủ đơn giản để thuận lợi cho tính toán nhưng vẫn phản ánh được bản chất động học của hệ thống. Đặc biệt, thời gian trễ thuần thể hiện khoảng thời gian từ khi thay đổi tín hiệu điều khiển đến khi lưu lượng thực sự biến đổi tại đầu ra.
-
-\subsubsection{Đánh giá đặc tính động học}
-
-Đối tượng điều khiển lưu lượng dầu thường có các đặc điểm sau:
-
+Áp dụng giải thuật nhận dạng cho tập dữ liệu \texttt{ap-suat-hoi.csv} (với biên độ bậc thang giả định là $1.0$), tập tham số $A$ được định lượng cụ thể:
 \begin{itemize}
-    \item đáp ứng tương đối nhanh so với các quá trình nhiệt;
-    \item có thời gian trễ do truyền động van và lan truyền áp lực trong đường ống;
-    \item có nhiễu từ áp suất nguồn và thay đổi độ nhớt dầu;
-    \item có thể coi gần đúng là đối tượng tự cân bằng bậc nhất trong vùng làm việc quanh điểm vận hành.
+    \item Hệ số khuếch đại tĩnh: $K_p = 1.2270$
+    \item Hằng số thời gian thứ nhất: $T_{1p} = 5.9870$ s
+    \item Hằng số thời gian thứ hai: $T_{2p} = 5.9871$ s
+    \item Thời gian trễ vận chuyển: $L_p = 3.9478$ s
 \end{itemize}
 
-Những đặc điểm này cho phép áp dụng hiệu quả các phương pháp tổng hợp dựa trên mô hình như IMC và bộ điều khiển bền vững.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{Hinhve/nhan_dang_ap_suat.png}
+    \caption{Đồ thị so sánh kết quả nhận dạng đối tượng áp suất hơi theo mô hình SOPDT}
+    \label{fig:nhan_dang_ap_suat}
+\end{figure}
 
-\subsection{Tổng hợp bộ điều khiển theo phương pháp IMC}
+Sự xấp xỉ bằng nhau của hai hằng số thời gian ($T_{1p} \approx T_{2p}$) cho thấy đối tượng có tính chất của hai khâu quán tính nối tiếp, tạo nên độ cản dịu (damping) lớn đối với quá trình biến đổi năng lượng, điều này giải thích cho hình dáng đường cong mượt mà của áp suất.
 
-\subsubsection{Nguyên lý phương pháp IMC}
+\subsection{Phân tích và biến đổi sơ đồ cấu trúc Cascade}
 
-IMC (Internal Model Control) là phương pháp điều khiển dựa trên mô hình đối tượng nội tại. Ý tưởng cốt lõi là dùng mô hình của đối tượng để dự đoán đầu ra và thiết kế bộ điều khiển sao cho hệ kín đạt được đặc tính mong muốn đồng thời có khả năng bền vững tốt. Với đối tượng FOPDT, bộ lọc IMC thường có dạng:
-
-\begin{equation}
-    F(s) = \frac{1}{(\lambda s + 1)^n}
-\end{equation}
-
-trong đó $\lambda$ là tham số chỉnh định duy nhất quyết định mức cân bằng giữa tốc độ đáp ứng và độ bền vững, còn $n$ được chọn để bộ điều khiển khả thi và ổn định.
-
-Với mô hình FOPDT:
-
-\begin{equation}
-    G_p(s) = \frac{K_p}{T_p s + 1} e^{-\tau_p s}
-\end{equation}
-
-bộ điều khiển IMC tương đương dạng PI có thể viết gần đúng thành:
-
-\begin{equation}
-    R_{IMC}(s) = K_c \left(1 + \frac{1}{T_i s}\right)
-\end{equation}
-
-với:
-
-\begin{equation}
-    K_c = \frac{T_p}{K_p(\lambda + \tau_p)}, \qquad T_i = T_p
-\end{equation}
-
-\subsubsection{Lựa chọn tham số IMC}
-
-Trong bài toán này, tham số $\lambda$ được chọn theo nguyên tắc lớn hơn thời gian trễ của đối tượng để bảo đảm đáp ứng êm dịu và ít nhạy với sai số mô hình. Cụ thể, chọn:
-
-\begin{equation}
-    \lambda = \alpha \tau_p, \qquad \alpha \in [2, 4]
-\end{equation}
-
-Giá trị $\alpha$ càng lớn thì hệ kín càng bền vững nhưng tốc độ đáp ứng giảm. Đối với hệ cấp dầu nhiên liệu khởi động, ưu tiên của thiết kế là an toàn và ổn định, do đó lựa chọn $\lambda$ ở vùng trung bình cao là phù hợp.
-
-\subsubsection{Kết quả tổng hợp IMC}
-
-Sau khi thay các tham số nhận dạng của đối tượng vào công thức IMC, thu được bộ điều khiển PI vòng lưu lượng. Bộ điều khiển này có ưu điểm là dễ chỉnh định, ít nhạy với nhiễu và phù hợp với đối tượng có thời gian trễ vừa phải. Đặc tính đáp ứng mô phỏng cho thấy hệ thống tăng giảm lưu lượng tương đối mượt, độ quá điều chỉnh nhỏ và sai số xác lập được triệt tiêu nhờ khâu tích phân.
-
-\subsection{Tổng hợp bộ điều khiển bền vững tối ưu}
-
-\subsubsection{Cơ sở lý thuyết}
-
-Bộ điều khiển bền vững tối ưu được thiết kế nhằm đạt đặc tính vòng kín gần với một khâu quán tính bậc nhất mong muốn. Phương pháp này đặc biệt thích hợp cho các quá trình công nghiệp có trễ và biến thiên tham số, vì nó ưu tiên ổn định và khả năng kháng nhiễu hơn là tốc độ đáp ứng cực nhanh.
-
-Đối với đối tượng dạng FOPDT, bộ điều khiển được xây dựng từ phần không trễ của mô hình:
-
-\begin{equation}
-    G_{PT}(s) = \frac{K_p}{T_p s + 1}
-\end{equation}
-
-và bộ điều chỉnh có dạng:
-
-\begin{equation}
-    R_{rob}(s) = \frac{1}{\theta s} G_{PT}^{-1}(s)
-\end{equation}
-
-Khi khai triển, bộ điều khiển thu được có dạng PI, trong đó tham số $\theta$ đóng vai trò điều chỉnh độ bền vững.
-
-\subsubsection{Chọn chỉ số dao động cắt}
-
-Để thuận tiện so sánh với kết quả tham khảo từ tài liệu, bài toán được xây dựng theo tiêu chí chỉ số dao động cắt $m_c$. Với yêu cầu độ quá điều chỉnh nhỏ và hệ thống an toàn, chọn $m_c$ ở vùng cho đáp ứng êm và có dự trữ ổn định cao. Từ $m_c$, xác định được các hệ số $\theta_c$, $\psi_c$ và $\omega_c$ để tổng hợp các tham số điều khiển.
-
-Với đối tượng FOPDT, ta có:
-
-\begin{equation}
-    \theta = \theta_c \tau_p
-\end{equation}
-
-\begin{equation}
-    K_c = \frac{1}{K_p \theta}, \qquad T_i = T_p
-\end{equation}
-
-Nếu cần gia tăng kháng nhiễu cho trường hợp tín hiệu đo có dao động cao, có thể hiệu chỉnh thêm hệ số khuếch đại theo chỉ tiêu bền vững. Cách làm này giúp bộ điều khiển giữ được đáp ứng mượt và ít vọt lố ngay cả khi tham số thực tế lệch so với mô hình danh định.
-
-\subsubsection{Kết quả tổng hợp bền vững}
-
-Sau khi tính toán, bộ điều khiển bền vững thu được có cấu trúc PI. Mô phỏng cho thấy đường đáp ứng mượt hơn so với chỉnh định quá mạnh, gần như không dao động, độ quá điều chỉnh rất nhỏ và thời gian xác lập chấp nhận được. Đối với hệ cấp dầu nhiên liệu hỗ trợ lò PC, đây là lựa chọn phù hợp vì ưu tiên sự ổn định và độ tin cậy trong vận hành hơn là đáp ứng quá nhanh.
-
-\subsection{Đánh giá chất lượng hệ thống qua mô phỏng Python}
-
-\subsubsection{Quy trình mô phỏng}
-
-Sau khi tổng hợp bộ điều khiển, chất lượng hệ thống được đánh giá bằng mô phỏng trong Python. Quy trình mô phỏng gồm các bước:
-
+Nguyên lý nền tảng để thiết kế hệ thống điều khiển Cascade là phân tách hệ thống lồng ghép thành từng phần và tổng hợp từ trong ra ngoài (Inner-to-Outer Tuning). Quy trình biến đổi sơ đồ cấu trúc được triển khai theo các bước học thuật chuẩn mực:
 \begin{enumerate}
-    \item xây dựng hàm truyền của đối tượng và bộ điều khiển;
-    \item ghép kín hệ thống phản hồi âm;
-    \item mô phỏng đáp ứng bậc thang với giá trị đặt thay đổi;
-    \item trích xuất các chỉ tiêu chất lượng như thời gian lên, thời gian xác lập, độ quá điều chỉnh và sai số xác lập.
+    \item \textbf{Tổng hợp vòng trong:} Bộ điều khiển vòng trong ($R_2$) được thiết kế thuần túy dựa trên hàm truyền của van $G_v(s)$. Mục tiêu kỹ thuật là tạo ra một vòng kín có khả năng triệt tiêu nhiễu tức thời và đáp ứng nhạy bén với giá trị đặt lưu lượng.
+    \item \textbf{Thiết lập đối tượng tương đương:} Sau khi vòng trong đã được đóng kín và chỉnh định đạt tính ổn định, bản thân toàn bộ vòng trong (bao gồm $R_2$ và $G_v(s)$) được quy đổi thành một khâu truyền đạt duy nhất. Khâu truyền đạt này nhân với hàm truyền đối tượng vòng ngoài $G_p(s)$ sẽ hình thành nên \textit{đối tượng tương đương vòng ngoài} ($G_{eq}(s)$).
+    \item \textbf{Tổng hợp vòng ngoài:} Bộ điều khiển vòng ngoài ($R_1$) được tính toán dựa trên đặc tính động học của đối tượng tương đương $G_{eq}(s)$ nhằm kiểm soát mục tiêu cốt lõi của toàn tổ máy là áp suất hơi mới.
 \end{enumerate}
 
-Các thư viện thường dùng là \texttt{numpy}, \texttt{scipy.signal} và \texttt{matplotlib}. Việc mô phỏng bằng Python có ưu điểm là dễ tự động hóa, thuận tiện cho việc quét tham số và so sánh nhiều phương án điều khiển trên cùng một bộ dữ liệu.
+\subsection{Tổng hợp bộ điều khiển IMC và Bền vững tối ưu}
 
-\subsubsection{Các chỉ tiêu đánh giá}
+\subsubsection{Tổng hợp vòng trong theo phương pháp Mô hình nội (IMC)}
 
-Chất lượng hệ thống được đánh giá dựa trên các tiêu chí sau:
+Đối với vòng điều khiển lưu lượng, phương pháp điều khiển Mô hình nội (Internal Model Control - IMC) được ứng dụng nhằm thiết kế thuật toán điều khiển một cách trực quan, dựa trên nguyên tắc nghịch đảo hàm truyền của đối tượng. Đặc điểm ưu việt của IMC là thu gọn toàn bộ quá trình chỉnh định về một tham số duy nhất $\lambda_v$ (hằng số thời gian bộ lọc), cho phép kỹ sư hệ thống dễ dàng thiết lập sự cân bằng giữa tốc độ đáp ứng và khả năng dự trữ ổn định.
 
+Để đảm bảo bộ điều khiển vòng trong phản ứng đủ nhanh nhưng không đẩy cơ cấu van vào vùng bão hòa, tham số bộ lọc được chọn theo kinh nghiệm thực tiễn: $\lambda_v = \max(0.5, L_v) = 0.8649$ s. Áp dụng quy tắc chuyển đổi cấu trúc IMC sang hệ số của thuật toán PI tiêu chuẩn công nghiệp (áp dụng cho mô hình FOPDT), ta thu được hệ phương trình:
+\begin{equation}
+    K_{p2} = \frac{T_v}{K_v (\lambda_v + L_v)}
+\end{equation}
+\begin{equation}
+    T_{i2} = T_v
+\end{equation}
+
+Thế các hằng số nhận dạng thực nghiệm vào hệ phương trình, thông số bộ điều khiển PI vòng trong được xác định:
 \begin{itemize}
-    \item \textbf{Độ quá điều chỉnh $M_p$}: càng nhỏ càng tốt để tránh lưu lượng dầu vượt quá mức cho phép.
-    \item \textbf{Thời gian lên $t_r$}: phản ánh tốc độ đáp ứng ban đầu của hệ thống.
-    \item \textbf{Thời gian xác lập $t_s$}: khoảng thời gian để hệ thống đi vào vùng sai số nhỏ quanh giá trị đặt.
-    \item \textbf{Sai số xác lập $e_{ss}$}: cần tiến tới xấp xỉ 0 để bảo đảm điều khiển chính xác.
-    \item \textbf{Chỉ tiêu tích phân sai số}: như IAE, ISE hoặc ITAE để phản ánh tổng sai lệch trong toàn bộ quá trình quá độ.
+    \item Độ lợi tỷ lệ: $K_{p2} = 3.2703$
+    \item Thời gian tích phân: $T_{i2} = 4.9646$ s
+\end{itemize}
+Trong kiến trúc này, khâu vi phân (D) bị chủ động loại bỏ nhằm ngăn chặn việc khuếch đại các thành phần tín hiệu nhiễu tần số cao (vốn luôn tồn tại trong đo lường lưu lượng), qua đó bảo vệ bộ truyền động cơ khí của van khỏi những dao động mài mòn không cần thiết.
+
+\subsubsection{Xấp xỉ đối tượng tương đương và Tổng hợp vòng ngoài theo Bền vững tối ưu}
+
+Với bộ điều khiển PI vòng trong đã được tối ưu hóa, tốc độ đáp ứng của khâu cung cấp lưu lượng vượt xa quán tính chậm chạp của quá trình sinh hơi bao ngoài. Nhờ đó, hàm truyền vòng kín của vòng lưu lượng có thể được xấp xỉ đơn giản bằng $1$ trong tính toán dải tần số làm việc của vòng ngoài. Do vậy, hàm truyền của đối tượng tương đương vòng ngoài có thể được xem như trùng khớp hoàn toàn với hàm truyền SOPDT của lò hơi:
+\begin{equation}
+    G_{eq}(s) \approx G_p(s) = \frac{K_p}{(T_{1p} s + 1)(T_{2p} s + 1)} e^{-L_p s}
+\end{equation}
+
+Để đảm bảo bám sát các tiêu chuẩn khắt khe về sai số và độ vọt lố (Overshoot) khi nhà máy thay đổi phụ tải, bộ điều khiển vòng ngoài ($R_1$) được tổng hợp theo phương pháp Bền vững tối ưu (Optimal Robust Control). Phương pháp này định hình một quỹ đạo vòng kín lý tưởng thông qua việc hiệu chỉnh chỉ số dao động cắt $m_c$. Theo yêu cầu kỹ thuật, độ quá điều chỉnh không được phép vượt quá $5\%$. Dựa trên bảng tra cứu nền tảng của lý thuyết điều khiển bền vững, giá trị $m_c = 0.972$ được lựa chọn, tương ứng với hệ số $\theta_c = 1.95$. Từ đó, thời gian đáp ứng vòng kín mục tiêu được tính toán là:
+\begin{equation}
+    \theta = \theta_c \cdot L_p = 1.95 \times 3.9478 = 7.6982 \text{ s}
+\end{equation}
+
+Để áp dụng công thức điều khiển bền vững, mô hình SOPDT được xấp xỉ chuyển đổi về cấu trúc FOPDT bằng cách gộp tuyến tính hai hằng số thời gian: $T_{eq} = T_{1p} + T_{2p}$. Sự sụt giảm bậc động học này sẽ được bù đắp hoàn hảo bởi khâu vi phân (D) của bộ PID. Hệ phương trình tổng hợp PID cho vòng ngoài được thiết lập như sau:
+\begin{equation}
+    K_{p1} = \frac{T_{1p} + T_{2p}}{K_p \cdot \theta}
+\end{equation}
+\begin{equation}
+    T_{i1} = T_{1p} + T_{2p}
+\end{equation}
+\begin{equation}
+    T_{d1} = \frac{T_{1p} \cdot T_{2p}}{T_{1p} + T_{2p}}
+\end{equation}
+
+Thông qua việc tính toán trên tập lệnh Python, bộ thông số tối ưu cho bộ điều khiển PID vòng ngoài được công bố cụ thể:
+\begin{itemize}
+    \item Độ lợi tỷ lệ: $K_{p1} = 1.2676$
+    \item Thời gian tích phân: $T_{i1} = 11.9741$ s
+    \item Thời gian vi phân: $T_{d1} = 2.9935$ s
 \end{itemize}
 
-\subsubsection{So sánh kết quả giữa IMC và bộ điều khiển bền vững}
+\subsection{Đánh giá chất lượng hệ thống đạt được}
 
-Kết quả mô phỏng cho thấy cả hai phương pháp đều đáp ứng tốt yêu cầu điều khiển lưu lượng dầu. Tuy nhiên, chúng có xu hướng khác nhau:
+Tính đúng đắn và ưu việt của giải pháp điều khiển Cascade được thẩm định toàn diện thông qua kết quả mô phỏng trên nền tảng Python. Quy trình mô phỏng đã tích hợp cấu trúc vòng kín kép cùng các thông số lý thuyết (PI vòng trong, PID vòng ngoài) đã được định lượng phía trên.
 
-\begin{itemize}
-    \item \textbf{IMC}: đáp ứng êm, cân bằng tốt giữa tốc độ và bền vững, dễ chỉnh định thông qua một tham số $\lambda$.
-    \item \textbf{Bền vững tối ưu}: đáp ứng ít dao động hơn, kháng nhiễu tốt hơn và phù hợp hơn với yêu cầu an toàn của hệ cấp dầu nhiên liệu khởi động.
-\end{itemize}
+Về trạng thái tĩnh (Steady-state), khâu tích phân (I) tích hợp ở cả hai bộ điều khiển hoàn thành xuất sắc vai trò loại trừ sai lệch tĩnh (Steady-state Error bằng $0$). Điều này bảo đảm áp suất hơi luôn bám sát chuẩn xác vào giá trị đặt, bất chấp các nhiễu tải dài hạn. Về đặc tính động học, quá trình quá độ của hệ thống diễn ra cực kỳ mượt mà. Sự hỗ trợ từ khâu vi phân (D) ở vòng ngoài tạo ra tính dự báo trước xu hướng thay đổi của áp suất, kết hợp cùng sức mạnh triệt tiêu nhiễu thủy lực ngay từ gốc của vòng trong, đã giúp hệ thống khống chế hiệu quả độ vọt lố ở mức rất thấp.
 
-Nếu ưu tiên tốc độ phản ứng, IMC là phương án tốt. Nếu ưu tiên độ an toàn, ổn định và khả năng chịu biến động công nghệ, bộ điều khiển bền vững tối ưu là lựa chọn phù hợp hơn.
-
-\subsection{Kết luận chương}
-
-Chương này đã trình bày quá trình phân tích, nhận dạng và tổng hợp bộ điều khiển cho hệ cấp dầu nhiên liệu khởi động của lò hơi PC. Từ mô hình động học đã nhận dạng, hai phương pháp tổng hợp được áp dụng là IMC và bộ điều khiển bền vững tối ưu. Kết quả mô phỏng bằng Python cho thấy cả hai phương pháp đều cho chất lượng điều khiển tốt, trong đó phương pháp bền vững có xu hướng đáp ứng êm hơn và phù hợp hơn với yêu cầu vận hành an toàn của hệ thống.
-
-Kết quả của chương là cơ sở để lựa chọn phương án điều khiển phù hợp và làm tiền đề cho phần triển khai trên PLC và HMI ở các bước tiếp theo.
+Chất lượng đáp ứng hoàn toàn thỏa mãn các chỉ tiêu khắt khe trong vận hành hệ thống cấp hơi áp lực cao tại các nhà máy nhiệt điện. Những phân tích định lượng này tái khẳng định tính chính xác trong việc lựa chọn mô hình nhận dạng thực nghiệm, cũng như minh chứng cho giá trị thực tiễn của sự kết hợp giữa thuật toán IMC và Bền vững tối ưu trong một cấu trúc điều khiển Cascade đa biến.
 
 \end{document}

@@ -7,56 +7,79 @@
 
 \subsection{Triết lý thiết kế hệ thống điều khiển}
 
-\subsubsection{Quan điểm thiết kế}
+\subsubsection{Cấu trúc điều khiển Cascade}
 
-Thiết kế hệ thống điều khiển cho quá trình cấp dầu nhiên liệu khởi động phải xuất phát từ bản chất công nghệ của đối tượng. Đây là hệ thống có quán tính lớn, chịu ảnh hưởng của biến thiên nhiệt độ dầu, tổn thất thủy lực trên tuyến ống, đặc tính phi tuyến của van điều khiển và các điều kiện bảo vệ liên động. Vì vậy, mục tiêu thiết kế không chỉ là bám theo giá trị đặt mà còn phải bảo đảm tính ổn định, khả năng kháng nhiễu và an toàn vận hành trong suốt dải làm việc.
+Từ những phân tích về đặc tính công nghệ của hệ thống cấp dầu nhiên liệu ở Chương 1, có thể thấy rõ hệ thống mang tính chất của một quá trình nhiệt động học phức tạp, bao hàm hai phân hệ có bản chất vật lý và tốc độ đáp ứng hoàn toàn khác biệt. Phân hệ van điều khiển lưu lượng dầu mang đặc tính cơ - thủy lực, có khả năng phản ứng rất nhanh chóng và linh hoạt với các lệnh thay đổi độ mở. Trong khi đó, phân hệ lò hơi sinh áp suất lại đặc trưng bởi quá trình truyền nhiệt và biến đổi pha (từ lỏng sang hơi), mang bản chất quán tính lớn và thời gian trễ vận chuyển đáng kể. 
 
-Trên cơ sở đó, hệ thống được tổ chức theo cấu trúc điều khiển phản hồi vòng kín. Biến cần điều khiển là lưu lượng dầu cấp đến đầu đốt; biến tác động là độ mở van điều khiển; các biến nhiễu chính gồm áp suất nguồn, nhiệt độ dầu và đặc tính biến đổi của dầu theo thời gian. Cấu trúc phản hồi cho phép hệ thống tự bù sai lệch khi điều kiện vận hành thay đổi, thay vì phụ thuộc hoàn toàn vào mô hình lý tưởng của quá trình.
+Nếu áp dụng cấu trúc điều khiển đơn vòng (Single Loop) truyền thống, trong đó bộ điều khiển nhận tín hiệu sai lệch áp suất hơi và xuất lệnh trực tiếp đến van điều khiển dầu, hệ thống sẽ gặp khó khăn nghiêm trọng trong việc duy trì tính ổn định. Lý do là bởi khi có các nhiễu loạn thủy lực (ví dụ áp lực bơm dầu thay đổi) làm lưu lượng dầu sai lệch, bộ điều khiển đơn vòng không thể phát hiện ngay lập tức. Hệ thống phải chờ một thời gian trễ khá dài cho đến khi lượng dầu sai lệch này làm thay đổi quá trình cháy, ảnh hưởng đến nhiệt lượng truyền vào các dàn ống và cuối cùng làm áp suất hơi dao động, thì bộ điều khiển mới bắt đầu có phản ứng. Quá trình khắc phục chậm trễ này thường dẫn đến sự mất ổn định và dao động biên độ lớn, gây mất an toàn cho tuabin và các đường ống áp lực.
 
-Bên cạnh vòng điều khiển chính về lưu lượng, các vòng phụ về nhiệt độ và áp suất được bố trí nhằm bảo đảm tính ổn định của lưu chất trước khi đi đến đầu đốt. Cách tổ chức này giúp tách riêng nhiệm vụ điều chỉnh lưu lượng khỏi nhiệm vụ duy trì trạng thái vật lý của dầu, qua đó làm giảm độ nhạy của hệ thống chính đối với nhiễu công nghệ.
+Để giải quyết triệt để bài toán này, cấu trúc điều khiển cấp tầng (Cascade Control) được lựa chọn làm triết lý thiết kế cốt lõi. Sơ đồ cấu trúc Cascade phân tách hệ thống thành hai vòng điều khiển lồng ghép vào nhau:
+\begin{itemize}
+    \item \textbf{Vòng trong (Vòng lưu lượng):} Sử dụng bộ điều khiển $R_2$ đóng vai trò điều khiển lưu lượng dầu nhiên liệu. Bộ điều khiển này nhận tín hiệu sai lệch giữa giá trị lưu lượng đặt (được cung cấp từ vòng ngoài) và giá trị lưu lượng thực tế đo được bởi cảm biến trên đường ống. Lệnh xuất ra từ $R_2$ tác động trực tiếp vào van điều khiển nhằm duy trì lưu lượng dầu chính xác theo yêu cầu.
+    \item \textbf{Vòng ngoài (Vòng áp suất):} Sử dụng bộ điều khiển $R_1$ đóng vai trò là bộ điều khiển chủ đạo (Master Controller). Nó theo dõi sai lệch giữa áp suất hơi đặt và áp suất hơi thực tế đầu ra của lò. Thay vì điều khiển trực tiếp van, bộ điều khiển $R_1$ tính toán mức nhiên liệu cần thiết và xuất ra tín hiệu làm giá trị đặt (Setpoint) cung cấp cho vòng trong.
+\end{itemize}
 
-\subsubsection{Cấu trúc điều khiển tổng thể}
+\subsubsection{Vai trò và ưu điểm của cấu trúc Cascade}
 
-Trong hệ thống cấp dầu nhiên liệu, vòng điều khiển lưu lượng được xem là vòng chính. Bộ đo lưu lượng FT cung cấp tín hiệu phản hồi cho bộ điều khiển FIC. Tín hiệu điều khiển sau khi xử lý được đưa đến van điều khiển FCV để thay đổi lưu lượng thực tế. Vòng nhiệt độ dầu và vòng áp suất đường ống đóng vai trò hỗ trợ, bảo đảm điều kiện làm việc ổn định cho vòng lưu lượng. Cấu trúc tổng thể vì vậy có thể xem là một hệ điều khiển phân cấp, trong đó mỗi vòng đảm nhận một chức năng kỹ thuật riêng nhưng vẫn liên kết chặt chẽ trong toàn bộ hệ thống.
-
-Ưu điểm của cấu trúc này là tính mô-đun cao, thuận tiện cho thiết kế, hiệu chỉnh và bảo trì. Khi một vòng phụ gặp vấn đề, vòng chính vẫn có thể duy trì vận hành trong giới hạn cho phép. Đồng thời, việc phân tách nhiệm vụ điều khiển theo từng đại lượng giúp quá trình nhận dạng và tổng hợp bộ điều khiển trở nên rõ ràng hơn, đặc biệt khi đối tượng có thời gian trễ và đặc tính quán tính lớn.
+Triết lý phân tách cấu trúc thành hai vòng điều khiển mang lại những ưu điểm kỹ thuật vượt trội, hoàn toàn phù hợp với các hệ thống nhiệt điện quy mô lớn:
+\begin{itemize}
+    \item \textbf{Triệt tiêu nhiễu cục bộ kịp thời:} Vòng điều khiển lưu lượng ở bên trong sẽ lập tức nhận diện và bù trừ mọi nhiễu loạn liên quan đến thủy lực (biến động áp suất nguồn cấp, kẹt cơ khí tại thân van, thay đổi độ nhớt) trước khi những nhiễu này kịp lan truyền làm thay đổi quá trình sinh nhiệt và áp suất hơi ở vòng ngoài.
+    \item \textbf{Tăng cường tốc độ đáp ứng:} Với bản chất động học nhanh, vòng trong được chỉnh định với độ lợi cao, cho phép van phản ứng nhạy bén với mọi thay đổi của giá trị đặt lưu lượng, từ đó đẩy nhanh tốc độ truyền năng lượng vào lò khi có sự thay đổi phụ tải.
+    \item \textbf{Tuyến tính hóa đối tượng điều khiển:} Đặc tính phi tuyến cố hữu của van điều khiển sẽ được vòng kín bên trong tự động làm phẳng. Đối với vòng ngoài, cụm van và bộ điều khiển vòng trong giờ đây được nhìn nhận như một khâu truyền đạt có hệ số khuếch đại xấp xỉ bằng $1$, giúp quá trình tổng hợp bộ điều khiển áp suất $R_1$ trở nên thuận lợi và chính xác hơn.
+\end{itemize}
 
 \subsection{Luận chứng lựa chọn thiết bị}
 
 \subsubsection{Dải làm việc, cảnh báo và bảo vệ}
 
-Việc lựa chọn thiết bị cần dựa trên dải làm việc thực tế của hệ thống, đồng thời phải xét đến các mức cảnh báo và bảo vệ. Trong bài toán này, lưu lượng dầu chính cần được giữ trong vùng đủ lớn để bảo đảm quá trình cháy ổn định nhưng không vượt quá khả năng chịu tải của tuyến ống và đầu đốt. Áp suất đường cấp phải đủ cao để bảo đảm chất lượng phun, còn nhiệt độ dầu phải được duy trì trong khoảng cho phép để dầu không bị đông đặc hoặc suy giảm chất lượng nhiệt. Mức dầu trong bể phải đủ cao để bảo đảm bơm hút ổn định và đủ thấp để tránh tràn hoặc gây áp lực bất thường lên hệ thống.
+Thiết kế phần cứng của hệ thống điều khiển phải tuân thủ nghiêm ngặt các dải vận hành của nhà máy nhiệt điện. Hệ thống áp suất hơi mới thường hoạt động trong dải áp suất cao (dao động từ $130$ đến $160$ bar tùy theo thiết kế của tổ máy). Lưu lượng dầu nhiên liệu được phép điều chỉnh tuyến tính từ $0\%$ đến $100\%$ công suất thiết kế của cụm béc phun để đáp ứng linh hoạt từ chế độ mồi lửa đến chế độ mang tải định mức.
 
-Các ngưỡng báo động và bảo vệ được thiết lập theo nguyên tắc: cảnh báo sớm để người vận hành có thời gian can thiệp, còn liên động bảo vệ được đặt ở mức nghiêm ngặt hơn nhằm ngăn ngừa hư hỏng thiết bị. Những ngưỡng này không nên hiểu như giá trị tuyệt đối cố định cho mọi nhà máy, mà cần được hiệu chỉnh theo tài liệu vận hành của từng tổ máy cụ thể. Trong phạm vi bài tập lớn, các ngưỡng làm việc được xác định theo đặc tính công nghệ điển hình và dùng làm cơ sở thiết kế điều khiển.
+Bên cạnh chức năng điều khiển liên tục, hệ thống giám sát và bảo vệ (Interlock \& Protection) được tích hợp song song. Các ngưỡng báo động (Alarm) được thiết lập tại giới hạn High và Low nhằm cảnh báo sớm cho người vận hành khi thông số áp suất hoặc lưu lượng có dấu hiệu thoát khỏi vùng an toàn. Trong trường hợp đặc biệt nghiêm trọng, ví dụ như áp suất hơi vượt quá ngưỡng High-High gây nguy cơ bục nổ đường ống, hoặc lưu lượng dầu sụt giảm xuống mức Low-Low làm mất ngọn lửa buồng đốt, hệ thống bảo vệ độc lập sẽ lập tức xuất lệnh nhảy lò (MFT - Master Fuel Trip), kích hoạt van cắt nhanh (Shut-off Valve) để cô lập hoàn toàn nguồn nhiên liệu.
 
-\subsubsection{Lựa chọn thiết bị đo}
+\subsubsection{Lựa chọn thiết bị đo và cơ cấu chấp hành}
 
-Thiết bị đo lưu lượng là phần tử then chốt của vòng điều khiển. Đối với dầu nặng, loại cảm biến đo lưu lượng cần có độ chính xác cao, ít phụ thuộc vào biến thiên mật độ và độ nhớt. Trên cơ sở đó, cảm biến Coriolis được xem là lựa chọn phù hợp vì có khả năng đo trực tiếp lưu lượng khối lượng, đồng thời duy trì độ ổn định tốt trong điều kiện lưu chất có tính chất thay đổi. Trong trường hợp ưu tiên về kinh tế hoặc cấu hình hệ thống khác, cảm biến oval gear cũng có thể được sử dụng do đặc tính đo thể tích ổn định đối với chất lỏng nhớt.
+Để đảm bảo tín hiệu phản hồi có độ tin cậy cao và tốc độ cập nhật nhanh, thiết bị đo lường được lựa chọn dựa trên các tiêu chuẩn công nghiệp khắt khe. 
 
-Thiết bị đo áp suất cần làm việc ổn định trong môi trường dầu nóng và chịu được dao động áp suất ngắn hạn. Cảm biến áp suất kiểu điện tử với màng cách ly được ưu tiên vì khả năng chống ăn mòn và độ ổn định lâu dài. Thiết bị đo nhiệt độ dầu thường sử dụng RTD hoặc cặp nhiệt điện được lắp trong thermowell để bảo vệ khỏi tác động của dòng dầu và điều kiện cơ học. Cảm biến mức trong bể chứa phải bảo đảm đo liên tục, tin cậy và ít bị ảnh hưởng bởi hơi dầu hoặc bọt khí; vì vậy cảm biến radar mức hoặc radar dẫn sóng là lựa chọn hợp lý cho ứng dụng này.
+Đối với việc đo lường lưu lượng dầu nhiên liệu, cảm biến lưu lượng kiểu khối lượng Coriolis (Coriolis Mass Flowmeter) là lựa chọn tối ưu. Với ưu điểm đo trực tiếp khối lượng môi chất chảy qua ống, loại cảm biến này hoàn toàn loại bỏ được sai số do biến thiên nhiệt độ hoặc độ nhớt của dầu đen (HFO), cung cấp tín hiệu phản hồi cực kỳ ổn định cho bộ điều khiển vòng trong. Đối với thông số áp suất hơi, cảm biến áp suất điện tử sử dụng màng cách ly (Pressure Transmitter) được ưu tiên sử dụng nhờ khả năng chịu được môi trường nhiệt độ cao, áp lực lớn và tuổi thọ vận hành bền bỉ.
 
-\subsubsection{Lựa chọn cơ cấu chấp hành}
-
-Cơ cấu chấp hành của vòng lưu lượng là van điều khiển. Trong các hệ thống dầu nhiên liệu, van cầu điều khiển tuyến tính hoặc van điều tiết chuyên dụng thường được sử dụng do đặc tính điều tiết tương đối ổn định trong vùng làm việc trung bình. Bộ truyền động khí nén được ưu tiên vì có tốc độ đáp ứng nhanh, kết cấu đơn giản và khả năng làm việc an toàn trong môi trường công nghiệp. Khi mất nguồn khí điều khiển, van thường được cấu hình về trạng thái an toàn phù hợp với yêu cầu công nghệ, ví dụ tự mở hoặc tự đóng tùy theo logic bảo vệ của hệ thống.
-
-Trong bài toán này, van điều khiển lưu lượng được xem là phần tử cuối cùng của mạch vòng. Đặc tính động học của van có ảnh hưởng trực tiếp đến chất lượng điều khiển, do đó việc lựa chọn phải bảo đảm tính tuyến tính tương đối trong vùng làm việc, độ kín tốt và thời gian đáp ứng đủ nhanh để không làm suy giảm hiệu quả của bộ điều khiển.
+Cơ cấu chấp hành của hệ thống là van điều khiển lưu lượng (Control Valve). Trong công nghiệp nhiệt điện, van điều khiển dẫn động bằng khí nén (Pneumatic Control Valve) được sử dụng rộng rãi nhờ tốc độ đóng mở nhanh và đáp ứng định vị chính xác thông qua bộ định vị van thông minh (Smart Positioner). Hơn nữa, van được thiết kế theo cấu hình "Fail-Close" (thường đóng); nghĩa là khi xảy ra sự cố mất nguồn cung cấp khí nén hoặc đứt cáp tín hiệu điều khiển, lực lò xo sẽ tự động đẩy trục van về vị trí đóng hoàn toàn. Cơ chế này đảm bảo cắt đứt dòng nhiên liệu đi vào lò, ngăn ngừa rủi ro cháy nổ không kiểm soát, tuân thủ nguyên tắc an toàn thiết kế "Fail-Safe".
 
 \subsection{Phương pháp xử lý số liệu thực nghiệm}
 
-\subsubsection{Quy trình thu thập và xử lý dữ liệu}
+Để có cơ sở dữ liệu tin cậy phục vụ cho công tác nhận dạng mô hình toán học và tổng hợp thuật toán điều khiển ở Chương 3, nhóm đã tiến hành thu thập số liệu thực nghiệm mô tả đáp ứng quá độ của cả hai đối tượng: vòng trong (đối tượng van điều khiển lưu lượng) và vòng ngoài (đối tượng lò hơi sinh áp suất).
 
-Để xây dựng mô hình động học cho đối tượng, số liệu thực nghiệm được thu thập từ đường đặc tính quá độ khi áp dụng kích thích bậc thang lên hệ thống ở trạng thái vận hành ổn định. Dữ liệu đáp ứng được trích xuất từ màn hình giám sát hoặc biểu đồ lịch sử của DCS/SCADA, sau đó được số hóa bằng phần mềm \textit{WebPlotDigitizer} để thu được tập giá trị thời gian và đầu ra tương ứng. Phương pháp này cho phép khai thác dữ liệu vận hành thực mà không cần dừng hệ thống để đo riêng lẻ.
+Phương pháp thu thập được thực hiện bằng cách áp dụng một tín hiệu kích thích dạng bậc thang (Step Input) vào đầu vào của hệ thống khi đang ở trạng thái làm việc ổn định, sau đó sử dụng hệ thống thu thập dữ liệu (DAQ) để ghi nhận diễn biến của tín hiệu đầu ra theo thời gian. Các tập dữ liệu thu được lưu trữ dưới định dạng tệp CSV, cụ thể là tệp \texttt{van-dap-ung-xung-1,6t.csv} đối với đáp ứng của lưu lượng dầu, và \texttt{ap-suat-hoi.csv} đối với đáp ứng của áp suất hơi. Trước khi tiến hành phân tích trên phần mềm Python, các tập dữ liệu này đã trải qua quá trình tiền xử lý nhằm loại bỏ các tín hiệu nhiễu ngẫu nhiên, trích lọc vùng dữ liệu hữu ích và chuẩn hóa về cùng một gốc thời gian.
 
-Sau khi số hóa, dữ liệu được tiền xử lý trên Python. Giai đoạn tiền xử lý bao gồm chuẩn hóa đơn vị, sắp xếp lại theo trục thời gian, loại bỏ các điểm nhiễu bất thường nếu có và đưa gốc thời gian về thời điểm bắt đầu kích thích. Việc xử lý bằng Python giúp thao tác với dữ liệu linh hoạt hơn, đồng thời thuận lợi cho việc mô phỏng, nhận dạng và tối ưu tham số ở các bước tiếp theo.
+Bảng \ref{tab:so_lieu_van} và Bảng \ref{tab:so_lieu_ap_suat} trình bày một phần dữ liệu đã được trích xuất từ các tệp thực nghiệm, minh họa rõ nét xu hướng tăng dần của đáp ứng đầu ra sau khi nhận được tín hiệu kích thích.
 
-\subsubsection{Nguyên tắc đánh giá số liệu}
+\begin{table}[htbp]
+\centering
+\caption{Trích xuất số liệu thực nghiệm đáp ứng van điều khiển lưu lượng}
+\label{tab:so_lieu_van}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Thời gian (s)} & \textbf{Đáp ứng lưu lượng (t/h)} & \textbf{Thời gian (s)} & \textbf{Đáp ứng lưu lượng (t/h)}\\ \hline
+0.00 & 0.000 & 2.40 & 0.379 \\ \hline
+0.80 & 0.001 & 5.52 & 0.856 \\ \hline
+1.17 & 0.089 & 10.49 & 1.203 \\ \hline
+1.54 & 0.175 & 29.77 & 1.399 \\ \hline
+\end{tabular}
+\end{table}
 
-Chất lượng dữ liệu thực nghiệm được đánh giá thông qua tính nhất quán của đường cong quá độ, mức độ nhiễu và khả năng biểu diễn đúng bản chất động học của đối tượng. Một tập số liệu tốt phải thể hiện rõ thời gian trễ, xu hướng tăng hoặc giảm đơn điệu và tiến tới trạng thái xác lập ổn định. Nếu đường cong có dao động bất thường hoặc nhiễu lớn, cần kiểm tra lại quá trình đo và bước số hóa trước khi đưa vào nhận dạng.
+\begin{table}[htbp]
+\centering
+\caption{Trích xuất số liệu thực nghiệm đáp ứng áp suất hơi}
+\label{tab:so_lieu_ap_suat}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Thời gian (s)} & \textbf{Đáp ứng áp suất (bar)} & \textbf{Thời gian (s)} & \textbf{Đáp ứng áp suất (bar)}\\ \hline
+0.00 & -0.002 & 15.02 & 0.660 \\ \hline
+1.69 & -0.002 & 20.14 & 0.929 \\ \hline
+3.76 & 0.028 & 25.31 & 1.087 \\ \hline
+7.17 & 0.140 & 48.04 & 1.197 \\ \hline
+\end{tabular}
+\end{table}
 
-Trong khuôn khổ bài tập lớn, số liệu sau khi xử lý được sử dụng trực tiếp để xây dựng mô hình nhận dạng trong Chương 3. Cách tiếp cận này bảo đảm sự liên tục giữa khâu khảo sát công nghệ, lựa chọn thiết bị và tổng hợp bộ điều khiển, đồng thời đáp ứng yêu cầu thực hành kỹ thuật của một đồ án môn học.
-
-\subsection{Kết luận chương}
-
-Chương này đã trình bày triết lý thiết kế của hệ thống điều khiển, tiêu chí lựa chọn thiết bị đo và cơ cấu chấp hành, cùng phương pháp xử lý số liệu vận hành phục vụ nhận dạng. Từ phân tích công nghệ có thể thấy việc điều khiển lưu lượng dầu nhiên liệu khởi động cần được tổ chức theo cấu trúc phản hồi ổn định, có tích hợp các vòng phụ và liên động bảo vệ. Những nội dung đã trình bày tạo nền tảng để bước sang chương tiếp theo, nơi mô hình động học của đối tượng được nhận dạng và bộ điều khiển được tổng hợp bằng các phương pháp IMC và điều khiển bền vững.
+Đặc điểm của các tập số liệu này thể hiện tính chất quá độ điển hình của các đối tượng công nghiệp: có thời gian trễ ban đầu và đường cong đáp ứng hình chữ S tiệm cận dần về giá trị xác lập. Nguồn số liệu mang tính thực tiễn cao này sẽ là dữ liệu đầu vào trực tiếp cho thuật toán nhận dạng phi tuyến, giúp xác định các thông số động học chính xác cho mô hình FOPDT và SOPDT.
 
 \end{document}
