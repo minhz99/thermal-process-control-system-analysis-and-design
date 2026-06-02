@@ -3,85 +3,32 @@
 \documentclass[../main.tex]{subfiles}
 \begin{document}
 
-\section{Sơ lược về công nghệ và hệ thống}
+\section{Tổng quan về đối tượng công nghệ}
 
-\subsection{Giới thiệu chung}
+\subsection{Giới thiệu chung về hệ thống cấp dầu nhiên liệu khởi động}
 
-Trong các nhà máy nhiệt điện hiện đại, quá trình đốt cháy nhiên liệu trong lò hơi đóng vai trò trung tâm trong toàn bộ quy trình sản xuất điện năng. Chất lượng của quá trình đốt cháy này phụ thuộc trực tiếp vào khả năng cung cấp nhiên liệu một cách liên tục, ổn định và chính xác theo nhu cầu tải thực tế của tổ máy. Dầu nhiên liệu nặng (heavy fuel oil – HFO), hay còn gọi là dầu mazut, được sử dụng rộng rãi trong giai đoạn khởi động lò hoặc làm nhiên liệu dự phòng tại nhiều nhà máy nhiệt điện trên thế giới cũng như tại Việt Nam. Do đặc tính độ nhớt cao ở nhiệt độ thường, loại dầu này đòi hỏi phải được gia nhiệt trước khi đưa vào buồng đốt, tạo nên sự phức tạp đặc trưng trong thiết kế hệ thống điều khiển.
+Trong các nhà máy nhiệt điện đốt than, dầu nhiên liệu khởi động được sử dụng trong giai đoạn khởi động lò, duy trì ngọn lửa mồi, hỗ trợ bắt cháy khi phụ tải thấp và làm nguồn dự phòng khi hệ thống cấp than chưa sẵn sàng hoặc khi điều kiện vận hành yêu cầu chuyển đổi chế độ cháy. Đối tượng công nghệ của bài tập lớn là hệ thống cấp và điều khiển lưu lượng dầu nhiên liệu khởi động cho lò than phun. Đây là một hệ thống công nghệ có tính liên tục, làm việc trong điều kiện nhiệt độ cao, dầu có độ nhớt lớn và yêu cầu an toàn cháy nổ nghiêm ngặt.
 
-Hệ thống điều khiển lưu lượng dầu nhiên liệu khởi động cho lò than phun là tập hợp các thiết bị và giải pháp kỹ thuật có chức năng đo lường, xử lý tín hiệu và điều tiết lượng dầu cấp vào buồng đốt một cách tự động, nhằm đảm bảo quá trình khởi động lò diễn ra an toàn và quá trình cháy luôn ở điều kiện tối ưu. Hệ thống này hoạt động theo nguyên lý vòng kín (closed-loop control), trong đó giá trị lưu lượng thực đo được liên tục so sánh với giá trị đặt (setpoint) và sai lệch giữa hai đại lượng này sẽ được bộ điều khiển xử lý để tạo ra tín hiệu hiệu chỉnh tác động lên cơ cấu chấp hành. Theo tiêu chuẩn ISA-5.1 và các quy chuẩn thiết kế nhà máy điện, hệ thống được yêu cầu đáp ứng các tiêu chí khắt khe về độ chính xác, khả năng phản ứng nhanh và tính sẵn sàng hoạt động cao.
+Về bản chất, hệ thống này thực hiện nhiệm vụ tiếp nhận, lưu trữ, gia nhiệt, tuần hoàn, đo lường và phân phối dầu đến các đầu đốt của lò hơi. Trong chu trình đó, lưu lượng dầu cấp là đại lượng có ảnh hưởng trực tiếp đến cường độ cháy, nhiệt lượng sinh ra trong buồng lửa và khả năng duy trì trạng thái cháy ổn định. Do đó, bài toán điều khiển lưu lượng dầu không chỉ là bài toán tự động hóa đơn thuần mà còn là một khâu kỹ thuật quan trọng quyết định độ tin cậy của toàn bộ quá trình khởi động lò.
+
+Hình~\ref{fig:hmi_fuel_oil} là giao diện giám sát điển hình của hệ thống cấp dầu nhiên liệu trên DCS. Hình này cho thấy các cụm bể chứa, đường hồi lưu, bộ gia nhiệt và các nhánh cấp cho đầu đốt được tích hợp trong một cấu trúc công nghệ khép kín.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.90\textwidth]{Hinhve/hmi-fuel-oil.jpg}
-    \caption{Màn hình HMI hệ thống Fuel Oil Supply to Boiler System (ABB DCS)}
+    \caption{Giao diện giám sát hệ thống cấp dầu nhiên liệu khởi động cho lò hơi}
     \label{fig:hmi_fuel_oil}
 \end{figure}
 
 \subsection{Mô tả đối tượng công nghệ}
 
-Hệ thống điều khiển lưu lượng dầu nhiên liệu khởi động cho lò than phun trong nhà máy nhiệt điện được thiết kế theo cấu trúc nhiều tầng, từ khâu tiếp nhận và lưu trữ dầu thô đến khâu phân phối và đốt cháy trong buồng lò. Mỗi tầng công nghệ đảm nhận một chức năng cụ thể và được kết nối chặt chẽ thông qua hệ thống đường ống, van và thiết bị điều khiển.
+Hệ thống cấp dầu nhiên liệu khởi động thường bao gồm các khâu chính: tiếp nhận dầu, lưu trữ trong bể, bơm chuyển, gia nhiệt, tuần hoàn hồi lưu và phân phối đến các đầu đốt. Dầu sau khi tiếp nhận từ nguồn ngoài được đưa vào bể đệm, sau đó bơm chuyển dầu đến các bể chứa chính. Tại đây, mức dầu được giám sát liên tục nhằm bảo đảm nguồn cấp ổn định cho hệ thống bơm hút.
 
-Dầu nhiên liệu được tiếp nhận từ nguồn cung bên ngoài (tàu bơm, xà lan) và lưu trữ tạm thời trong bể đệm (buffer tank). Từ bể đệm, bơm chuyển (transfer pump) vận chuyển dầu đến các bể chứa chính (Tank 1 và Tank 2), đây là nguồn dự trữ dầu trực tiếp cấp cho quá trình đốt. Mức dầu trong các bể này được giám sát liên tục bằng cảm biến mức (LT) để đảm bảo hệ thống luôn có đủ nguồn cung.
+Từ các bể chứa chính, dầu được bơm qua tuyến công nghệ chính đến bộ gia nhiệt. Mục đích của gia nhiệt là giảm độ nhớt động học của dầu xuống mức phù hợp với điều kiện vận chuyển qua đường ống và phun tơi tại đầu đốt. Đối với dầu HFO hoặc mazut, nhiệt độ làm việc thường phải được duy trì trong vùng đủ cao để bảo đảm tính chảy và tính phun sương, đồng thời không vượt quá giới hạn gây phân hủy nhiệt hoặc tạo cặn bám.
 
-Từ các bể chứa chính, bơm dầu nhiên liệu (fuel oil pump) hút dầu và đẩy vào hệ thống đường ống cung cấp. Dầu sau bơm được dẫn qua hệ thống gia nhiệt (fuel oil heater) sử dụng hơi nước (steam pipeline) làm tác nhân nhiệt. Tại đây, dầu được gia nhiệt đến nhiệt độ làm việc thích hợp, thường trong khoảng 80–120°C đối với dầu HFO, nhằm đưa độ nhớt động học xuống mức phù hợp cho quá trình phun sương tại đầu đốt.
+Sau bộ gia nhiệt, dầu nóng được dẫn đến manifold phân phối để chia đến các nhóm đầu đốt. Lưu lượng trên từng nhánh được điều tiết bởi van điều khiển lưu lượng. Một phần dòng dầu còn được hồi lưu về bể chứa nhằm duy trì tuần hoàn, tránh lắng cặn và bảo đảm dầu luôn ở trạng thái nhiệt ổn định. Đường hồi lưu cũng có vai trò bảo vệ bơm khỏi làm việc trong điều kiện thiếu tải hoặc lưu lượng quá nhỏ.
 
-Sau khi đạt nhiệt độ yêu cầu, dầu nóng được dẫn đến manifold phân phối (fuel oil supply manifold). Đây là điểm phân chia dòng dầu thành các nhánh nhỏ hơn để cung cấp riêng biệt cho từng nhóm đầu đốt (burner group) của lò hơi. Lưu lượng dầu trên mỗi nhánh được điều tiết bởi một van điều khiển lưu lượng (FCV) riêng biệt hoạt động theo tín hiệu từ bộ điều khiển FIC tương ứng. Một đặc điểm quan trọng của hệ thống là đường hồi lưu dầu (fuel oil recirculation line): khi nhu cầu cấp dầu cho buồng đốt giảm, một phần dầu sẽ được hồi lưu về bể chứa nhằm duy trì dầu trong trạng thái tuần hoàn liên tục để tránh hiện tượng dầu bị làm nguội và tăng độ nhớt trong đường ống, đồng thời bảo vệ bơm khỏi tình trạng chạy không tải.
-
-\subsection{Phân loại hệ thống điều khiển lưu lượng dầu nhiên liệu khởi động}
-
-Dựa trên cấu trúc đường dòng và mức độ tự động hóa, hệ thống điều khiển lưu lượng dầu nhiên liệu khởi động cho lò than phun có thể được phân thành ba loại chính. Hệ thống hở (open-loop system) là loại đơn giản nhất, trong đó dầu tuần hoàn theo một chiều từ bể chứa đến các đầu đốt mà không có đường hồi lưu; dạng hệ thống này thường áp dụng trong các nhà máy quy mô nhỏ sử dụng dầu nhẹ, nơi yêu cầu điều khiển không quá phức tạp. Hệ thống kín (closed-loop circulation system) có thêm đường hồi lưu dầu thừa về bể chứa, cho phép duy trì nhiệt độ dầu ổn định trong toàn bộ hệ thống ngay cả khi nhu cầu đốt thấp, phù hợp với các nhà máy lớn sử dụng dầu nặng HFO cần được gia nhiệt liên tục. Hệ thống tự động hóa hoàn toàn (fully automated system) là dạng tiên tiến nhất, trong đó toàn bộ quá trình đo lường, xử lý tín hiệu và điều chỉnh được thực hiện bởi PLC/DCS tích hợp với hệ thống giám sát trung tâm SCADA/HMI; đây là loại hệ thống phổ biến tại các nhà máy nhiệt điện hiện đại, cho phép vận hành linh hoạt, giám sát từ xa và phản ứng nhanh trước các thay đổi về tải. Phân loại tổng hợp được trình bày trong Bảng~\ref{tab:phan_loai_he_thong}.
-
-\begin{table}[htbp]
-    \centering
-    \caption{Phân loại các hệ thống điều khiển lưu lượng dầu nhiên liệu khởi động}
-    \label{tab:phan_loai_he_thong}
-    \resizebox{\textwidth}{!}{%
-    \begin{tabular}{|p{3.5cm}|p{6cm}|p{4.5cm}|}
-        \hline
-        \textbf{Loại hệ thống} & \textbf{Đặc điểm} & \textbf{Ứng dụng} \\
-        \hline
-        Hệ thống hở & Dầu tuần hoàn một chiều, không tái sử dụng dầu thừa. Cấu trúc đơn giản, chi phí thấp. & Nhà máy nhỏ, sử dụng dầu nhẹ (DO). \\
-        \hline
-        Hệ thống kín & Dầu dư được hồi lưu về bể chứa, duy trì nhiệt độ ổn định và tiết kiệm nhiên liệu. & Nhà máy lớn, sử dụng dầu nặng (HFO, mazut). \\
-        \hline
-        Hệ thống tự động hoàn toàn & Điều khiển bằng PLC/DCS, tích hợp với hệ thống giám sát lò hơi qua SCADA/HMI. & Nhà máy nhiệt điện hiện đại. \\
-        \hline
-    \end{tabular}
-    }
-\end{table}
-
-\section{Các thông số điều khiển, giám sát của hệ thống}
-
-Trong hệ thống điều khiển lưu lượng dầu nhiên liệu khởi động cho lò than phun, có bốn nhóm thông số vật lý cần được theo dõi và điều chỉnh liên tục để đảm bảo hệ thống vận hành an toàn và hiệu quả.
-
-Lưu lượng dòng chất (Flow) là đối tượng điều khiển chính, quyết định trực tiếp năng lượng cung cấp cho đầu đốt. Giá trị lưu lượng tính theo đơn vị m³/h hoặc kg/h phụ thuộc vào độ mở của van điều chỉnh FCV, tốc độ bơm phân phối và áp suất hệ thống. Đây là biến điều khiển cần được duy trì bám sát theo giá trị đặt từ hệ thống điều phối tải cấp trên (Boiler Master).
-
-Nhiệt độ dầu (Temperature) chi phối trực tiếp đến độ nhớt của dầu, điều kiện tiên quyết để đảm bảo chất lượng phun sương tại vòi đốt. Dầu HFO cần được duy trì trong khoảng nhiệt độ 80–120°C ở đầu ra bộ gia nhiệt để hệ thống bơm và vòi phun hoạt động ở hiệu suất tối đa. Nếu nhiệt độ dầu thấp hơn ngưỡng này, độ nhớt tăng cao sẽ gây tắc nghẽn đường ống và vòi phun; ngược lại, nhiệt độ quá cao có thể dẫn đến phân hủy nhiệt và tạo cặn trong hệ thống.
-
-Áp suất đường phân phối (Pressure) đóng vai trò kiểm soát chất lượng phun sương và đảm bảo an toàn đường ống. Việc duy trì áp suất đầu vào vòi đốt trong dải ổn định giúp lưu lượng phun sương luôn đồng đều, tránh hiện tượng tắt ngọn lửa bất ngờ do sụt áp hoặc nguy cơ rò rỉ do quá áp. Áp suất được kiểm soát bởi mạch vòng PIC thông qua van bypass hồi lưu hoặc điều tốc bơm.
-
-Mức dầu trong bể chứa (Level) phản ánh trữ lượng dầu sẵn có để đảm bảo hệ thống bơm luôn có đủ nguồn cấp. Nếu mức dầu quá thấp, không khí sẽ xâm nhập vào đường hút của bơm, gây ra hiện tượng xâm thực (cavitation) làm hỏng cánh bơm và gián đoạn nguồn cung nhiên liệu; nếu mức dầu quá cao, nguy cơ tràn bể tiềm ẩn những rủi ro về an toàn cháy nổ và ô nhiễm môi trường.
-
-\section{Vai trò, ý nghĩa của hệ thống và các yếu tố ảnh hưởng}
-
-\subsection{Vai trò của hệ thống điều khiển}
-
-Hệ thống điều khiển lưu lượng dầu nhiên liệu khởi động cho lò than phun giữ vai trò then chốt trong quá trình khởi động và vận hành của nhà máy nhiệt điện, thể hiện trên ba phương diện chính.
-
-Về điều tiết cung cấp nhiên liệu, hệ thống điều khiển lưu lượng đảm bảo lượng dầu được cấp vào buồng đốt luôn phù hợp với nhu cầu tải thực tế. Khi phụ tải điện tăng cao, hệ thống điều khiển cấp trên sẽ yêu cầu tăng lưu lượng dầu để tăng cường độ đốt cháy, sinh thêm hơi và tăng công suất tua-bin; ngược lại, khi phụ tải giảm, lưu lượng dầu sẽ được điều chỉnh giảm tương ứng nhằm tránh lãng phí nhiên liệu và nguy cơ quá nhiệt lò hơi.
-
-Về tối ưu hóa hiệu suất đốt cháy, hệ thống phối hợp chặt chẽ với hệ thống điều khiển lưu lượng gió cháy để duy trì tỷ lệ không khí – nhiên liệu (air-fuel ratio) tối ưu. Tỷ lệ này quyết định trực tiếp đến hiệu suất cháy và lượng khí thải phát sinh. Việc điều khiển lưu lượng dầu chính xác vì vậy không chỉ mang lại hiệu quả kinh tế mà còn góp phần bảo vệ môi trường.
-
-Về đảm bảo an toàn vận hành, hệ thống có khả năng phản ứng tức thì trước các tình huống bất thường thông qua cơ chế khóa liên động (interlock). Khi các thông số đo lường vượt ngưỡng bảo vệ, bộ điều khiển sẽ tự động kích hoạt van an toàn, ngắt cấp dầu hoặc chuyển sang chế độ vận hành dự phòng để bảo vệ an toàn cho lò hơi và toàn bộ nhà máy.
-
-\subsection{Các yếu tố ảnh hưởng đến thông số quá trình}
-
-Bên cạnh các yếu tố điều khiển chủ động, sự vận hành ổn định của hệ thống còn bị tác động bởi nhiều nguồn nhiễu loạn từ bên ngoài. Thứ nhất là đặc tính thành phần dầu cấp: dầu có lẫn nhiều tạp chất cơ học hoặc hơi ẩm sẽ dẫn tới thay đổi tỷ trọng, làm chậm phản ứng cháy, từ đó tạo ra sai lệch giữa lượng dầu tính toán qua van phân phối và nhiệt lượng tỏa ra thực tế. Thứ hai là biến thiên nguồn nhiệt lượng bổ trợ: áp suất và lưu lượng hơi nước đưa vào bầu gia nhiệt mang theo độ trễ và bất định, làm nhiệt độ dầu ra thay đổi, kéo theo sự biến đổi độ nhớt và gián tiếp ảnh hưởng đến lưu lượng qua bơm cấp. Thứ ba là tổn thất thủy lực và mài mòn: sau thời gian dài vận hành, sự mài mòn cơ khí tại đầu van điều tiết khiến đặc tính van không còn tuyến tính như thiết kế lý tưởng, dẫn đến sai số tĩnh tích lũy trong kiểm soát lưu lượng.
-
-\section{Sơ đồ hệ thống đo lường, điều khiển giám sát cho đối tượng}
-
-Sơ đồ công nghệ tổng quan (Process Flow Diagram – PFD) của hệ thống điều khiển lưu lượng dầu nhiên liệu khởi động cho lò than phun được xây dựng nhằm mô tả trực quan toàn bộ luồng vật chất và năng lượng đi qua hệ thống, đồng thời thể hiện mối liên hệ giữa các thiết bị công nghệ chính (Hình~\ref{fig:so_do_cong_nghe}).
+Sơ đồ công nghệ tổng quan được trình bày trong Hình~\ref{fig:so_do_cong_nghe}. Sơ đồ này chỉ ra mối quan hệ giữa khâu lưu trữ, gia nhiệt, điều tiết và hồi lưu; đồng thời là cơ sở để xây dựng sơ đồ đo lường và cấu trúc điều khiển ở các phần sau.
 
 \begin{figure}[htbp]
     \centering
@@ -89,177 +36,65 @@ Sơ đồ công nghệ tổng quan (Process Flow Diagram – PFD) của hệ th�
         scale=0.95,
         every node/.style={transform shape},
         equipment/.style={draw, rectangle, minimum width=2.2cm, minimum height=1.0cm, align=center, thick, fill=white, font=\sffamily\small},
-        valve h/.pic={
-            \draw[thick, fill=white] (-0.2, 0.15) -- (-0.2, -0.15) -- (0,0) -- cycle;
-            \draw[thick, fill=white] (0.2, 0.15) -- (0.2, -0.15) -- (0,0) -- cycle;
-        },
-        valve v/.pic={
-            \draw[thick, fill=white] (-0.15, 0.2) -- (0.15, 0.2) -- (0,0) -- cycle;
-            \draw[thick, fill=white] (-0.15, -0.2) -- (0.15, -0.2) -- (0,0) -- cycle;
-        },
-        control valve v/.pic={
-            \draw[thick, fill=white] (-0.15, 0.2) -- (0.15, 0.2) -- (0,0) -- cycle;
-            \draw[thick, fill=white] (-0.15, -0.2) -- (0.15, -0.2) -- (0,0) -- cycle;
-            \draw[thick] (0,0) -- (0.25, 0);
-            \node[right, font=\sffamily\scriptsize, inner sep=1pt] at (0.25, 0) {D};
-        },
-        control valve h/.pic={
-            \draw[thick, fill=white] (-0.2, 0.15) -- (-0.2, -0.15) -- (0,0) -- cycle;
-            \draw[thick, fill=white] (0.2, 0.15) -- (0.2, -0.15) -- (0,0) -- cycle;
-            \draw[thick] (0,0) -- (0, 0.25);
-            \node[above, font=\sffamily\scriptsize, inner sep=1pt] at (0, 0.25) {D};
-        },
-        pump/.pic={
-            \draw[thick, fill=white] (0,0) circle (0.35);
-            \draw[thick] (0,0.35) -- (0,-0.35);
-            \draw[thick] (-0.25, 0.25) -- (0,-0.35);
-            \draw[thick] (0.25, 0.25) -- (0,-0.35);
-        },
         pipe/.style={thick, draw=cyan!70!black},
         arrow/.style={-Latex, thick, draw=cyan!70!black}
     ]
-        % Equipment Nodes
-        \node[equipment, minimum width=2.2cm] (buffer) at (0, 5) {Bể chứa\\đệm};
+        \node[equipment] (buffer) at (0, 5) {Bể chứa\đệm};
         \node[equipment, minimum width=1.8cm] (tank1) at (4, 5) {Tank 1};
         \node[equipment, minimum width=1.8cm] (tank2) at (8, 5) {Tank 2};
-        
-        \node[equipment, minimum width=2.2cm] (heater1) at (4, 1.2) {Gia nhiệt\\dầu};
-        \node[equipment, minimum width=2.2cm] (heater2) at (8, 1.2) {Gia nhiệt\\dầu};
-
-        % Return line at top
+        \node[equipment] (heater1) at (4, 1.2) {Gia nhiệt\dầu};
+        \node[equipment] (heater2) at (8, 1.2) {Gia nhiệt\dầu};
         \draw[pipe] (3.8, 7) -- (8.2, 7);
-        \node[above, font=\sffamily\small] at (6, 7) {Dầu từ lò hơi hồi về};
+        \node[above, font=\sffamily\small] at (6, 7) {Dầu hồi lưu từ lò};
         \draw[pipe] (6, 7) -- (6, 5);
-        
-        % Connection between Tank 1 & Tank 2
         \draw[pipe] (tank1.east) -- (tank2.west);
-        \pic at (5.3, 5) {valve h};
-        \pic at (6.7, 5) {valve h};
-
-        % Buffer tank to Tank 1
         \draw[arrow] (buffer.east) -- (tank1.west);
-
-        % Column 1 (Under Tank 1)
-        \draw[arrow] (tank1.south) -- (4, 4.1);
-        \pic at (4, 3.9) {valve v};
-        \draw[arrow] (4, 3.7) -- (4, 3.35);
-        \pic at (4, 3.0) {pump};
-        \draw[arrow] (4, 2.65) -- (4, 2.4);
-        \pic at (4, 2.2) {valve v};
-        \draw[arrow] (4, 2.0) -- (heater1.north);
-        
-        \draw[arrow] (heater1.south) -- (4, 0.15);
-        \pic at (4, -0.2) {pump};
-        \draw[arrow] (4, -0.55) -- (4, -0.8);
-        \pic at (4, -1.0) {valve v};
-        \draw[pipe] (4, -1.2) -- (4, -1.8);
-
-        % Column 2 (Under Tank 2)
-        \draw[arrow] (tank2.south) -- (8, 4.1);
-        \pic at (8, 3.9) {valve v};
-        \draw[arrow] (8, 3.7) -- (8, 3.35);
-        \pic at (8, 3.0) {pump};
-        \draw[arrow] (8, 2.65) -- (8, 2.4);
-        \pic at (8, 2.2) {valve v};
-        \draw[arrow] (8, 2.0) -- (heater2.north);
-        
-        \draw[arrow] (heater2.south) -- (8, 0.15);
-        \pic at (8, -0.2) {pump};
-        \draw[arrow] (8, -0.55) -- (8, -0.8);
-        \pic at (8, -1.0) {valve v};
-        \draw[pipe] (8, -1.2) -- (8, -1.8);
-
-        % Bottom junction
-        \draw[pipe] (4, -1.8) -- (8, -1.8);
-        \draw[pipe] (6, -1.8) -- (6, -2.6);
-        \draw[pipe] (6, -2.6) -- (1.3, -2.6);
-        \pic at (3.65, -2.6) {valve h};
-        
-        % Left side rise
-        \draw[pipe] (1.3, -2.6) -- (1.3, -1.2);
-        \pic at (1.3, -1.9) {control valve v};
-        
-        % Parallel branches split
-        \draw[pipe] (1.3, -1.2) -- (0.5, -1.2) -- (0.5, 0);
-        \draw[pipe] (1.3, -1.2) -- (2.1, -1.2) -- (2.1, 0);
-        \pic at (0.5, -0.6) {control valve v};
-        \pic at (2.1, -0.6) {control valve v};
-        
-        % Parallel branches merge
+        \draw[arrow] (tank1.south) -- (4, 4.1) -- (4, 2.0) -- (heater1.north);
+        \draw[arrow] (heater1.south) -- (4, -1.2);
+        \draw[arrow] (tank2.south) -- (8, 4.1) -- (8, 2.0) -- (heater2.north);
+        \draw[arrow] (heater2.south) -- (8, -1.2);
+        \draw[pipe] (4, -1.2) -- (8, -1.2);
+        \draw[pipe] (6, -1.2) -- (6, -2.2) -- (1.3, -2.2) -- (1.3, -1.2);
+        \draw[pipe] (1.3, -2.2) -- (1.3, -0.8);
+        \draw[pipe] (1.3, -0.8) -- (0.5, -0.8) -- (0.5, 0);
+        \draw[pipe] (1.3, -0.8) -- (2.1, -0.8) -- (2.1, 0);
         \draw[pipe] (0.5, 0) -- (2.1, 0);
         \draw[pipe] (1.3, 0) -- (1.3, 1.0);
-        
-        % Outlet header
         \draw[thick, draw=cyan!70!black, {Latex}-{Latex}] (0.0, 1.0) -- (2.6, 1.0);
-        \node[above, font=\sffamily\small] at (1.3, 1.0) {Đi đến vòi phun};
-
+        \node[above, font=\sffamily\small] at (1.3, 1.0) {Đến đầu đốt};
     \end{tikzpicture}
     \caption{Sơ đồ công nghệ tổng quan hệ thống cấp dầu nhiên liệu}
     \label{fig:so_do_cong_nghe}
 \end{figure}
 
-Nhìn vào sơ đồ, có thể nhận thấy hệ thống được tổ chức thành các khối chức năng rõ ràng và có mối quan hệ tuần tự với nhau. Khối lưu trữ và tiếp nhận dầu bao gồm bể đệm và các bể chứa chính với hệ thống bơm chuyển dầu. Khối xử lý và gia nhiệt bao gồm bộ lọc dầu, bộ gia nhiệt và hệ thống ống hơi nước. Khối phân phối và điều chỉnh bao gồm manifold, van điều khiển lưu lượng FCV và các đầu đốt. Khối hồi lưu, gồm đường ống hồi lưu và van điều tiết hồi lưu, đảm bảo dầu luôn được tuần hoàn kín, duy trì nhiệt độ ổn định và bảo vệ bơm trong mọi điều kiện tải.
+\subsection{Các thông số điều khiển và giám sát}
 
-Đối tượng trọng tâm của bài tập lớn là mạch vòng điều chỉnh lưu lượng chính. Trong mạch vòng này, tín hiệu lưu lượng được đo bởi lưu lượng kế FT, phản hồi về bộ điều khiển FIC để tính toán sai lệch so với giá trị đặt, sau đó bộ điều khiển phát tín hiệu hiệu chỉnh đến van FCV để thay đổi lưu lượng thực tế. Đây là vòng điều khiển cơ bản nhất và là nền tảng để phân tích và tổng hợp bộ điều khiển trong các chương tiếp theo.
+Trong hệ thống cấp dầu nhiên liệu, các thông số cần được theo dõi và điều khiển liên tục gồm lưu lượng, áp suất, nhiệt độ và mức dầu. Lưu lượng là biến công nghệ trọng tâm, phản ánh trực tiếp lượng nhiên liệu được đưa tới đầu đốt. Ở chế độ vận hành ổn định, lưu lượng phải bám theo giá trị đặt của hệ thống điều phối để bảo đảm cường độ cháy phù hợp với yêu cầu phụ tải.
 
+Áp suất đường ống phân phối có vai trò duy trì điều kiện vận chuyển và phun tơi ổn định. Nếu áp suất quá thấp, lưu lượng tại đầu đốt dao động mạnh và quá trình phun sương suy giảm; nếu áp suất quá cao, nguy cơ rò rỉ và hư hỏng thiết bị tăng lên. Vì vậy, áp suất thường được giữ trong một dải làm việc hẹp để tối ưu hóa tính ổn định động lực học của hệ thống.
 
-Bảng~\ref{tab:thong_so_hmi} trình bày tổng hợp các thông số vận hành thực tế được đọc từ màn hình HMI của hệ thống DCS ABB trong điều kiện lò đang hoạt động ổn định ở tải định mức. Tất cả các thông số đều nằm trong dải làm việc bình thường, xác nhận hệ thống đang vận hành đúng theo thiết kế.
+Nhiệt độ dầu ảnh hưởng trực tiếp đến độ nhớt, khả năng bơm và chất lượng phun. Đối với dầu nặng, khi nhiệt độ thấp, độ nhớt tăng mạnh khiến tổn thất thủy lực tăng và quá trình phun bị xấu đi. Khi nhiệt độ quá cao, dầu có thể lão hóa nhiệt, tạo cặn và ảnh hưởng tới độ bền thiết bị. Do đó, nhiệt độ là thông số vừa mang tính công nghệ vừa mang tính bảo vệ đối với toàn bộ tuyến dầu.
 
-\begin{table}[H]
-    \centering
-    \caption{Tổng hợp thông số vận hành thực tế từ HMI}
-    \label{tab:thong_so_hmi}
-    \begin{tabular}{|p{4cm}|p{3.5cm}|p{2.5cm}|p{3cm}|}
-        \hline
-        \textbf{Thông số} & \textbf{Giá trị thực tế} & \textbf{Dải tối ưu} & \textbf{Nhận xét} \\
-        \hline
-        Tổng lưu lượng FO & $\approx 31{,}8\,\text{t/h}$ & Theo tải lò & Bình thường \\
-        \hline
-        Áp suất trước burner & $11$--$12\,\text{kgf/cm}^2$ & $10$--$15\,\text{kgf/cm}^2$ & Đạt chuẩn \\
-        \hline
-        Nhiệt độ dầu & $120$--$140\,^{\circ}\text{C}$ & $110$--$140\,^{\circ}\text{C}$ & Tối ưu \\
-        \hline
-        Mức Tank 1 & $\approx 58{,}8\,\%$ & $20$--$80\,\%$ & An toàn \\
-        \hline
-        Mức Tank 2 & $\approx 66{,}0\,\%$ & $20$--$80\,\%$ & An toàn \\
-        \hline
-        Recirculation & Đang hoạt động & Luôn mở & Bình thường \\
-        \hline
-    \end{tabular}
-\end{table}
+Mức dầu trong bể chứa là biến giám sát quan trọng để bảo đảm bơm làm việc trong điều kiện hút ổn định. Mức quá thấp có thể gây xâm thực và làm mất áp hút, còn mức quá cao làm tăng nguy cơ tràn và mất an toàn cháy nổ. Các tín hiệu mức vì vậy thường gắn với cơ chế cảnh báo và liên động bảo vệ.
 
-\section{Thiết bị công nghệ chính của hệ thống điều khiển lưu lượng dầu}
+\subsection{Vai trò của hệ thống và các yếu tố ảnh hưởng}
 
-\subsection{Thiết bị đo lường (Cảm biến lưu lượng)}
+Hệ thống điều khiển lưu lượng dầu khởi động có ba vai trò chính. Thứ nhất, nó bảo đảm cung cấp nhiên liệu đúng theo nhu cầu của quá trình cháy, giúp lò hơi khởi động tin cậy và duy trì ngọn lửa ổn định trong các chế độ tải khác nhau. Thứ hai, hệ thống góp phần nâng cao hiệu suất cháy bằng cách duy trì lưu lượng cấp và áp suất phân phối ở vùng tối ưu, từ đó hỗ trợ quá trình hòa trộn nhiên liệu với không khí diễn ra hiệu quả hơn. Thứ ba, hệ thống là một phần của cơ chế bảo vệ an toàn, vì mọi sai lệch lớn về lưu lượng, áp suất hoặc mức dầu đều có thể dẫn tới mất ổn định cháy hoặc sự cố cháy nổ.
 
-Chức năng chính của các thiết bị này là đo lường chính xác lượng dầu đang chảy qua đường ống và truyền tín hiệu về hệ thống điều khiển. Để thực hiện nhiệm vụ này, nhiều nguyên lý đo lường khác nhau được ứng dụng trong thực tế công nghiệp. Đồng hồ đo lưu lượng kiểu Coriolis được đánh giá cao nhờ khả năng cung cấp phép đo khối lượng dòng chảy trực tiếp với độ chính xác vượt trội, đồng thời ít chịu ảnh hưởng bởi sự dao động về mật độ, nhiệt độ và độ nhớt của dầu. Bên cạnh đó, đồng hồ đo lưu lượng kiểu tuabin (Turbine flowmeter) sử dụng một rô-to quay tự do theo dòng chảy, với tốc độ quay tỷ lệ thuận với tốc độ dòng, mang lại lợi thế về chi phí hợp lý và dải đo rộng. Đối với các loại dầu có độ nhớt cao như HFO, đồng hồ đo lưu lượng kiểu bánh răng oval (Oval gear flowmeter) là một lựa chọn lý tưởng. Thiết bị này hoạt động dựa trên nguyên lý đo thể tích, sử dụng các bánh răng ăn khớp để định lượng lượng dầu chính xác trong mỗi chu kỳ quay. Ngoài ra, đồng hồ đo lưu lượng chênh áp (Differential pressure flowmeter) cũng được ứng dụng rộng rãi bằng cách tạo ra sự thu hẹp có chủ đích trên đường ống và suy diễn lưu lượng từ độ sụt áp tại điểm thu hẹp đó. Cuối cùng, công nghệ cảm biến lưu lượng siêu âm (Ultrasonic flowmeter) cho phép xác định tốc độ dòng chảy thông qua việc phân tích sự truyền sóng siêu âm xuyên qua lưu chất, mang lại giải pháp đo lường không tiếp xúc hiệu quả. Các thiết bị này hiện được cung cấp bởi nhiều nhà sản xuất uy tín trên thế giới như IFM, Alia, Digital Flow, Belimo, Krohne, Emerson, Yokogawa và Endress+Hauser.
+Chất lượng vận hành của hệ thống chịu ảnh hưởng bởi nhiều nguồn nhiễu. Trước hết là biến thiên độ nhớt của dầu do thay đổi nhiệt độ môi trường hoặc điều kiện gia nhiệt. Tiếp theo là dao động áp suất đầu ra của bơm và tổn thất trên tuyến ống, làm đặc tính lưu lượng thay đổi theo thời gian. Ngoài ra, sự mài mòn của van điều khiển và cặn bẩn trong dầu có thể làm thay đổi đặc tính tuyến tính hóa của cơ cấu chấp hành. Đây là những nguyên nhân dẫn đến sai lệch động học cần được xem xét khi mô hình hóa và thiết kế điều khiển.
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.60\textwidth]{Hinhve/coriolis_flowmeter.png}
-    \caption{Cảm biến đo lưu lượng kiểu Coriolis}
-    \label{fig:coriolis_flowmeter}
-\end{figure}
+\subsection{Thiết bị công nghệ chính}
 
-\subsection{Thiết bị chấp hành (Van điều khiển)}
+Hệ thống được cấu thành từ các thiết bị đo lường, chấp hành và điều khiển. Thiết bị đo lưu lượng đóng vai trò cung cấp tín hiệu phản hồi chính cho vòng điều khiển. Trong các ứng dụng dầu nặng, cảm biến lưu lượng kiểu Coriolis hoặc oval gear thường được ưu tiên nhờ khả năng đo ổn định trong môi trường có độ nhớt biến thiên. Van điều khiển lưu lượng là cơ cấu chấp hành trực tiếp, có nhiệm vụ thay đổi độ mở để điều tiết lưu lượng cấp đến đầu đốt. Bộ điều khiển trung tâm, thường là PLC hoặc DCS, thực hiện xử lý tín hiệu, so sánh sai lệch và phát lệnh điều chỉnh cho van. Bên cạnh đó, các thiết bị phụ trợ như cảm biến áp suất, cảm biến nhiệt độ, công tắc mức và hệ thống báo động liên động bảo đảm hệ thống vận hành an toàn trong toàn bộ dải công nghệ.
 
-Van điều khiển đóng vai trò là thiết bị cuối cùng trong vòng điều khiển, thực hiện nhiệm vụ điều chỉnh trực tiếp lưu lượng dầu cấp đến các vòi phun dựa trên tín hiệu định hướng từ bộ điều khiển trung tâm. Tùy thuộc vào yêu cầu công nghệ đặc thù, các loại van khác nhau sẽ được lựa chọn sử dụng. Van cầu (Globe valve) được ưu tiên ứng dụng trong các nhiệm vụ điều chỉnh lưu lượng nhờ khả năng điều tiết dòng chảy một cách liên tục và chính xác. Trong khi đó, van bi (Ball valve) thường được trang bị cho các mục đích đóng cắt nhanh hoặc điều tiết lưu lượng dựa trên thiết kế đặc biệt của cửa van. Đối với hệ thống đường ống kích thước lớn và chỉ đòi hỏi độ chính xác điều chỉnh ở mức tương đối, van bướm (Butterfly valve) là giải pháp mang tính kinh tế cao. Ngoài ra, các dòng van điện từ (Solenoid valve) được tích hợp chủ yếu trong các mạch bảo vệ an toàn để đáp ứng các yêu cầu đóng mở khẩn cấp.
+\subsection{Sơ đồ đo lường, điều khiển và giám sát}
 
-Để vận hành các van này, hệ thống sử dụng các bộ truyền động phù hợp nhằm chuyển đổi tín hiệu điều khiển thành chuyển động cơ học. Bộ truyền động điện (Electric actuator) ứng dụng động cơ điện để thực hiện chuyển động xoay hoặc tịnh tiến ty van, cho phép điều khiển vị trí một cách ổn định. Tuy nhiên, trong các nhà máy nhiệt điện, bộ truyền động khí nén (Pneumatic actuator) lại được ưa chuộng hơn nhờ sử dụng năng lượng khí nén tác động lên màng lò xo để thay đổi vị trí van. Công nghệ này mang lại ưu điểm vượt trội về tốc độ phản hồi nhanh, kết cấu đơn giản và độ tin cậy vận hành rất cao, đặc biệt trong các tình huống yêu cầu xử lý sự cố an toàn.
+Từ đặc điểm công nghệ nêu trên, sơ đồ đo lường và điều khiển của hệ thống có thể tổ chức theo cấu trúc vòng kín cơ bản. Cảm biến lưu lượng FT đo lưu lượng thực tế trên tuyến cấp dầu và gửi tín hiệu về bộ điều khiển FIC. Bộ điều khiển so sánh giá trị đo với giá trị đặt, sau đó phát tín hiệu điều khiển đến van FCV để điều chỉnh độ mở. Khi lưu lượng thay đổi, quá trình cháy trong lò cũng biến đổi tương ứng; vì vậy, hệ thống giám sát trung tâm phải liên kết thông số lưu lượng với áp suất, nhiệt độ và mức dầu để bảo đảm điều kiện vận hành đồng bộ.
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.45\textwidth]{Hinhve/control_valve.png}
-    \caption{Van điều khiển lưu lượng FCV}
-    \label{fig:control_valve}
-\end{figure}
+Bên cạnh vòng lưu lượng chính, các vòng phụ như điều khiển áp suất và nhiệt độ dầu có vai trò hỗ trợ làm ổn định trạng thái vật lý của lưu chất. Các tín hiệu báo mức thấp thấp, mức cao cao, áp suất cao hoặc nhiệt độ vượt ngưỡng được đưa vào logic bảo vệ liên động. Cấu trúc đo lường và điều khiển như vậy vừa đáp ứng yêu cầu điều hành vận hành, vừa tạo cơ sở rõ ràng cho việc mô hình hóa và tổng hợp bộ điều khiển ở các chương sau.
 
-\subsection{Thiết bị điều khiển (Bộ điều khiển)}
+\subsection{Kết luận chương}
 
-Bộ điều khiển đóng vai trò là trung tâm xử lý thông tin đầu não của toàn bộ hệ thống tự động hóa. Đơn vị này chịu trách nhiệm thu nhận các tín hiệu phản hồi từ thiết bị đo lường, đối chiếu với giá trị đặt (setpoint) để xác định sai số và áp dụng các thuật toán điều khiển tinh vi như PID nhằm tính toán ra tín hiệu hiệu chỉnh tương ứng gửi đến cơ cấu chấp hành. Trong các nhà máy nhiệt điện hiện đại, kiến trúc điều khiển chủ yếu xoay quanh Hệ thống điều khiển phân tán (DCS). DCS cung cấp một nền tảng toàn diện để điều phối và giám sát tập trung toàn bộ các cụm công nghệ phức tạp. Ở cấp độ điều khiển cục bộ, Bộ điều khiển logic khả trình (PLC) được triển khai như những vi xử lý công nghiệp mạnh mẽ, đảm nhận việc thực thi các logic khóa liên động an toàn, tính toán các mạch vòng PID độc lập và đảm bảo tốc độ giao tiếp theo thời gian thực. Các hệ thống này luôn được tích hợp chặt chẽ với nền tảng SCADA/HMI, tạo ra một giao diện đồ họa trực quan giúp đội ngũ vận hành dễ dàng theo dõi biến thiên của các thông số quá trình, tiếp nhận các tín hiệu cảnh báo bất thường và thực hiện các thao tác can thiệp thủ công khi cần thiết.
-
-\subsection{Thiết bị phụ trợ và giám sát khác}
-
-Để duy trì tính toàn vẹn và nâng cao mức độ an toàn trong vận hành, hệ thống điều khiển lưu lượng dầu còn được trang bị một hệ thống các thiết bị phụ trợ đa dạng. Cụm thiết bị cảm biến và rơ-le áp suất đảm nhận vai trò giám sát liên tục trạng thái áp lực trên đường ống, kịp thời phát hiện và ngăn chặn các nguy cơ quá áp hoặc sụt áp đột ngột. Song song đó, các cảm biến nhiệt độ liên tục theo dõi mức nhiệt độ của dòng dầu, cung cấp dữ liệu thiết yếu để hệ thống duy trì độ nhớt của dầu HFO trong giới hạn tối ưu cho việc phun sương. Ở khâu chuẩn bị lưu chất, các bộ lọc dầu được lắp đặt nhằm tách bỏ các cặn bẩn và tạp chất cơ học lơ lửng, ngăn ngừa triệt để nguy cơ bào mòn van điều khiển và gây tắc nghẽn các bép phun nhỏ hẹp tại mỏ đốt. Động lực di chuyển của toàn bộ dòng lưu chất được cung cấp bởi hệ thống bơm dầu, tạo ra cột áp thủy lực đủ lớn để vượt qua mọi trở lực của đường ống. Cuối cùng, hệ thống các van an toàn được thiết lập như chốt chặn bảo vệ cuối cùng, có khả năng tự động xả áp tự nhiên khi áp suất hệ thống tăng cao vượt quá ngưỡng giới hạn thiết kế cho phép.
+Chương này đã làm rõ cấu trúc công nghệ, các thông số vận hành chủ yếu và vai trò kỹ thuật của hệ thống cấp dầu nhiên liệu khởi động cho lò than phun. Qua phân tích có thể thấy đối tượng là một hệ quá trình có quán tính lớn, chịu ảnh hưởng mạnh của nhiệt độ, áp suất và đặc tính lưu chất, đồng thời đòi hỏi độ tin cậy cao về an toàn. Những đặc điểm đó là cơ sở để lựa chọn thiết bị đo, cơ cấu chấp hành và triết lý điều khiển phù hợp trong các chương tiếp theo.
 
 \end{document}

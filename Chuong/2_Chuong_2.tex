@@ -3,286 +3,60 @@
 \documentclass[../main.tex]{subfiles}
 \begin{document}
 
-\section{Triết lý thiết kế hệ thống điều khiển}
+\section{Thiết kế vòng điều khiển đối tượng}
 
-\subsection{Thiết kế sơ đồ cấu trúc điều khiển hệ thống}
+\subsection{Triết lý thiết kế hệ thống điều khiển}
 
-Sơ đồ P\&ID là tài liệu kỹ thuật nền tảng định hình toàn bộ cấu trúc điều khiển của hệ thống cấp dầu nhiên liệu. Khác với sơ đồ PFD chỉ mô tả luồng vật chất, P\&ID thể hiện đầy đủ các vòng điều chỉnh, thiết bị đo lường, cơ cấu chấp hành và mối liên hệ tín hiệu giữa chúng. Hệ thống điều khiển cung cấp dầu nhiên liệu khởi động cho lò than phun được tổ chức thành bốn mạch vòng điều chỉnh có quan hệ phân cấp và phối hợp chặt chẽ với nhau, bao gồm mạch vòng lưu lượng (FIC), mạch vòng áp suất (PIC), mạch vòng nhiệt độ (TIC) và mạch vòng mức (LIC).
+\subsubsection{Quan điểm thiết kế}
 
-Trọng tâm của thiết kế là cấu trúc \textbf{điều khiển nối tầng hai vòng} (cascade control) kết nối mạch vòng lưu lượng (vòng trong) với mạch vòng phụ tải lò hơi (vòng ngoài), được minh họa trong Hình~\ref{fig:vong_dieu_khien_phu_tai_lo}.
+Thiết kế hệ thống điều khiển cho quá trình cấp dầu nhiên liệu khởi động phải xuất phát từ bản chất công nghệ của đối tượng. Đây là hệ thống có quán tính lớn, chịu ảnh hưởng của biến thiên nhiệt độ dầu, tổn thất thủy lực trên tuyến ống, đặc tính phi tuyến của van điều khiển và các điều kiện bảo vệ liên động. Vì vậy, mục tiêu thiết kế không chỉ là bám theo giá trị đặt mà còn phải bảo đảm tính ổn định, khả năng kháng nhiễu và an toàn vận hành trong suốt dải làm việc.
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.85\textwidth]{Hinhve/vong-dieu-khien.png}
-    \caption{Sơ đồ cấu trúc vòng điều khiển phụ tải lò hơi (cascade control)}
-    \label{fig:vong_dieu_khien_phu_tai_lo}
-\end{figure}
+Trên cơ sở đó, hệ thống được tổ chức theo cấu trúc điều khiển phản hồi vòng kín. Biến cần điều khiển là lưu lượng dầu cấp đến đầu đốt; biến tác động là độ mở van điều khiển; các biến nhiễu chính gồm áp suất nguồn, nhiệt độ dầu và đặc tính biến đổi của dầu theo thời gian. Cấu trúc phản hồi cho phép hệ thống tự bù sai lệch khi điều kiện vận hành thay đổi, thay vì phụ thuộc hoàn toàn vào mô hình lý tưởng của quá trình.
 
-Sơ đồ điều khiển phụ tải lò hơi sử dụng cấu trúc điều khiển nối tầng (cascade control), trong đó bao gồm hai vòng điều khiển lồng nhau nhằm nâng cao chất lượng đáp ứng. Vòng ngoài chịu trách nhiệm kiểm soát phụ tải lò hơi ($O_1$) thông qua bộ điều khiển phụ tải ($R_1$). Bộ điều khiển này nhận giá trị đặt ($z$) và giá trị phụ tải lò thực tế ($y_1$) để tính toán sai lệch ($\epsilon_1$), từ đó xuất ra tín hiệu điều khiển ($u_1$) đóng vai trò là giá trị đặt về lưu lượng dầu cho vòng trong. Vòng điều khiển bên trong đảm nhận nhiệm vụ điều chỉnh lưu lượng dầu thông qua bộ điều khiển lưu lượng ($R_2$). Sai lệch điều khiển lưu lượng ($\epsilon_2$) được xác định dựa trên sự chênh lệch giữa giá trị lưu lượng yêu cầu ($u_1$) và lưu lượng dầu thực tế cấp vào lò ($y_2$). Dựa trên sai lệch này, bộ điều khiển sinh ra tín hiệu tác động ($u_2$) để thay đổi độ mở của van điều khiển lưu lượng dầu FCV ($O_2$), qua đó đảm bảo lưu lượng dầu bám sát giá trị yêu cầu và duy trì sự ổn định của phụ tải lò hơi.
+Bên cạnh vòng điều khiển chính về lưu lượng, các vòng phụ về nhiệt độ và áp suất được bố trí nhằm bảo đảm tính ổn định của lưu chất trước khi đi đến đầu đốt. Cách tổ chức này giúp tách riêng nhiệm vụ điều chỉnh lưu lượng khỏi nhiệm vụ duy trì trạng thái vật lý của dầu, qua đó làm giảm độ nhạy của hệ thống chính đối với nhiễu công nghệ.
 
-Mạch vòng điều chỉnh lưu lượng (FIC) và mạch vòng điều chỉnh áp suất (PIC) được tích hợp trong cùng một sơ đồ P\&ID vì hai mạch vòng này có quan hệ vật lý mật thiết: áp suất và lưu lượng của dòng dầu trong đường ống phụ thuộc lẫn nhau qua đặc tính thủy lực của hệ thống. Lưu lượng kế FT đo lưu lượng thực tế và truyền tín hiệu về bộ điều khiển FIC; bộ điều khiển FIC xuất tín hiệu điều khiển đến van điều chỉnh FCV trên đường dầu cấp cho lò. Đồng thời, mạch vòng áp suất với cảm biến PT và bộ điều khiển PIC duy trì áp suất đường phân phối ổn định thông qua van bypass hồi lưu, nhằm cải thiện tính tuyến tính của van FCV và đảm bảo chất lượng phun sương tại đầu đốt.
+\subsubsection{Cấu trúc điều khiển tổng thể}
 
-\begin{figure}[htbp]
-    \centering
-    \resizebox{1\textwidth}{!}{%
-    \begin{tikzpicture}[>=stealth, thick]
-    % Main pipe
-    \draw[line width=1.5pt, ->] (0,0) node[left, align=right] {Từ bộ\\gia nhiệt} -- (3,0);
-    \draw[line width=1.5pt, ->] (3,0) -- (6.7,0);
-    \draw[line width=1.5pt, ->] (7.3,0) -- (10,0) node[right, align=left] {Đến đầu đốt\\(Burners)};
-    
-    % Branch pipe
-    \draw[line width=1.5pt] (2,0) -- (2,-2);
-    \draw[line width=1.5pt, ->] (2,-2) -- (3.7,-2);
-    \draw[line width=1.5pt, ->] (4.3,-2) -- (10,-2) node[right, align=left] {Hồi lưu về bể chứa\\(Recirculation)};
-    
-    % PCV on branch
-    \draw[thick] (3.7,-1.7) -- (4.3,-2.3) -- (4.3,-1.7) -- (3.7,-2.3) -- cycle;
-    \draw[thick] (4.0,-2) -- (4.0,-1.2);
-    \draw[thick] (3.7,-1.2) -- (4.3,-1.2);
-    \draw[thick] (3.7,-1.2) arc (180:0:0.3);
-    \coordinate (pcv_act) at (4.0,-0.9);
-    \node[below] at (4.0,-2.4) {PCV};
-    
-    % PT 101
-    \draw[thin] (1,0) -- (1,2.4);
-    \draw[thick, fill=white] (1,3) circle (0.6);
-    \node at (1,3.25) {PT}; \node at (1,2.75) {101};
-    
-    % PIC 101
-    \draw[thick, fill=white] (4.0,3) circle (0.6);
-    \draw[thin] (3.4,3) -- (4.6,3);
-    \node at (4.0,3.25) {PIC}; \node at (4.0,2.75) {101};
-    
-    % FT 201
-    \draw[thick] (5.5,0.3) -- (5.5,-0.3);
-    \draw[thin] (5.5,0) -- (5.5,2.4);
-    \draw[thick, fill=white] (5.5,3) circle (0.6);
-    \node at (5.5,3.25) {FT}; \node at (5.5,2.75) {201};
-    
-    % FCV 201
-    \draw[thick] (6.7,0.3) -- (7.3,-0.3) -- (7.3,0.3) -- (6.7,-0.3) -- cycle;
-    \draw[thick] (7.0,0) -- (7.0,0.8);
-    \draw[thick] (6.7,0.8) -- (7.3,0.8);
-    \draw[thick] (6.7,0.8) arc (180:0:0.3);
-    \coordinate (fcv_act) at (7.0,1.1);
-    \node[below] at (7.0,-0.4) {FCV};
-    
-    % FIC 201
-    \draw[thick, fill=white] (7.0,3) circle (0.6);
-    \draw[thin] (6.4,3) -- (7.6,3);
-    \node at (7.0,3.25) {FIC}; \node at (7.0,2.75) {201};
-    
-    % Signals (dashed)
-    \draw[dashed, ->] (1.6,3) -- (3.4,3); % PT to PIC
-    \draw[dashed, ->] (4.0,2.4) -- (pcv_act); % PIC to PCV
-    \draw[dashed, ->] (6.1,3) -- (6.4,3); % FT to FIC
-    \draw[dashed, ->] (7.0,2.4) -- (fcv_act); % FIC to FCV
-    \end{tikzpicture}%
-    }
-    \caption{Sơ đồ P\&ID mạch vòng điều chỉnh lưu lượng và áp suất}
-    \label{fig:pid_luu_luong_ap_suat}
-\end{figure}
+Trong hệ thống cấp dầu nhiên liệu, vòng điều khiển lưu lượng được xem là vòng chính. Bộ đo lưu lượng FT cung cấp tín hiệu phản hồi cho bộ điều khiển FIC. Tín hiệu điều khiển sau khi xử lý được đưa đến van điều khiển FCV để thay đổi lưu lượng thực tế. Vòng nhiệt độ dầu và vòng áp suất đường ống đóng vai trò hỗ trợ, bảo đảm điều kiện làm việc ổn định cho vòng lưu lượng. Cấu trúc tổng thể vì vậy có thể xem là một hệ điều khiển phân cấp, trong đó mỗi vòng đảm nhận một chức năng kỹ thuật riêng nhưng vẫn liên kết chặt chẽ trong toàn bộ hệ thống.
 
-Mạch vòng điều chỉnh nhiệt độ (TIC) kiểm soát nhiệt độ dầu tại đầu ra bộ gia nhiệt thông qua vòng điều khiển kín: cảm biến nhiệt độ TT đo nhiệt độ thực tế của dầu, tín hiệu phản hồi về bộ điều khiển TIC, và bộ điều khiển phát lệnh đến van điều chỉnh hơi (steam control valve) có bộ truyền động khí nén để tăng hoặc giảm lưu lượng hơi nước cấp vào bộ gia nhiệt.
+Ưu điểm của cấu trúc này là tính mô-đun cao, thuận tiện cho thiết kế, hiệu chỉnh và bảo trì. Khi một vòng phụ gặp vấn đề, vòng chính vẫn có thể duy trì vận hành trong giới hạn cho phép. Đồng thời, việc phân tách nhiệm vụ điều khiển theo từng đại lượng giúp quá trình nhận dạng và tổng hợp bộ điều khiển trở nên rõ ràng hơn, đặc biệt khi đối tượng có thời gian trễ và đặc tính quán tính lớn.
 
-\begin{figure}[htbp]
-    \centering
-    \resizebox{1\textwidth}{!}{%
-    \begin{tikzpicture}[>=stealth, thick]
-    % Heater box
-    \draw[thick, fill=gray!10] (4,-1.5) rectangle (6,1.5);
-    \node[align=center] at (5,0) {Heater};
-    
-    % Oil line
-    \draw[line width=1.5pt, ->] (0,-0.5) node[left, align=right] {Dầu HFO\\từ bơm} -- (4,-0.5);
-    \draw[line width=1.5pt, ->] (6,-0.5) -- (10,-0.5) node[right, align=left] {Dầu HFO ra\\(đến lò)};
-    
-    % Steam line
-    \draw[line width=1.5pt, ->] (0,2) node[left, align=right] {Hơi nước\\cấp} -- (2.2,2);
-    \draw[line width=1.5pt, ->] (2.8,2) -- (5,2) -- (5,1.5);
-    \draw[line width=1.5pt, ->] (5,-1.5) -- (5,-2.5) node[below] {Nước ngưng (Condensate)};
-    
-    % TCV 301 on horizontal Steam line
-    \draw[thick] (2.2,2.3) -- (2.8,1.7) -- (2.8,2.3) -- (2.2,1.7) -- cycle;
-    \draw[thick] (2.5,2) -- (2.5,2.8);
-    \draw[thick] (2.2,2.8) -- (2.8,2.8);
-    \draw[thick] (2.2,2.8) arc (180:0:0.3);
-    \coordinate (tcv_act) at (2.5,3.1);
-    \node[below] at (2.5,1.6) {TCV};
-    
-    % TT 301 on Oil outlet
-    \draw[thin] (8,-0.5) -- (8,1.4);
-    \draw[thick, fill=white] (8,2) circle (0.6);
-    \node at (8,2.25) {TT}; \node at (8,1.75) {301};
-    
-    % TIC 301
-    \draw[thick, fill=white] (8,4) circle (0.6);
-    \draw[thin] (7.4,4) -- (8.6,4);
-    \node at (8,4.25) {TIC}; \node at (8,3.75) {301};
-    
-    % Signals
-    \draw[dashed, ->] (8,2.6) -- (8,3.4); % TT to TIC
-    \draw[dashed, ->] (7.4,4) -- (2.5,4) -- (tcv_act); % TIC to TCV
-    \end{tikzpicture}%
-    }
-    \caption{Sơ đồ P\&ID mạch vòng điều chỉnh nhiệt độ}
-    \label{fig:pid_nhiet_do}
-\end{figure}
+\subsection{Luận chứng lựa chọn thiết bị}
 
-Mạch vòng điều chỉnh mức (LIC) đảm bảo duy trì mức dầu trong bể chứa ở phạm vi an toàn bằng cách điều chỉnh van nạp, đồng thời đóng vai trò bảo vệ hệ thống bơm thông qua cơ chế khóa liên động (interlock) theo các báo động giới hạn thấp (LL) và cao (HH). Khi mức dầu đạt ngưỡng LL, hệ thống sẽ tự động dừng bơm để tránh chạy khô; khi đạt ngưỡng HH, van nạp sẽ bị đóng khẩn cấp để ngăn ngừa tràn bể.
+\subsubsection{Dải làm việc, cảnh báo và bảo vệ}
 
-\begin{figure}[htbp]
-    \centering
-    \resizebox{1\textwidth}{!}{%
-    \begin{tikzpicture}[>=stealth, thick]
-    % Tank (Cylinder)
-    \draw[thick, fill=gray!10] (4,2) arc (180:0:1 and 0.3) -- (6,-2) arc (360:180:1 and 0.3) -- cycle;
-    \draw[thick] (4,2) arc (180:360:1 and 0.3);
-    \node[align=center] at (5,0) {Bể chứa dầu\\(Tank)};
-    
-    % Inlet pipe (Top)
-    \draw[line width=1.5pt, ->] (0,1.5) node[left, align=right] {Dầu HFO\\từ nguồn} -- (1.7,1.5);
-    \draw[line width=1.5pt, ->] (2.3,1.5) -- (4,1.5);
-    
-    % LCV on inlet
-    \draw[thick] (1.7,1.8) -- (2.3,1.2) -- (2.3,1.8) -- (1.7,1.2) -- cycle;
-    \draw[thick] (2.0,1.5) -- (2.0,2.3);
-    \draw[thick] (1.7,2.3) -- (2.3,2.3);
-    \draw[thick] (1.7,2.3) arc (180:0:0.3);
-    \coordinate (lcv_act) at (2.0,2.6);
-    \node[below] at (2.0,1.1) {LCV};
-    
-    % Outlet pipe (Bottom)
-    \draw[line width=1.5pt, ->] (5,-2) -- (5,-3) -- (7.5,-3);
-    \draw[line width=1.5pt, ->] (8.5,-3) -- (10,-3) node[right, align=left] {Đến hệ thống\\bơm cấp};
-    
-    % Pump on outlet
-    \draw[thick, fill=white] (8,-3) circle (0.5);
-    \draw[thick] (7.7,-2.6) -- (7.7,-3.4) -- (8.4,-3) -- cycle;
-    \node[below] at (8,-3.6) {Bơm};
-    \coordinate (pump_ctrl) at (8,-2.5);
-    
-    % LT 401
-    \draw[thin] (6,-1) -- (7,-1) -- (7,1.4); 
-    \draw[thick, fill=white] (7,2) circle (0.6);
-    \node at (7,2.25) {LT}; \node at (7,1.75) {401};
-    
-    % LIC 401
-    \draw[thick, fill=white] (7,4) circle (0.6);
-    \draw[thin] (6.4,4) -- (7.6,4);
-    \node at (7,4.25) {LIC}; \node at (7,3.75) {401};
-    
-    % Interlock Block (I)
-    \draw[thick, fill=white] (4.2, 3.5) rectangle (5.8, 4.5);
-    \node[align=center] at (5, 4) {Khóa\\liên động};
-    
-    % Signals
-    \draw[dashed, ->] (7,2.6) -- (7,3.4); % LT to LIC
-    \draw[dashed, ->] (6.4,4) -- (5.8,4); % LIC to Interlock
-    \draw[dashed, ->] (7,4.6) -- (7, 5.5) -- (2.0, 5.5) -- (lcv_act); % Normal control LIC to LCV
-    
-    % Interlock Signals
-    \draw[dashed, ->] (4.2,4) -- (2.7,4) -- (2.7, 3) -- (2.2, 2.7); % HH to LCV
-    \draw[dashed, ->] (5.5,3.5) -- (5.5, 3.2) -- (8.5, 3.2) -- (8.5, -2.5) -- (pump_ctrl); % LL to Pump
-    
-    \node[above] at (4.5, 5.5) {Tín hiệu điều chỉnh mức (PID)};
-    \node[above] at (3.5, 4.0) {HH};
-    \node[above] at (7.8, 3.2) {LL};
-    \end{tikzpicture}%
-    }
-    \caption{Sơ đồ P\&ID mạch vòng điều chỉnh mức}
-    \label{fig:pid_muc}
-\end{figure}
+Việc lựa chọn thiết bị cần dựa trên dải làm việc thực tế của hệ thống, đồng thời phải xét đến các mức cảnh báo và bảo vệ. Trong bài toán này, lưu lượng dầu chính cần được giữ trong vùng đủ lớn để bảo đảm quá trình cháy ổn định nhưng không vượt quá khả năng chịu tải của tuyến ống và đầu đốt. Áp suất đường cấp phải đủ cao để bảo đảm chất lượng phun, còn nhiệt độ dầu phải được duy trì trong khoảng cho phép để dầu không bị đông đặc hoặc suy giảm chất lượng nhiệt. Mức dầu trong bể phải đủ cao để bảo đảm bơm hút ổn định và đủ thấp để tránh tràn hoặc gây áp lực bất thường lên hệ thống.
 
-\subsection{Vai trò của từng phần tử trong sơ đồ cấu trúc}
+Các ngưỡng báo động và bảo vệ được thiết lập theo nguyên tắc: cảnh báo sớm để người vận hành có thời gian can thiệp, còn liên động bảo vệ được đặt ở mức nghiêm ngặt hơn nhằm ngăn ngừa hư hỏng thiết bị. Những ngưỡng này không nên hiểu như giá trị tuyệt đối cố định cho mọi nhà máy, mà cần được hiệu chỉnh theo tài liệu vận hành của từng tổ máy cụ thể. Trong phạm vi bài tập lớn, các ngưỡng làm việc được xác định theo đặc tính công nghệ điển hình và dùng làm cơ sở thiết kế điều khiển.
 
-Hệ thống điều khiển cung cấp dầu nhiên liệu HFO được cấu thành từ sự phối hợp chặt chẽ giữa các thiết bị công nghệ chính (thiết bị chấp hành công trình nhiệt) và các phần tử điều khiển tự động.
+\subsubsection{Lựa chọn thiết bị đo}
 
-\subsubsection{Các thiết bị công nghệ chính (Đối tượng vật lý)}
+Thiết bị đo lưu lượng là phần tử then chốt của vòng điều khiển. Đối với dầu nặng, loại cảm biến đo lưu lượng cần có độ chính xác cao, ít phụ thuộc vào biến thiên mật độ và độ nhớt. Trên cơ sở đó, cảm biến Coriolis được xem là lựa chọn phù hợp vì có khả năng đo trực tiếp lưu lượng khối lượng, đồng thời duy trì độ ổn định tốt trong điều kiện lưu chất có tính chất thay đổi. Trong trường hợp ưu tiên về kinh tế hoặc cấu hình hệ thống khác, cảm biến oval gear cũng có thể được sử dụng do đặc tính đo thể tích ổn định đối với chất lỏng nhớt.
 
-Bể chứa dầu HFO (Tank 1 và Tank 2) đảm nhận vai trò lưu trữ nhiên liệu phục vụ trực tiếp cho lò hơi, được thiết kế với lớp bảo ôn cách nhiệt chuyên dụng để giảm thiểu thất thoát nhiệt năng ra môi trường. Bên trong bể được trang bị cụm sấy hơi phụ trợ nhằm giữ cho nhiệt độ dầu luôn duy trì ở dải nhiệt độ tối thiểu từ $40^\circ\text{C}$ đến $50^\circ\text{C}$, qua đó phòng ngừa hiệu quả hiện tượng dầu bị đông đặc. Dung tích trữ lượng của các bể này được tính toán kỹ lưỡng để phù hợp với dải công suất làm việc của lò hơi. Động lực đẩy chính cho toàn bộ hệ thống được cung cấp bởi hệ thống bơm dầu cấp chính (Fuel Oil Pump). Do đặc thù dầu HFO có độ nhớt rất cao, việc sử dụng bơm trục vít kép (Twin-screw pump) là giải pháp tối ưu nhờ đặc tính cung cấp lưu lượng ổn định, hạn chế xung động áp suất và khả năng tự mồi tuyệt vời, đảm bảo áp suất dầu ở đầu đẩy luôn ở trạng thái cân bằng. Dầu sau khi rời bơm sẽ được đưa tới bộ gia nhiệt dầu (Fuel Oil Heater). Đây là một thiết bị trao đổi nhiệt kiểu ống chùm (Shell and Tube), tận dụng hơi nước bão hòa để truyền nhiệt gián tiếp, giúp nâng nhiệt độ dầu lên dải vận hành tối ưu từ $80^\circ\text{C}$ đến $120^\circ\text{C}$. Quá trình này có tác dụng hạ thấp độ nhớt của dầu, đảm bảo điều kiện lý tưởng nhất về mặt động học chất lưu trước khi dầu được đưa vào các vòi phun của mỏ đốt.
+Thiết bị đo áp suất cần làm việc ổn định trong môi trường dầu nóng và chịu được dao động áp suất ngắn hạn. Cảm biến áp suất kiểu điện tử với màng cách ly được ưu tiên vì khả năng chống ăn mòn và độ ổn định lâu dài. Thiết bị đo nhiệt độ dầu thường sử dụng RTD hoặc cặp nhiệt điện được lắp trong thermowell để bảo vệ khỏi tác động của dòng dầu và điều kiện cơ học. Cảm biến mức trong bể chứa phải bảo đảm đo liên tục, tin cậy và ít bị ảnh hưởng bởi hơi dầu hoặc bọt khí; vì vậy cảm biến radar mức hoặc radar dẫn sóng là lựa chọn hợp lý cho ứng dụng này.
 
-\subsubsection{Các phần tử trong vòng phản hồi điều khiển}
+\subsubsection{Lựa chọn cơ cấu chấp hành}
 
-Mỗi mạch vòng điều chỉnh khép kín được cấu thành từ ba phần tử cốt lõi, mỗi phần tử đảm nhận một chức năng không thể thay thế trong toàn bộ chuỗi điều khiển.
+Cơ cấu chấp hành của vòng lưu lượng là van điều khiển. Trong các hệ thống dầu nhiên liệu, van cầu điều khiển tuyến tính hoặc van điều tiết chuyên dụng thường được sử dụng do đặc tính điều tiết tương đối ổn định trong vùng làm việc trung bình. Bộ truyền động khí nén được ưu tiên vì có tốc độ đáp ứng nhanh, kết cấu đơn giản và khả năng làm việc an toàn trong môi trường công nghiệp. Khi mất nguồn khí điều khiển, van thường được cấu hình về trạng thái an toàn phù hợp với yêu cầu công nghệ, ví dụ tự mở hoặc tự đóng tùy theo logic bảo vệ của hệ thống.
 
-Thiết bị đo lường (cảm biến) đóng vai trò là phần tử tiên phong trong vòng điều khiển, thực hiện chức năng thu thập trạng thái vật lý thực của các thông số quá trình chủ chốt như lưu lượng (FT), nhiệt độ (TT), áp suất (PT) và mức (LT). Các giá trị vật lý này sau đó được chuẩn hóa thành tín hiệu điện theo tiêu chuẩn 4–20\,mA để truyền tải về bộ điều khiển trung tâm. Tín hiệu đo lường chính là cơ sở dữ liệu thực nghiệm duy nhất để bộ điều khiển đối chiếu với giá trị đặt, do đó mọi sai số tại khâu này đều tác động trực tiếp đến độ chính xác vận hành của toàn bộ hệ thống. Dựa trên dữ liệu nhận được, bộ điều khiển sẽ xác định sai số và tiến hành tính toán tín hiệu hiệu chỉnh thông qua thuật toán PID. Sự phối hợp hài hòa của ba thành phần trong bộ điều khiển PID đóng vai trò quyết định chất lượng điều chỉnh: thành phần tỷ lệ (P) đảm bảo tốc độ phản hồi nhanh chóng, thành phần tích phân (I) triệt tiêu sai lệch tĩnh để hệ thống bám sát giá trị đặt, trong khi thành phần vi phân (D) giúp cải thiện tốc độ đáp ứng tổng thể và hạn chế hiện tượng vọt lố. Cuối cùng, tín hiệu tính toán sẽ được gửi đến cơ cấu chấp hành để tạo ra các tác động vật lý trở lại đối tượng điều khiển nhằm khử dứt điểm sai số. Tùy thuộc vào mạch vòng cụ thể, cơ cấu chấp hành có thể là van cấp hơi đối với điều khiển nhiệt độ, van tuyến tính FCV trong điều khiển lưu lượng, hoặc cụm van nạp và bơm chuyển trong kiểm soát mức. Độ tin cậy và đặc tính làm việc tuyến tính của các cơ cấu chấp hành này có sức ảnh hưởng rất lớn đến khả năng duy trì trạng thái cân bằng của toàn bộ vòng điều khiển khép kín.
+Trong bài toán này, van điều khiển lưu lượng được xem là phần tử cuối cùng của mạch vòng. Đặc tính động học của van có ảnh hưởng trực tiếp đến chất lượng điều khiển, do đó việc lựa chọn phải bảo đảm tính tuyến tính tương đối trong vùng làm việc, độ kín tốt và thời gian đáp ứng đủ nhanh để không làm suy giảm hiệu quả của bộ điều khiển.
 
-\subsection{Phân tích ưu điểm của sơ đồ cấu trúc và sự phù hợp với yêu cầu công nghệ}
+\subsection{Phương pháp xử lý số liệu thực nghiệm}
 
-Thiết kế cấu trúc phân mảnh theo P\&ID, trong đó mỗi thông số công nghệ có một vòng điều chỉnh PID độc lập, mang lại những ưu điểm rõ rệt so với các phương án điều khiển tập trung phức tạp hơn. Trước hết, về độ tin cậy cục bộ, các mạch vòng điều chỉnh hoạt động độc lập với nhau, không phụ thuộc lẫn nhau về mặt phần mềm. Nếu mạch vòng nhiệt độ TIC gặp sự cố, mạch vòng lưu lượng FIC vẫn có thể tiếp tục hoạt động với thiết lập áp suất bơm mặc định, đảm bảo lò hơi không bị ngắt hoàn toàn. Điều này rất quan trọng trong môi trường vận hành liên tục của nhà máy nhiệt điện, nơi mọi sự cố dừng máy không kế hoạch đều gây tổn thất kinh tế lớn.
+\subsubsection{Quy trình thu thập và xử lý dữ liệu}
 
-Ngoài ra, thuật toán PID kinh điển phù hợp với bản chất tuyến tính hóa cục bộ của các đối tượng nhiệt điện, vốn được đặc trưng bởi quán tính lớn và thời gian trễ vừa phải, và có thể được mô hình hóa tốt bằng hàm truyền bậc nhất hoặc bậc hai có trễ. Bên cạnh đó, việc mỗi phần tử trong sơ đồ có ký hiệu định danh rõ ràng theo chuẩn ISA, chẳng hạn như PT-101, FCV-201, TT-301, giúp công tác bảo trì, hiệu chuẩn và khắc phục sự cố được khoanh vùng chính xác mà không ảnh hưởng đến các vòng điều khiển khác.
+Để xây dựng mô hình động học cho đối tượng, số liệu thực nghiệm được thu thập từ đường đặc tính quá độ khi áp dụng kích thích bậc thang lên hệ thống ở trạng thái vận hành ổn định. Dữ liệu đáp ứng được trích xuất từ màn hình giám sát hoặc biểu đồ lịch sử của DCS/SCADA, sau đó được số hóa bằng phần mềm \textit{WebPlotDigitizer} để thu được tập giá trị thời gian và đầu ra tương ứng. Phương pháp này cho phép khai thác dữ liệu vận hành thực mà không cần dừng hệ thống để đo riêng lẻ.
 
-\section{Lựa chọn thiết bị}
+Sau khi số hóa, dữ liệu được tiền xử lý trên Python. Giai đoạn tiền xử lý bao gồm chuẩn hóa đơn vị, sắp xếp lại theo trục thời gian, loại bỏ các điểm nhiễu bất thường nếu có và đưa gốc thời gian về thời điểm bắt đầu kích thích. Việc xử lý bằng Python giúp thao tác với dữ liệu linh hoạt hơn, đồng thời thuận lợi cho việc mô phỏng, nhận dạng và tối ưu tham số ở các bước tiếp theo.
 
-\subsection{Dải làm việc của thông số quá trình, mức cảnh báo và bảo vệ}
+\subsubsection{Nguyên tắc đánh giá số liệu}
 
-Việc xác định chính xác dải làm việc của từng thông số quá trình là cơ sở để lựa chọn thiết bị phù hợp và thiết lập các ngưỡng bảo vệ hệ thống. Căn cứ vào đặc tính của dầu HFO và yêu cầu vận hành lò hơi, các thông số và ngưỡng bảo vệ được tổng hợp trong Bảng~\ref{tab:alarm_levels}.
+Chất lượng dữ liệu thực nghiệm được đánh giá thông qua tính nhất quán của đường cong quá độ, mức độ nhiễu và khả năng biểu diễn đúng bản chất động học của đối tượng. Một tập số liệu tốt phải thể hiện rõ thời gian trễ, xu hướng tăng hoặc giảm đơn điệu và tiến tới trạng thái xác lập ổn định. Nếu đường cong có dao động bất thường hoặc nhiễu lớn, cần kiểm tra lại quá trình đo và bước số hóa trước khi đưa vào nhận dạng.
 
-\begin{table}[H]
-    \centering
-    \caption{Dải thông số làm việc và các mức cảnh báo, bảo vệ}
-    \label{tab:alarm_levels}
-    \begin{tabular}{|p{3.5cm}|p{3.5cm}|p{6cm}|}
-        \hline
-        \textbf{Thông số} & \textbf{Dải thiết kế} & \textbf{Mức cảnh báo \& Bảo vệ} \\
-        \hline
-        \textbf{Áp suất phân phối} & 5 đến 20\,bar & Cảnh báo Cao (P$>$H): Mở van nhánh hồi lưu.\par Cảnh báo Thấp (P$<$H): Bật bơm phụ. \\
-        \hline
-        \textbf{Nhiệt độ dầu HFO} & 80°C – 120°C & Hạ giới: 60°C (Nguy cơ tắc dòng).\par Thượng giới: 140°C (Cảnh báo đóng van hơi). \\
-        \hline
-        \textbf{Mức bể đệm} & 10\% - 90\% chiều cao & Low-Low (LL): Khóa liên động tắt bơm.\par High-High (HH): Báo tràn khẩn cấp. \\
-        \hline
-    \end{tabular}
-\end{table}
+Trong khuôn khổ bài tập lớn, số liệu sau khi xử lý được sử dụng trực tiếp để xây dựng mô hình nhận dạng trong Chương 3. Cách tiếp cận này bảo đảm sự liên tục giữa khâu khảo sát công nghệ, lựa chọn thiết bị và tổng hợp bộ điều khiển, đồng thời đáp ứng yêu cầu thực hành kỹ thuật của một đồ án môn học.
 
-\subsection{Lựa chọn thiết bị đo}
+\subsection{Kết luận chương}
 
-Việc lựa chọn thiết bị đo lường được thực hiện trên cơ sở luận chứng kỹ thuật nghiêm ngặt: dải đo phù hợp với thông số làm việc thực tế, độ chính xác cao đáp ứng yêu cầu điều khiển chất lượng, khả năng chịu đựng ăn mòn hóa chất và nhiệt độ của dầu HFO nặng.
-
-Đối với nhiệm vụ đo lường lưu lượng (Flow Transmitter - FT), cảm biến đo lưu lượng kiểu Coriolis của hãng Emerson Micro Motion (Model ELITE F100) được lựa chọn để lắp đặt trên đường ống dầu chính cấp cho lò. Thiết bị này hoạt động dựa trên nguyên lý lực Coriolis, cho phép đo trực tiếp khối lượng với dải đo từ $0$ đến $50\,\text{t/h}$, hoàn toàn đáp ứng được mức tải định mức $\approx 31{,}8\,\text{t/h}$ của hệ thống. Ưu điểm nổi bật của dòng cảm biến này là sai số phép đo cực thấp chỉ $\pm 0{,}1\%$ trị số đọc và khả năng duy trì độ ổn định cao ngay cả khi độ nhớt của dầu HFO thay đổi đáng kể. Tín hiệu đầu ra được xuất chuẩn $4$--$20\,\text{mA}$ tích hợp giao thức HART.
-
-Để giám sát áp suất dầu (Pressure Transmitter - PT) trên đường ống phân phối chính và trước vòi phun, cảm biến áp suất kiểu điện dung màng cách ly của hãng Rosemount (Model 3051S) được tin dùng. Công nghệ màng điện dung silic của thiết bị mang lại khả năng chống mỏi cơ học vượt trội và ngăn ngừa hiện tượng trôi điểm không theo thời gian. Cảm biến được hiệu chuẩn với dải đo từ $0$ đến $25\,\text{bar}$ (phù hợp với dải làm việc thực tế $5$--$20\,\text{bar}$), đạt cấp chính xác rất cao $\pm 0{,}055\%$ dải đo và hỗ trợ truyền thông $4$--$20\,\text{mA}$ / HART.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.32\textwidth]{Hinhve/rosemount-3051s-coplanar-pressure-transmitter-1-5-valve-4.png}
-    \caption{Cảm biến đo áp suất Rosemount 3051S}
-    \label{fig:rosemount_3051s}
-\end{figure}
-
-Đối với chức năng đo lường nhiệt độ (Temperature Transmitter - TT), hệ thống sử dụng cảm biến nhiệt độ kiểu điện trở kim loại RTD Pt100 song kép (4 dây) theo tiêu chuẩn Class A của hãng Rosemount (Model 644). Để đảm bảo độ bền trong môi trường công nghiệp khắc nghiệt, cảm biến được trang bị kèm theo ống bảo vệ (thermowell) có khả năng chịu mài mòn cao. Thiết bị bao phủ dải đo rộng từ $-50^\circ\text{C}$ đến $200^\circ\text{C}$, phù hợp để giám sát nhiệt độ làm việc tối ưu trong khoảng $80^\circ\text{C}$--$120^\circ\text{C}$ của dầu HFO. Độ chính xác của cảm biến đạt mức $\pm (0{,}15 + 0{,}002 |t|)\,^\circ\text{C}$, đồng thời được tích hợp bộ chuyển đổi tín hiệu tại đầu cảm biến để phát dòng $4$--$20\,\text{mA}$ về bộ điều khiển.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.32\textwidth]{Hinhve/rosemount-644-temperature-transmitter-1-1.png}
-    \caption{Cảm biến đo nhiệt độ Rosemount 644}
-    \label{fig:rosemount_644}
-\end{figure}
-
-Trong công tác đo mức bể chứa (Level Transmitter - LT), giải pháp được lựa chọn là cảm biến đo mức Radar sóng dẫn đường liên tục của hãng Endress+Hauser (Model Levelflex FMP51), lắp đặt trực tiếp trên đỉnh các bồn Tank 1 và Tank 2. Nhờ ứng dụng nguyên lý truyền sóng radar tần số cao dọc theo cáp kim loại, thiết bị này không bị gây nhiễu bởi hiện tượng khói dầu bay hơi hoặc bám dính trên bề mặt đo. Cảm biến có dải đo lên đến $8\,\text{m}$, đáp ứng dư dả cho chiều cao thực tế $6\,\text{m}$ của các bể chứa, với cấp chính xác cực tốt $\pm 2\,\text{mm}$ và hỗ trợ giao thức truyền thông chuẩn công nghiệp.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.25\textwidth]{Hinhve/FMP51.png}
-    \caption{Cảm biến đo mức Radar Levelflex FMP51}
-    \label{fig:fmp51}
-\end{figure}
-
-\subsection{Lựa chọn cơ cấu chấp hành}
-
-Đối với cơ cấu chấp hành, van điều khiển lưu lượng chính (Flow Control Valve - FCV) được lựa chọn là dòng van cầu điều chỉnh tuyến tính dẫn động bằng khí nén của hãng Fisher Emerson (Model Easy-e ET), kết hợp với bộ định vị thông minh FIELDVUE DVC6200. Thân van có kích thước DN80 và tuân thủ tiêu chuẩn mặt bích ANSI Class 300. Van hoạt động theo kiểu tác động khí nén lên màng lò xo (Pneumatic Diaphragm Actuator). Một đặc điểm thiết kế quan trọng là cấu hình an toàn tự mở hoàn toàn khi thất thoát khí nén (Fail-Open / Air-to-Close), đảm bảo lò hơi luôn có dòng dầu tuần hoàn dự phòng để tránh tình trạng tắc nghẽn cục bộ gây nguy hiểm. Bộ định vị van thông minh đảm nhận việc nhận tín hiệu điều khiển $4$--$20\,\text{mA}$ từ PLC và liên tục phản hồi vị trí độ mở thực tế của van thông qua mạng HART.
-
-\section{Phương pháp xử lý số liệu}
-
-\subsection{Phương pháp thí nghiệm và số hóa dữ liệu vận hành}
-
-Để nhận dạng chính xác đặc tính động học của các đối tượng điều khiển trong hệ thống (bao gồm van điều khiển lưu lượng và bộ phận sinh hơi), phương pháp thực nghiệm hàm quá độ kết hợp công cụ số hóa dữ liệu được áp dụng. Phương pháp này tiến hành thu thập dữ liệu đáp ứng thực tế thông qua các bước cụ thể như sau:
-
-Quá trình xử lý số liệu bắt đầu bằng việc tiến hành các thí nghiệm bậc thang trên nền tảng hệ thống đang vận hành ổn định tại một điểm làm việc xác định. Tại đây, những kích thích dạng bậc thang được chủ động áp đặt lên các biến đầu vào, cụ thể là phần trăm độ mở đối với van điều khiển và lưu lượng dầu nhiên liệu cấp vào đối với bộ phận sinh hơi. Ngay sau khi tín hiệu kích thích được đưa vào, hệ thống DCS sẽ tự động ghi nhận và trực quan hóa đặc tính quá độ của các biến đầu ra tương ứng, bao gồm lưu lượng dầu thực tế và áp suất hơi nước, dưới dạng các đồ thị diễn biến theo thời gian. Do các tập dữ liệu vận hành gốc thường được lưu trữ dưới định dạng hình ảnh, nhóm đã ứng dụng phần mềm Automeris WebPlotDigitizer để tiến hành số hóa. Công cụ này cho phép trích xuất chính xác tọa độ không gian của các điểm dữ liệu $(t_i, y_i)$ dọc theo đường cong đặc tính, qua đó khôi phục lại chuỗi số liệu thực nghiệm nguyên bản với độ tin cậy cao. Bước cuối cùng trong khâu chuẩn bị là quá trình làm sạch và chuẩn hóa dữ liệu thực hiện trên môi trường Python. Các thuật toán tiền xử lý sẽ tự động sàng lọc và loại bỏ các điểm dữ liệu dị thường hoặc nhiễu đo lường, sau đó sắp xếp chuỗi dữ liệu theo trật tự thời gian tăng dần và thực hiện phép tịnh tiến dời gốc tọa độ về mốc thời điểm bắt đầu thí nghiệm ($t=0$).
-
-Dữ liệu thực nghiệm sau khi làm sạch sẽ được xuất ra các tệp dữ liệu định dạng CSV làm đầu vào trực tiếp cho quá trình khớp mô hình và tối ưu hóa tham số bằng Python, được trình bày chi tiết trong Chương 3. Việc kết hợp số hóa bằng Automeris và tối ưu hóa bằng thuật toán Python giúp giảm thiểu sai số chủ quan của phương pháp đồ họa kẻ-vẽ tiếp tuyến truyền thống, đồng thời đảm bảo mô hình nhận dạng có độ tin cậy cao hơn.
+Chương này đã trình bày triết lý thiết kế của hệ thống điều khiển, tiêu chí lựa chọn thiết bị đo và cơ cấu chấp hành, cùng phương pháp xử lý số liệu vận hành phục vụ nhận dạng. Từ phân tích công nghệ có thể thấy việc điều khiển lưu lượng dầu nhiên liệu khởi động cần được tổ chức theo cấu trúc phản hồi ổn định, có tích hợp các vòng phụ và liên động bảo vệ. Những nội dung đã trình bày tạo nền tảng để bước sang chương tiếp theo, nơi mô hình động học của đối tượng được nhận dạng và bộ điều khiển được tổng hợp bằng các phương pháp IMC và điều khiển bền vững.
 
 \end{document}
