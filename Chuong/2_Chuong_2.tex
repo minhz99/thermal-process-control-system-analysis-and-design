@@ -9,6 +9,17 @@
 
 Sơ đồ P\&ID là tài liệu kỹ thuật nền tảng định hình toàn bộ cấu trúc điều khiển của hệ thống cấp dầu nhiên liệu. Khác với sơ đồ PFD chỉ mô tả luồng vật chất, P\&ID thể hiện đầy đủ các vòng điều chỉnh, thiết bị đo lường, cơ cấu chấp hành và mối liên hệ tín hiệu giữa chúng. Hệ thống điều khiển cung cấp dầu nhiên liệu khởi động cho lò than phun được tổ chức thành bốn mạch vòng điều chỉnh có quan hệ phân cấp và phối hợp chặt chẽ với nhau, bao gồm mạch vòng lưu lượng (FIC), mạch vòng áp suất (PIC), mạch vòng nhiệt độ (TIC) và mạch vòng mức (LIC).
 
+Trọng tâm của thiết kế là cấu trúc \textbf{điều khiển nối tầng hai vòng} (cascade control) kết nối mạch vòng lưu lượng (vòng trong) với mạch vòng phụ tải lò hơi (vòng ngoài), được minh họa trong Hình~\ref{fig:vong_dieu_khien_phu_tai_lo}.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{Hinhve/vong-dieu-khien.png}
+    \caption{Sơ đồ cấu trúc vòng điều khiển phụ tải lò hơi (cascade control)}
+    \label{fig:vong_dieu_khien_phu_tai_lo}
+\end{figure}
+
+Sơ đồ điều khiển phụ tải lò hơi sử dụng cấu trúc điều khiển nối tầng (cascade control), trong đó bao gồm hai vòng điều khiển lồng nhau nhằm nâng cao chất lượng đáp ứng. Vòng ngoài chịu trách nhiệm kiểm soát phụ tải lò hơi ($O_1$) thông qua bộ điều khiển phụ tải ($R_1$). Bộ điều khiển này nhận giá trị đặt ($z$) và giá trị phụ tải lò thực tế ($y_1$) để tính toán sai lệch ($\epsilon_1$), từ đó xuất ra tín hiệu điều khiển ($u_1$) đóng vai trò là giá trị đặt về lưu lượng dầu cho vòng trong. Vòng điều khiển bên trong đảm nhận nhiệm vụ điều chỉnh lưu lượng dầu thông qua bộ điều khiển lưu lượng ($R_2$). Sai lệch điều khiển lưu lượng ($\epsilon_2$) được xác định dựa trên sự chênh lệch giữa giá trị lưu lượng yêu cầu ($u_1$) và lưu lượng dầu thực tế cấp vào lò ($y_2$). Dựa trên sai lệch này, bộ điều khiển sinh ra tín hiệu tác động ($u_2$) để thay đổi độ mở của van điều khiển lưu lượng dầu FCV ($O_2$), qua đó đảm bảo lưu lượng dầu bám sát giá trị yêu cầu và duy trì sự ổn định của phụ tải lò hơi.
+
 Mạch vòng điều chỉnh lưu lượng (FIC) và mạch vòng điều chỉnh áp suất (PIC) được tích hợp trong cùng một sơ đồ P\&ID vì hai mạch vòng này có quan hệ vật lý mật thiết: áp suất và lưu lượng của dòng dầu trong đường ống phụ thuộc lẫn nhau qua đặc tính thủy lực của hệ thống. Lưu lượng kế FT đo lưu lượng thực tế và truyền tín hiệu về bộ điều khiển FIC; bộ điều khiển FIC xuất tín hiệu điều khiển đến van điều chỉnh FCV trên đường dầu cấp cho lò. Đồng thời, mạch vòng áp suất với cảm biến PT và bộ điều khiển PIC duy trì áp suất đường phân phối ổn định thông qua van bypass hồi lưu, nhằm cải thiện tính tuyến tính của van FCV và đảm bảo chất lượng phun sương tại đầu đốt.
 
 \begin{figure}[htbp]
@@ -186,13 +197,17 @@ Mạch vòng điều chỉnh mức (LIC) đảm bảo duy trì mức dầu trong
 
 \subsection{Vai trò của từng phần tử trong sơ đồ cấu trúc}
 
+Hệ thống điều khiển cung cấp dầu nhiên liệu HFO được cấu thành từ sự phối hợp chặt chẽ giữa các thiết bị công nghệ chính (thiết bị chấp hành công trình nhiệt) và các phần tử điều khiển tự động.
+
+\subsubsection{Các thiết bị công nghệ chính (Đối tượng vật lý)}
+
+Bể chứa dầu HFO (Tank 1 và Tank 2) đảm nhận vai trò lưu trữ nhiên liệu phục vụ trực tiếp cho lò hơi, được thiết kế với lớp bảo ôn cách nhiệt chuyên dụng để giảm thiểu thất thoát nhiệt năng ra môi trường. Bên trong bể được trang bị cụm sấy hơi phụ trợ nhằm giữ cho nhiệt độ dầu luôn duy trì ở dải nhiệt độ tối thiểu từ $40^\circ\text{C}$ đến $50^\circ\text{C}$, qua đó phòng ngừa hiệu quả hiện tượng dầu bị đông đặc. Dung tích trữ lượng của các bể này được tính toán kỹ lưỡng để phù hợp với dải công suất làm việc của lò hơi. Động lực đẩy chính cho toàn bộ hệ thống được cung cấp bởi hệ thống bơm dầu cấp chính (Fuel Oil Pump). Do đặc thù dầu HFO có độ nhớt rất cao, việc sử dụng bơm trục vít kép (Twin-screw pump) là giải pháp tối ưu nhờ đặc tính cung cấp lưu lượng ổn định, hạn chế xung động áp suất và khả năng tự mồi tuyệt vời, đảm bảo áp suất dầu ở đầu đẩy luôn ở trạng thái cân bằng. Dầu sau khi rời bơm sẽ được đưa tới bộ gia nhiệt dầu (Fuel Oil Heater). Đây là một thiết bị trao đổi nhiệt kiểu ống chùm (Shell and Tube), tận dụng hơi nước bão hòa để truyền nhiệt gián tiếp, giúp nâng nhiệt độ dầu lên dải vận hành tối ưu từ $80^\circ\text{C}$ đến $120^\circ\text{C}$. Quá trình này có tác dụng hạ thấp độ nhớt của dầu, đảm bảo điều kiện lý tưởng nhất về mặt động học chất lưu trước khi dầu được đưa vào các vòi phun của mỏ đốt.
+
+\subsubsection{Các phần tử trong vòng phản hồi điều khiển}
+
 Mỗi mạch vòng điều chỉnh khép kín được cấu thành từ ba phần tử cốt lõi, mỗi phần tử đảm nhận một chức năng không thể thay thế trong toàn bộ chuỗi điều khiển.
 
-Thiết bị đo lường là phần tử đầu tiên trong vòng điều khiển, có chức năng thu thập trạng thái vật lý thực của thông số quá trình (lưu lượng FT, nhiệt độ TT, áp suất PT, mức LT) và chuẩn hóa thành tín hiệu điện chuẩn 4–20\,mA để truyền về bộ điều khiển. Đây là cơ sở dữ liệu thực nghiệm duy nhất để bộ điều khiển đối chiếu với giá trị đặt và đưa ra quyết định điều khiển; sai số của thiết bị đo trực tiếp ảnh hưởng đến độ chính xác của toàn bộ hệ thống.
-
-Bộ điều khiển nhận tín hiệu sai số (sai lệch giữa giá trị đặt và giá trị đo thực) và tính toán tín hiệu điều khiển dựa trên thuật toán PID. Thành phần tỷ lệ P đảm bảo tốc độ phản hồi nhanh; thành phần tích phân I khử sai lệch tĩnh và đảm bảo bám theo giá trị đặt; thành phần vi phân D cải thiện tốc độ đáp ứng và giảm vọt lố. Sự phối hợp hài hòa của ba thành phần này quyết định chất lượng điều chỉnh của vòng kín.
-
-Cơ cấu chấp hành là phần tử tác động vật lý trở lại đối tượng điều khiển để khử sai số. Đối với mạch vòng nhiệt độ, cơ cấu chấp hành là van cấp hơi; với mạch vòng lưu lượng, đó là van tuyến tính FCV; với mạch vòng mức, đó là van nạp hoặc bơm chuyển. Chất lượng và độ chính xác của cơ cấu chấp hành, đặc biệt là đặc tính tuyến tính của van, có ảnh hưởng lớn đến khả năng điều chỉnh chính xác của toàn bộ vòng kín.
+Thiết bị đo lường (cảm biến) đóng vai trò là phần tử tiên phong trong vòng điều khiển, thực hiện chức năng thu thập trạng thái vật lý thực của các thông số quá trình chủ chốt như lưu lượng (FT), nhiệt độ (TT), áp suất (PT) và mức (LT). Các giá trị vật lý này sau đó được chuẩn hóa thành tín hiệu điện theo tiêu chuẩn 4–20\,mA để truyền tải về bộ điều khiển trung tâm. Tín hiệu đo lường chính là cơ sở dữ liệu thực nghiệm duy nhất để bộ điều khiển đối chiếu với giá trị đặt, do đó mọi sai số tại khâu này đều tác động trực tiếp đến độ chính xác vận hành của toàn bộ hệ thống. Dựa trên dữ liệu nhận được, bộ điều khiển sẽ xác định sai số và tiến hành tính toán tín hiệu hiệu chỉnh thông qua thuật toán PID. Sự phối hợp hài hòa của ba thành phần trong bộ điều khiển PID đóng vai trò quyết định chất lượng điều chỉnh: thành phần tỷ lệ (P) đảm bảo tốc độ phản hồi nhanh chóng, thành phần tích phân (I) triệt tiêu sai lệch tĩnh để hệ thống bám sát giá trị đặt, trong khi thành phần vi phân (D) giúp cải thiện tốc độ đáp ứng tổng thể và hạn chế hiện tượng vọt lố. Cuối cùng, tín hiệu tính toán sẽ được gửi đến cơ cấu chấp hành để tạo ra các tác động vật lý trở lại đối tượng điều khiển nhằm khử dứt điểm sai số. Tùy thuộc vào mạch vòng cụ thể, cơ cấu chấp hành có thể là van cấp hơi đối với điều khiển nhiệt độ, van tuyến tính FCV trong điều khiển lưu lượng, hoặc cụm van nạp và bơm chuyển trong kiểm soát mức. Độ tin cậy và đặc tính làm việc tuyến tính của các cơ cấu chấp hành này có sức ảnh hưởng rất lớn đến khả năng duy trì trạng thái cân bằng của toàn bộ vòng điều khiển khép kín.
 
 \subsection{Phân tích ưu điểm của sơ đồ cấu trúc và sự phù hợp với yêu cầu công nghệ}
 
@@ -225,58 +240,49 @@ Việc xác định chính xác dải làm việc của từng thông số quá 
 
 \subsection{Lựa chọn thiết bị đo}
 
-Lựa chọn thiết bị đo lường phù hợp là yếu tố quyết định đến độ chính xác và độ tin cậy của toàn bộ hệ thống điều khiển. Đối với từng thông số công nghệ, thiết bị đo được lựa chọn dựa trên dải đo, điều kiện môi trường làm việc và yêu cầu độ chính xác.
+Việc lựa chọn thiết bị đo lường được thực hiện trên cơ sở luận chứng kỹ thuật nghiêm ngặt: dải đo phù hợp với thông số làm việc thực tế, độ chính xác cao đáp ứng yêu cầu điều khiển chất lượng, khả năng chịu đựng ăn mòn hóa chất và nhiệt độ của dầu HFO nặng.
 
-Đối với thiết bị đo lưu lượng (Flow Transmitter – FT), đồng hồ đo lưu lượng kiểu Coriolis được ưu tiên lựa chọn. Nguyên lý hoạt động dựa trên hiệu ứng lực Coriolis cho phép đo trực tiếp khối lượng dòng chảy với sai số chỉ khoảng ±0,1\%, không bị ảnh hưởng bởi sự thay đổi về nhiệt độ, áp suất hay độ nhớt của dầu – điều này đặc biệt quan trọng với dầu HFO có độ nhớt thay đổi theo nhiệt độ. Đối với các phân tuyến nhỏ hơn hoặc khi chi phí là yếu tố quan trọng, đồng hồ đo kiểu bánh răng oval (oval gear flow meter) có thể được sử dụng thay thế.
+Đối với nhiệm vụ đo lường lưu lượng (Flow Transmitter - FT), cảm biến đo lưu lượng kiểu Coriolis của hãng Emerson Micro Motion (Model ELITE F100) được lựa chọn để lắp đặt trên đường ống dầu chính cấp cho lò. Thiết bị này hoạt động dựa trên nguyên lý lực Coriolis, cho phép đo trực tiếp khối lượng với dải đo từ $0$ đến $50\,\text{t/h}$, hoàn toàn đáp ứng được mức tải định mức $\approx 31{,}8\,\text{t/h}$ của hệ thống. Ưu điểm nổi bật của dòng cảm biến này là sai số phép đo cực thấp chỉ $\pm 0{,}1\%$ trị số đọc và khả năng duy trì độ ổn định cao ngay cả khi độ nhớt của dầu HFO thay đổi đáng kể. Tín hiệu đầu ra được xuất chuẩn $4$--$20\,\text{mA}$ tích hợp giao thức HART.
 
-Đối với cảm biến áp suất (Pressure Transmitter – PT), thiết bị sử dụng công nghệ điện dung màng cách ly được lựa chọn, cho dải áp tới 30\,bar với sai số nhỏ hơn 0,1\% span. Thiết bị đo áp suất được trang bị kèm theo các rơ-le công tắc áp suất (pressure switch) để cấp báo P$>$H và P$<$H khi áp suất vượt ngưỡng.
+Để giám sát áp suất dầu (Pressure Transmitter - PT) trên đường ống phân phối chính và trước vòi phun, cảm biến áp suất kiểu điện dung màng cách ly của hãng Rosemount (Model 3051S) được tin dùng. Công nghệ màng điện dung silic của thiết bị mang lại khả năng chống mỏi cơ học vượt trội và ngăn ngừa hiện tượng trôi điểm không theo thời gian. Cảm biến được hiệu chuẩn với dải đo từ $0$ đến $25\,\text{bar}$ (phù hợp với dải làm việc thực tế $5$--$20\,\text{bar}$), đạt cấp chính xác rất cao $\pm 0{,}055\%$ dải đo và hỗ trợ truyền thông $4$--$20\,\text{mA}$ / HART.
 
-Đối với cảm biến nhiệt độ (Temperature Transmitter – TT), điện trở nhiệt RTD loại Pt100 (Platinum 100\,$\Omega$ tại 0°C) được lựa chọn vì có độ ổn định cao, khả năng chống nhiễu tốt và dải đo phù hợp cho nhiệt độ dưới 200°C. Tín hiệu từ Pt100 được chuyển đổi thành tín hiệu 4–20\,mA thông qua bộ chuyển đổi tín hiệu (head-mounted transmitter) để truyền về DCS.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.32\textwidth]{Hinhve/rosemount-3051s-coplanar-pressure-transmitter-1-5-valve-4.png}
+    \caption{Cảm biến đo áp suất Rosemount 3051S}
+    \label{fig:rosemount_3051s}
+\end{figure}
 
-Đối với cảm biến mức (Level Transmitter – LT), phương pháp đo bằng sóng siêu âm không tiếp xúc được áp dụng cho bể chứa HFO. Phương pháp này có ưu điểm không cần tiếp xúc trực tiếp với dầu, tránh được ảnh hưởng của độ bám dính và tính ăn mòn của dầu đối với điện cực đo.
+Đối với chức năng đo lường nhiệt độ (Temperature Transmitter - TT), hệ thống sử dụng cảm biến nhiệt độ kiểu điện trở kim loại RTD Pt100 song kép (4 dây) theo tiêu chuẩn Class A của hãng Rosemount (Model 644). Để đảm bảo độ bền trong môi trường công nghiệp khắc nghiệt, cảm biến được trang bị kèm theo ống bảo vệ (thermowell) có khả năng chịu mài mòn cao. Thiết bị bao phủ dải đo rộng từ $-50^\circ\text{C}$ đến $200^\circ\text{C}$, phù hợp để giám sát nhiệt độ làm việc tối ưu trong khoảng $80^\circ\text{C}$--$120^\circ\text{C}$ của dầu HFO. Độ chính xác của cảm biến đạt mức $\pm (0{,}15 + 0{,}002 |t|)\,^\circ\text{C}$, đồng thời được tích hợp bộ chuyển đổi tín hiệu tại đầu cảm biến để phát dòng $4$--$20\,\text{mA}$ về bộ điều khiển.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.32\textwidth]{Hinhve/rosemount-644-temperature-transmitter-1-1.png}
+    \caption{Cảm biến đo nhiệt độ Rosemount 644}
+    \label{fig:rosemount_644}
+\end{figure}
+
+Trong công tác đo mức bể chứa (Level Transmitter - LT), giải pháp được lựa chọn là cảm biến đo mức Radar sóng dẫn đường liên tục của hãng Endress+Hauser (Model Levelflex FMP51), lắp đặt trực tiếp trên đỉnh các bồn Tank 1 và Tank 2. Nhờ ứng dụng nguyên lý truyền sóng radar tần số cao dọc theo cáp kim loại, thiết bị này không bị gây nhiễu bởi hiện tượng khói dầu bay hơi hoặc bám dính trên bề mặt đo. Cảm biến có dải đo lên đến $8\,\text{m}$, đáp ứng dư dả cho chiều cao thực tế $6\,\text{m}$ của các bể chứa, với cấp chính xác cực tốt $\pm 2\,\text{mm}$ và hỗ trợ giao thức truyền thông chuẩn công nghiệp.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.25\textwidth]{Hinhve/FMP51.png}
+    \caption{Cảm biến đo mức Radar Levelflex FMP51}
+    \label{fig:fmp51}
+\end{figure}
 
 \subsection{Lựa chọn cơ cấu chấp hành}
 
-Van điều khiển lưu lượng (Control Valve – FCV) là cơ cấu chấp hành trực tiếp tác động lên thông số điều khiển chính. Cụm van cầu (globe valve) với thiết kế đĩa van tuyến tính được lựa chọn vì đặc tính kiểm soát độ mở chính xác trong toàn bộ dải điều chỉnh, phù hợp với yêu cầu điều chỉnh bám sát của vòng PID. Van sử dụng bộ truyền động khí nén (pneumatic actuator) kết hợp bộ định vị van thông minh (smart valve positioner) để đảm bảo vị trí van thực tế luôn trùng khớp với lệnh điều khiển. Cấu hình hỏng-mở (fail-open) được lựa chọn để trong trường hợp mất khí nén, van sẽ mở hoàn toàn, đảm bảo dòng dầu không bị ngắt đột ngột gây tắt lửa lò hơi bất ngờ.
-
-Bộ điều khiển trung tâm là PLC Siemens S7-1200, được lựa chọn do hỗ trợ đầy đủ khối hàm thư viện điều khiển PID Compact (FB41) với tính năng tự chỉnh định (auto-tuning), tương thích truyền thông Profinet với hệ thống SCADA và có khả năng mở rộng dễ dàng. Cấu trúc phần cứng mô-đun của S7-1200 cho phép tích hợp các module vào/ra analog và số phục vụ đọc tín hiệu từ các cảm biến và xuất tín hiệu điều khiển đến van.
+Đối với cơ cấu chấp hành, van điều khiển lưu lượng chính (Flow Control Valve - FCV) được lựa chọn là dòng van cầu điều chỉnh tuyến tính dẫn động bằng khí nén của hãng Fisher Emerson (Model Easy-e ET), kết hợp với bộ định vị thông minh FIELDVUE DVC6200. Thân van có kích thước DN80 và tuân thủ tiêu chuẩn mặt bích ANSI Class 300. Van hoạt động theo kiểu tác động khí nén lên màng lò xo (Pneumatic Diaphragm Actuator). Một đặc điểm thiết kế quan trọng là cấu hình an toàn tự mở hoàn toàn khi thất thoát khí nén (Fail-Open / Air-to-Close), đảm bảo lò hơi luôn có dòng dầu tuần hoàn dự phòng để tránh tình trạng tắc nghẽn cục bộ gây nguy hiểm. Bộ định vị van thông minh đảm nhận việc nhận tín hiệu điều khiển $4$--$20\,\text{mA}$ từ PLC và liên tục phản hồi vị trí độ mở thực tế của van thông qua mạng HART.
 
 \section{Phương pháp xử lý số liệu}
 
-\subsection{Phương pháp thí nghiệm và xử lý số liệu vận hành}
+\subsection{Phương pháp thí nghiệm và số hóa dữ liệu vận hành}
 
-Để nhận dạng đặc tính động học của đối tượng điều khiển, phương pháp thực nghiệm hàm quá độ (Transient Response Method) được áp dụng. Phương pháp này có ưu điểm là không cần biết trước cấu trúc bên trong của hệ thống, chỉ cần quan sát phản ứng đầu ra khi có kích thích đầu vào xác định, từ đó xác định các tham số của mô hình toán học. Trong điều kiện lò đốt vận hành ổn định tại điểm làm việc danh định, một tín hiệu kích thích dạng hàm bậc thang với biên độ $\Delta U$ được áp đặt lên van điều tiết FCV trong khi giữ nguyên các điều kiện vận hành khác. Đáp ứng lưu lượng thực tế $y(t)$ được ghi lại từ phần mềm HMI của DCS với tần số lấy mẫu đủ cao cho đến khi hệ thống đạt trạng thái xác lập mới. Từ đường cong đáp ứng này, tiến hành xác định điểm uốn và kẻ tiếp tuyến để khai thác các tham số đặc trưng của mô hình SOPDT (Second-Order Plus Dead Time), bao gồm hệ số truyền $K$, các hằng số thời gian quán tính $T_1$, $T_2$ và thời gian trễ thuần $\tau$.
+Để nhận dạng chính xác đặc tính động học của các đối tượng điều khiển trong hệ thống (bao gồm van điều khiển lưu lượng và bộ phận sinh hơi), phương pháp thực nghiệm hàm quá độ kết hợp công cụ số hóa dữ liệu được áp dụng. Phương pháp này tiến hành thu thập dữ liệu đáp ứng thực tế thông qua các bước cụ thể như sau:
 
-% \subsection{Bảng số liệu thực nghiệm}
+Quá trình xử lý số liệu bắt đầu bằng việc tiến hành các thí nghiệm bậc thang trên nền tảng hệ thống đang vận hành ổn định tại một điểm làm việc xác định. Tại đây, những kích thích dạng bậc thang được chủ động áp đặt lên các biến đầu vào, cụ thể là phần trăm độ mở đối với van điều khiển và lưu lượng dầu nhiên liệu cấp vào đối với bộ phận sinh hơi. Ngay sau khi tín hiệu kích thích được đưa vào, hệ thống DCS sẽ tự động ghi nhận và trực quan hóa đặc tính quá độ của các biến đầu ra tương ứng, bao gồm lưu lượng dầu thực tế và áp suất hơi nước, dưới dạng các đồ thị diễn biến theo thời gian. Do các tập dữ liệu vận hành gốc thường được lưu trữ dưới định dạng hình ảnh, nhóm đã ứng dụng phần mềm Automeris WebPlotDigitizer để tiến hành số hóa. Công cụ này cho phép trích xuất chính xác tọa độ không gian của các điểm dữ liệu $(t_i, y_i)$ dọc theo đường cong đặc tính, qua đó khôi phục lại chuỗi số liệu thực nghiệm nguyên bản với độ tin cậy cao. Bước cuối cùng trong khâu chuẩn bị là quá trình làm sạch và chuẩn hóa dữ liệu thực hiện trên môi trường Python. Các thuật toán tiền xử lý sẽ tự động sàng lọc và loại bỏ các điểm dữ liệu dị thường hoặc nhiễu đo lường, sau đó sắp xếp chuỗi dữ liệu theo trật tự thời gian tăng dần và thực hiện phép tịnh tiến dời gốc tọa độ về mốc thời điểm bắt đầu thí nghiệm ($t=0$).
 
-% Thí nghiệm được thực hiện bằng cách áp đặt tín hiệu bậc thang mở van $u(t) = 5{,}1 \cdot \mathbf{1}(t)$ (biên độ kích thích 5,1 đơn vị) lên đối tượng trong điều kiện lò hơi đang vận hành ổn định. Dữ liệu đáp ứng lưu lượng được trích xuất từ phần mềm HMI và các tọa độ đặc trưng phục vụ nhận dạng mô hình được tổng hợp trong Bảng~\ref{tab:thong_so_thuc_nghiem}.
-
-% \begin{table}[H]
-%     \centering
-%     \caption{Các điểm đặc trưng của đáp ứng quá độ thực nghiệm}
-%     \label{tab:thong_so_thuc_nghiem}
-%     \begin{tabular}{|l|c|c|}
-%         \hline
-%         \textbf{Điểm đồ thị / Thông số} & \textbf{Thời gian t (s)} & \textbf{Biên độ y(t)} \\
-%         \hline
-%         Nền ban đầu ($y(0)$) & $0{,}0$ & $1{,}30$ \\
-%         \hline
-%         Giao điểm tiếp tuyến / Trục hoành (A) & $2{,}579$ & $1{,}30$ \\
-%         \hline
-%         Điểm uốn (U) & $6{,}20$ & $1{,}88$ \\
-%         \hline
-%         Giao điểm tiếp tuyến / Trục tiệm cận (B) & $11{,}74$ & $2{,}80$ \\
-%         \hline
-%         Giá trị xác lập mới ($y(\infty)$) & $\infty$ & $2{,}80$ \\
-%         \hline
-%         \textbf{Biên độ tín hiệu kích $u_0$} & \multicolumn{2}{c|}{$5{,}1$} \\
-%         \hline
-%     \end{tabular}
-% \end{table}
-
-% Bảng số liệu thực nghiệm này cung cấp đầy đủ thông tin để thực hiện nhận dạng đối tượng bằng phương pháp đồ họa kẻ-vẽ tiếp tuyến tại điểm uốn, là cơ sở trực tiếp cho quá trình mô hình hóa và tổng hợp bộ điều khiển được trình bày chi tiết trong Chương 3.
-
-%Đây là thay đổi.
-%Đây là thay đổi 2.
+Dữ liệu thực nghiệm sau khi làm sạch sẽ được xuất ra các tệp dữ liệu định dạng CSV làm đầu vào trực tiếp cho quá trình khớp mô hình và tối ưu hóa tham số bằng Python, được trình bày chi tiết trong Chương 3. Việc kết hợp số hóa bằng Automeris và tối ưu hóa bằng thuật toán Python giúp giảm thiểu sai số chủ quan của phương pháp đồ họa kẻ-vẽ tiếp tuyến truyền thống, đồng thời đảm bảo mô hình nhận dạng có độ tin cậy cao hơn.
 
 \end{document}
