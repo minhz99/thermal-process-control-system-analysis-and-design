@@ -3,11 +3,9 @@
 \documentclass[../main.tex]{subfiles}
 \begin{document}
 
-\section{Thiết kế vòng điều khiển đối tượng}
+\section{Triết lý thiết kế hệ thống điều khiển}
 
-\subsection{Triết lý thiết kế hệ thống điều khiển}
-
-\subsubsection{Cấu trúc điều khiển Cascade}
+\subsection{Cấu trúc điều khiển Cascade}
 
 Từ những phân tích về đặc tính công nghệ của hệ thống cấp dầu nhiên liệu ở Chương 1, có thể thấy rõ hệ thống mang tính chất của một quá trình nhiệt động học phức tạp, bao hàm hai phân hệ có bản chất vật lý và tốc độ đáp ứng hoàn toàn khác biệt. Phân hệ van điều khiển lưu lượng dầu mang đặc tính cơ - thủy lực, có khả năng phản ứng rất nhanh chóng và linh hoạt với các lệnh thay đổi độ mở. Trong khi đó, phân hệ lò hơi sinh áp suất lại đặc trưng bởi quá trình truyền nhiệt và biến đổi pha (từ lỏng sang hơi), mang bản chất quán tính lớn và thời gian trễ vận chuyển đáng kể. 
 
@@ -19,7 +17,7 @@ Nếu áp dụng cấu trúc điều khiển đơn vòng (Single Loop) truyền 
     \item \textbf{Vòng ngoài (Vòng áp suất):} Sử dụng bộ điều khiển $R_1$ đóng vai trò là bộ điều khiển chủ đạo (Master Controller). Nó theo dõi sai lệch giữa áp suất hơi đặt và áp suất hơi thực tế đầu ra của lò. Thay vì điều khiển trực tiếp van, bộ điều khiển $R_1$ tính toán mức nhiên liệu cần thiết và xuất ra tín hiệu làm giá trị đặt (Setpoint) cung cấp cho vòng trong.
 \end{itemize}
 
-\subsubsection{Vai trò và ưu điểm của cấu trúc Cascade}
+\subsection{Vai trò và ưu điểm của cấu trúc Cascade}
 
 Triết lý phân tách cấu trúc thành hai vòng điều khiển mang lại những ưu điểm kỹ thuật vượt trội, hoàn toàn phù hợp với các hệ thống nhiệt điện quy mô lớn:
 \begin{itemize}
@@ -28,15 +26,15 @@ Triết lý phân tách cấu trúc thành hai vòng điều khiển mang lại 
     \item \textbf{Tuyến tính hóa đối tượng điều khiển:} Đặc tính phi tuyến cố hữu của van điều khiển sẽ được vòng kín bên trong tự động làm phẳng. Đối với vòng ngoài, cụm van và bộ điều khiển vòng trong giờ đây được nhìn nhận như một khâu truyền đạt có hệ số khuếch đại xấp xỉ bằng $1$, giúp quá trình tổng hợp bộ điều khiển áp suất $R_1$ trở nên thuận lợi và chính xác hơn.
 \end{itemize}
 
-\subsection{Luận chứng lựa chọn thiết bị}
+\section{Luận chứng lựa chọn thiết bị}
 
-\subsubsection{Dải làm việc, cảnh báo và bảo vệ}
+\subsection{Dải làm việc, cảnh báo và bảo vệ}
 
 Thiết kế phần cứng của hệ thống điều khiển phải tuân thủ nghiêm ngặt các dải vận hành của nhà máy nhiệt điện. Hệ thống áp suất hơi mới thường hoạt động trong dải áp suất cao (dao động từ $130$ đến $160$ bar tùy theo thiết kế của tổ máy). Lưu lượng dầu nhiên liệu được phép điều chỉnh tuyến tính từ $0\%$ đến $100\%$ công suất thiết kế của cụm béc phun để đáp ứng linh hoạt từ chế độ mồi lửa đến chế độ mang tải định mức.
 
 Bên cạnh chức năng điều khiển liên tục, hệ thống giám sát và bảo vệ (Interlock \& Protection) được tích hợp song song. Các ngưỡng báo động (Alarm) được thiết lập tại giới hạn High và Low nhằm cảnh báo sớm cho người vận hành khi thông số áp suất hoặc lưu lượng có dấu hiệu thoát khỏi vùng an toàn. Trong trường hợp đặc biệt nghiêm trọng, ví dụ như áp suất hơi vượt quá ngưỡng High-High gây nguy cơ bục nổ đường ống, hoặc lưu lượng dầu sụt giảm xuống mức Low-Low làm mất ngọn lửa buồng đốt, hệ thống bảo vệ độc lập sẽ lập tức xuất lệnh nhảy lò (MFT - Master Fuel Trip), kích hoạt van cắt nhanh (Shut-off Valve) để cô lập hoàn toàn nguồn nhiên liệu.
 
-\subsubsection{Lựa chọn thiết bị đo và cơ cấu chấp hành}
+\subsection{Lựa chọn thiết bị đo và cơ cấu chấp hành}
 
 Để đảm bảo tín hiệu phản hồi có độ tin cậy cao và tốc độ cập nhật nhanh, thiết bị đo lường được lựa chọn dựa trên các tiêu chuẩn công nghiệp khắt khe. 
 
@@ -44,7 +42,7 @@ Bên cạnh chức năng điều khiển liên tục, hệ thống giám sát v�
 
 Cơ cấu chấp hành của hệ thống là van điều khiển lưu lượng (Control Valve). Trong công nghiệp nhiệt điện, van điều khiển dẫn động bằng khí nén (Pneumatic Control Valve) được sử dụng rộng rãi nhờ tốc độ đóng mở nhanh và đáp ứng định vị chính xác thông qua bộ định vị van thông minh (Smart Positioner). Hơn nữa, van được thiết kế theo cấu hình "Fail-Close" (thường đóng); nghĩa là khi xảy ra sự cố mất nguồn cung cấp khí nén hoặc đứt cáp tín hiệu điều khiển, lực lò xo sẽ tự động đẩy trục van về vị trí đóng hoàn toàn. Cơ chế này đảm bảo cắt đứt dòng nhiên liệu đi vào lò, ngăn ngừa rủi ro cháy nổ không kiểm soát, tuân thủ nguyên tắc an toàn thiết kế "Fail-Safe".
 
-\subsection{Phương pháp xử lý số liệu thực nghiệm}
+\section{Phương pháp xử lý số liệu thực nghiệm}
 
 Để có cơ sở dữ liệu tin cậy phục vụ cho công tác nhận dạng mô hình toán học và tổng hợp thuật toán điều khiển ở Chương 3, nhóm đã tiến hành thu thập số liệu thực nghiệm mô tả đáp ứng quá độ của cả hai đối tượng: vòng trong (đối tượng van điều khiển lưu lượng) và vòng ngoài (đối tượng lò hơi sinh áp suất).
 

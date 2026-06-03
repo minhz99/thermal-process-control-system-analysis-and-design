@@ -3,9 +3,7 @@
 \documentclass[../main.tex]{subfiles}
 \begin{document}
 
-\section{Phân tích và tổng hợp hệ thống}
-
-\subsection{Phương pháp nhận dạng đối tượng}
+\section{Phương pháp nhận dạng đối tượng}
 
 Trong điều khiển tự động hóa hiện đại, quá trình tổng hợp và chỉnh định bộ điều khiển phụ thuộc hoàn toàn vào mức độ chính xác của mô hình toán học đại diện cho đối tượng thực tế. Phương pháp nhận dạng đối tượng được lựa chọn trong đồ án này dựa trên việc phân tích đáp ứng bậc thang (Step Response) của hệ thống trong miền thời gian. Về mặt toán học, quá trình nhận dạng được định hình thành một bài toán tối ưu hóa phi tuyến: tìm kiếm tập tham số $A$ của mô hình sao cho hàm mục tiêu sai số toàn phương $J$ đạt giá trị cực tiểu.
 
@@ -17,7 +15,7 @@ Trong đó, $y_{data}(t_i)$ là chuỗi giá trị đáp ứng thực nghiệm t
 
 Với cấu trúc điều khiển Cascade đã đề xuất, hai khâu động học cần được nhận dạng độc lập bao gồm đối tượng vòng trong (cụm van điều khiển lưu lượng dầu) và đối tượng vòng ngoài (quá trình sinh áp suất hơi của lò).
 
-\subsubsection{Nhận dạng đối tượng van (Vòng trong)}
+\subsection{Nhận dạng đối tượng van (Vòng trong)}
 
 Đối tượng van điều khiển có đặc tính động học tương đối nhanh nhưng vẫn tồn tại độ trễ do cơ khí và ma sát đường ống dẫn. Do đó, mô hình xấp xỉ quán tính bậc nhất có trễ (First-Order Plus Dead Time - FOPDT) được lựa chọn vì tính đơn giản và phản ánh đủ bản chất động lực học của hệ thống cơ - lưu chất. Hàm truyền của mô hình FOPDT có dạng:
 \begin{equation}
@@ -40,7 +38,7 @@ Tiến hành đưa dữ liệu thực nghiệm từ tệp \texttt{van-dap-ung-xu
 
 Biểu đồ tại Hình~\ref{fig:nhan_dang_van} cho thấy đường cong mô phỏng bám sát hoàn toàn với tập dữ liệu thực nghiệm, minh chứng cho tính đúng đắn và độ chính xác của cấu trúc FOPDT đối với phân hệ van lưu lượng.
 
-\subsubsection{Nhận dạng đối tượng áp suất hơi (Vòng ngoài)}
+\subsection{Nhận dạng đối tượng áp suất hơi (Vòng ngoài)}
 
 Quá trình sinh hơi trong lò mang bản chất tích lũy năng lượng và trao đổi nhiệt phức tạp qua nhiều bề mặt kim loại. Đáp ứng của áp suất hơi đối với sự thay đổi nhiên liệu diễn ra chậm chạp và có đặc tính quá độ hình chữ S rất rõ rệt. Vì vậy, mô hình quán tính bậc hai có trễ (Second-Order Plus Dead Time - SOPDT) là mô hình chuẩn mực và phù hợp nhất để xấp xỉ đối tượng nhiệt động này. Hàm truyền của mô hình SOPDT có dạng:
 \begin{equation}
@@ -64,7 +62,7 @@ Quá trình sinh hơi trong lò mang bản chất tích lũy năng lượng và 
 
 Sự xấp xỉ bằng nhau của hai hằng số thời gian ($T_{1p} \approx T_{2p}$) cho thấy đối tượng có tính chất của hai khâu quán tính nối tiếp, tạo nên độ cản dịu (damping) lớn đối với quá trình biến đổi năng lượng, điều này giải thích cho hình dáng đường cong mượt mà của áp suất.
 
-\subsection{Phân tích và biến đổi sơ đồ cấu trúc Cascade}
+\section{Phân tích và biến đổi sơ đồ cấu trúc Cascade}
 
 Nguyên lý nền tảng để thiết kế hệ thống điều khiển Cascade là phân tách hệ thống lồng ghép thành từng phần và tổng hợp từ trong ra ngoài (Inner-to-Outer Tuning). Quy trình biến đổi sơ đồ cấu trúc được triển khai theo các bước học thuật chuẩn mực:
 \begin{enumerate}
@@ -73,9 +71,9 @@ Nguyên lý nền tảng để thiết kế hệ thống điều khiển Cascade
     \item \textbf{Tổng hợp vòng ngoài:} Bộ điều khiển vòng ngoài ($R_1$) được tính toán dựa trên đặc tính động học của đối tượng tương đương $G_{eq}(s)$ nhằm kiểm soát mục tiêu cốt lõi của toàn tổ máy là áp suất hơi mới.
 \end{enumerate}
 
-\subsection{Tổng hợp bộ điều khiển IMC và Bền vững tối ưu}
+\section{Tổng hợp bộ điều khiển IMC và Bền vững tối ưu}
 
-\subsubsection{Tổng hợp vòng trong theo phương pháp Mô hình nội (IMC)}
+\subsection{Tổng hợp vòng trong theo phương pháp Mô hình nội (IMC)}
 
 Đối với vòng điều khiển lưu lượng, phương pháp điều khiển Mô hình nội (Internal Model Control - IMC) được ứng dụng nhằm thiết kế thuật toán điều khiển một cách trực quan, dựa trên nguyên tắc nghịch đảo hàm truyền của đối tượng. Đặc điểm ưu việt của IMC là thu gọn toàn bộ quá trình chỉnh định về một tham số duy nhất $\lambda_v$ (hằng số thời gian bộ lọc), cho phép kỹ sư hệ thống dễ dàng thiết lập sự cân bằng giữa tốc độ đáp ứng và khả năng dự trữ ổn định.
 
@@ -94,7 +92,7 @@ Thế các hằng số nhận dạng thực nghiệm vào hệ phương trình, 
 \end{itemize}
 Trong kiến trúc này, khâu vi phân (D) bị chủ động loại bỏ nhằm ngăn chặn việc khuếch đại các thành phần tín hiệu nhiễu tần số cao (vốn luôn tồn tại trong đo lường lưu lượng), qua đó bảo vệ bộ truyền động cơ khí của van khỏi những dao động mài mòn không cần thiết.
 
-\subsubsection{Xấp xỉ đối tượng tương đương và Tổng hợp vòng ngoài theo Bền vững tối ưu}
+\subsection{Xấp xỉ đối tượng tương đương và Tổng hợp vòng ngoài theo Bền vững tối ưu}
 
 Với bộ điều khiển PI vòng trong đã được tối ưu hóa, tốc độ đáp ứng của khâu cung cấp lưu lượng vượt xa quán tính chậm chạp của quá trình sinh hơi bao ngoài. Nhờ đó, hàm truyền vòng kín của vòng lưu lượng có thể được xấp xỉ đơn giản bằng $1$ trong tính toán dải tần số làm việc của vòng ngoài. Do vậy, hàm truyền của đối tượng tương đương vòng ngoài có thể được xem như trùng khớp hoàn toàn với hàm truyền SOPDT của lò hơi:
 \begin{equation}
@@ -124,7 +122,7 @@ Thông qua việc tính toán trên tập lệnh Python, bộ thông số tối 
     \item Thời gian vi phân: $T_{d1} = 2.9935$ s
 \end{itemize}
 
-\subsection{Đánh giá chất lượng hệ thống đạt được}
+\section{Đánh giá chất lượng hệ thống đạt được}
 
 Tính đúng đắn và ưu việt của giải pháp điều khiển Cascade được thẩm định toàn diện thông qua kết quả mô phỏng trên nền tảng Python. Quy trình mô phỏng đã tích hợp cấu trúc vòng kín kép cùng các thông số lý thuyết (PI vòng trong, PID vòng ngoài) đã được định lượng phía trên.
 

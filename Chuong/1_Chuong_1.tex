@@ -3,9 +3,7 @@
 \documentclass[../main.tex]{subfiles}
 \begin{document}
 
-\section{Tổng quan về đối tượng công nghệ}
-
-\subsection{Sơ lược về công nghệ và hệ thống}
+\section{Sơ lược về công nghệ và hệ thống}
 
 Trong dây chuyền sản xuất điện năng của các nhà máy nhiệt điện, quá trình cháy nhiên liệu đóng vai trò cốt lõi nhằm chuyển hóa năng lượng hóa học thành nhiệt năng để sinh hơi. Đối với các lò hơi đốt than phun (Pulverized Coal - PC), hệ thống cấp dầu nhiên liệu (Fuel Oil System) là một phân hệ công nghệ phụ trợ nhưng mang tính sống còn, đặc biệt trong các giai đoạn vận hành then chốt. Cụ thể, dầu nhiên liệu (thường là dầu FO hoặc DO) được sử dụng để mồi lửa khi khởi động lò từ trạng thái lạnh, hỗ trợ quá trình bắt cháy của than khi phụ tải của tổ máy xuống thấp, hoặc đóng vai trò nhiên liệu dự phòng khẩn cấp khi hệ thống cấp than gặp sự cố.
 
@@ -20,7 +18,7 @@ Như vậy, toàn bộ chu trình từ lúc cấp dầu đến khi sinh hơi t�
     \label{fig:hmi_fuel_oil}
 \end{figure}
 
-\subsection{Các thông số điều khiển và giám sát của hệ thống}
+\section{Các thông số điều khiển và giám sát của hệ thống}
 
 Để hệ thống cấp dầu nhiên liệu hoạt động an toàn và đạt hiệu suất cao, quá trình vận hành đòi hỏi sự giám sát và điều khiển liên tục các thông số kỹ thuật trọng yếu. Dựa trên đặc tính vật lý và yêu cầu của quá trình cháy, các thông số này được phân loại thành biến điều khiển chính, biến điều khiển phụ và các biến giám sát an toàn.
 
@@ -30,13 +28,13 @@ Lưu lượng dầu nhiên liệu (Fuel Oil Flow) là thông số điều khiể
 
 Ngoài hai thông số điều khiển cốt lõi nêu trên, nhiệt độ và áp suất dầu cấp trên đường ống cũng là những thông số giám sát mang tính bắt buộc. Nhiệt độ dầu quyết định độ nhớt động học; nếu nhiệt độ quá thấp, dầu sẽ khó tơi hóa khi phun, gây ra hiện tượng nhỏ giọt và khói đen. Ngược lại, nhiệt độ quá cao có thể gây đóng cặn carbon trong ống và béc phun. Áp suất dầu cấp cần được giữ ổn định ở đầu vào của van điều khiển nhằm tạo ra động năng đủ lớn để xé tơi màng dầu, đồng thời tránh hiện tượng xâm thực (cavitation) làm hư hỏng cấu trúc van.
 
-\subsection{Vai trò, ý nghĩa của hệ thống và thông số quá trình}
+\section{Vai trò, ý nghĩa của hệ thống và thông số quá trình}
 
 Hệ thống điều khiển cấp dầu nhiên liệu mang ý nghĩa quyết định đối với tính linh hoạt và độ tin cậy của toàn bộ nhà máy nhiệt điện. Trong bối cảnh vận hành thực tế, khi tổ máy nhận lệnh thay đổi phụ tải từ trung tâm điều độ hệ thống điện, lò hơi phải lập tức đáp ứng bằng cách thay đổi lượng hơi cung cấp. Thông số áp suất hơi chính là thước đo độ chênh lệch giữa công suất sinh hơi của lò và công suất tiêu thụ của tuabin. Do đó, việc duy trì áp suất hơi luôn bám sát giá trị đặt đảm bảo cho tổ máy vận hành an toàn, ngăn ngừa sự cố nhảy lò do áp suất vượt ngưỡng tác động của van an toàn.
 
 Mặt khác, việc chọn lưu lượng dầu làm thông số điều khiển phụ mang lại khả năng kháng nhiễu vượt trội cho hệ thống. Thay vì chờ đợi áp suất hơi biến thiên (thường mất thời gian dài do quán tính nhiệt của lò hơi rất lớn) mới tiến hành bù trừ lượng nhiên liệu, hệ thống đo lường lưu lượng dầu cho phép phát hiện tức thời những biến động bên trong hệ thống thủy lực, chẳng hạn như dao động áp lực bơm cấp dầu hoặc hiện tượng kẹt cơ khí của van điều khiển. Nhờ đó, thao tác điều chỉnh được thực hiện ngay lập tức, triệt tiêu nhiễu từ trong trứng nước trước khi chúng có cơ hội lan truyền và gây ảnh hưởng lên áp suất hơi của vòng ngoài.
 
-\subsection{Các yếu tố ảnh hưởng đến thông số quá trình}
+\section{Các yếu tố ảnh hưởng đến thông số quá trình}
 
 Hệ thống hoạt động trong môi trường công nghiệp phức tạp, do đó thường xuyên chịu sự tác động của nhiều loại nhiễu loạn khác nhau, ảnh hưởng trực tiếp đến chất lượng điều khiển. Có thể chia các yếu tố nhiễu thành hai nhóm chính dựa trên vị trí tác động của chúng: nhiễu tác động lên vòng ngoài (áp suất hơi) và nhiễu tác động lên vòng trong (lưu lượng dầu).
 
@@ -44,7 +42,7 @@ Hệ thống hoạt động trong môi trường công nghiệp phức tạp, do
 
 Đối với lưu lượng dầu nhiên liệu, các yếu tố nhiễu chủ yếu mang tính chất thủy lực và cơ học. Sự sụt áp trên đường ống cấp dầu do rò rỉ hoặc do bơm dầu vận hành không ổn định sẽ làm thay đổi chênh lệch áp suất qua van điều khiển (pressure drop). Theo đặc tính thủy lực, khi chênh áp qua van thay đổi, lưu lượng dầu thực tế sẽ dao động ngay cả khi độ mở của van vẫn được giữ nguyên. Ngoài ra, sự biến thiên nhiệt độ của dầu nhiên liệu làm thay đổi độ nhớt, gây ảnh hưởng trực tiếp đến hệ số lưu lượng ($C_v$) của van và tạo ra sự phi tuyến trong đặc tính tĩnh của đối tượng vòng trong.
 
-\subsection{Sơ đồ hệ thống đo lường và điều khiển giám sát}
+\section{Sơ đồ hệ thống đo lường và điều khiển giám sát}
 
 Xuất phát từ phân tích về sự chênh lệch lớn trong đặc tính động học giữa quá trình thủy lực của lưu lượng dầu (nhanh) và quá trình nhiệt động của áp suất hơi (chậm, có trễ), cấu trúc điều khiển đơn vòng (Single Loop) kinh điển sẽ không thể đáp ứng được các tiêu chuẩn khắt khe về chất lượng điều khiển. Việc sử dụng bộ điều khiển phản hồi duy nhất cho một đối tượng có quán tính và trễ lớn thường dẫn đến hiện tượng trượt quá mức (overshoot) và dao động kéo dài, gây nguy cơ mất an toàn vận hành.
 
