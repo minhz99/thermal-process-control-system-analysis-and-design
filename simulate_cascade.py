@@ -96,7 +96,7 @@ ax1.set_ylim(0, 1.2)
 # Subplot 2: Outer Loop
 ax2.plot(t1, y1, color="#d62728", linewidth=2.5, label="Đáp ứng áp suất hơi $y_1(t)$")
 ax2.axhline(1.0, color="#2ca02c", linestyle="--", linewidth=1.5, label="Tín hiệu đặt $z(t) = 1$")
-ax2.set_title("Đáp ứng quá độ của vòng điều khiển áp suất hơi (Cascade toàn mạch)", fontsize=13, fontweight='bold', pad=10)
+ax2.set_title("Đáp ứng quá độ của vòng điều khiển áp suất hơi (Hai vòng toàn mạch)", fontsize=13, fontweight='bold', pad=10)
 ax2.set_xlabel("Thời gian (s)", fontsize=11)
 ax2.set_ylabel("Áp suất hơi chuẩn hóa", fontsize=11)
 ax2.grid(True, linestyle=":", alpha=0.6)

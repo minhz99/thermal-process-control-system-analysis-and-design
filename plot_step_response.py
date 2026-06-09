@@ -1,0 +1,198 @@
+import numpy as np
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+import scipy.signal as sig
+
+def mult(p1, p2):
+    return np.convolve(p1, p2)
+
+def add(p1, p2):
+    return np.polyadd(p1, p2)
+
+# ============================================================
+# Hàm truyền FOPDT: G(s) = K / (T*s + 1) * e^(-L*s)
+# với Pade bậc 1 cho khâu trễ
+# ============================================================
+def fopdt(K, T, L):
+    # Phần không trễ: K / (T*s + 1)
+    num0 = [K]
+    den0 = [T, 1.0]
+    # Pade bậc 1 cho e^(-L*s)
+    num_p = [-L / 2.0, 1.0]
+    den_p = [L / 2.0, 1.0]
+    return mult(num0, num_p), mult(den0, den_p)
+
+# ============================================================
+# Hàm truyền SOPDT: G(s) = K / ((T1*s + 1)(T2*s + 1)) * e^(-L*s)
+# ============================================================
+def sopdt(K, T1, T2, L):
+    num0 = [K]
+    den0 = mult([T1, 1.0], [T2, 1.0])
+    num_p = [-L / 2.0, 1.0]
+    den_p = [L / 2.0, 1.0]
+    return mult(num0, num_p), mult(den0, den_p)
+
+# ============================================================
+# Bộ điều khiển PI: R(s) = Kp * (1 + 1/(Ti*s)) = (Kp*Ti*s + Kp) / (Ti*s)
+# ============================================================
+def pi_controller(Kp, Ti):
+    num = [Kp * Ti, Kp]
+    den = [Ti, 0.0]
+    return num, den
+
+# ============================================================
+# Bộ điều khiển PID: R(s) = Kp * (1 + 1/(Ti*s) + Td*s)
+# = (Kp*Td*Ti*s^2 + Kp*Ti*s + Kp) / (Ti*s)
+# ============================================================
+def pid_controller(Kp, Ti, Td):
+    num = [Kp * Td * Ti, Kp * Ti, Kp]
+    den = [Ti, 0.0]
+    return num, den
+
+# ============================================================
+# Vòng kín: C(s) = R(s)*G(s) / (1 + R(s)*G(s))
+# ============================================================
+def closed_loop(R_num, R_den, G_num, G_den):
+    # R(s)*G(s)
+    OL_num = mult(R_num, G_num)
+    OL_den = mult(R_den, G_den)
+    # 1 + R(s)*G(s)
+    CL_num = OL_num
+    CL_den = add(OL_den, OL_num)
+    return CL_num, CL_den
+
+# ============================================================
+# THÔNG SỐ TỪ VĂN BẢN
+# ============================================================
+
+# ---- Vòng trong (van): FOPDT ----
+Kv = 0.8776
+Tv = 4.9646
+Lv = 0.8649
+
+# PI vòng trong (IMC)
+Kp2 = 3.2703
+Ti2 = 4.9646
+
+# ---- Vòng ngoài (áp suất hơi): SOPDT ----
+Kp = 1.2270
+T1p = 5.9870
+T2p = 5.9871
+Lp = 3.9478
+
+# PID vòng ngoài (Bền vững tối ưu)
+Kp1 = 1.2676
+Ti1 = 11.9741
+Td1 = 2.9935
+
+# ============================================================
+# XÂY DỰNG HÀM TRUYỀN
+# ============================================================
+
+# Van G_v(s)
+Gv_num, Gv_den = fopdt(Kv, Tv, Lv)
+
+# PI vòng trong R2(s)
+R2_num, R2_den = pi_controller(Kp2, Ti2)
+
+# Vòng kín vòng trong: C2(s)
+C2_num, C2_den = closed_loop(R2_num, R2_den, Gv_num, Gv_den)
+
+# Lò hơi G_p(s) (đối tượng vòng ngoài)
+Gp_num, Gp_den = sopdt(Kp, T1p, T2p, Lp)
+
+# Đối tượng tương đương vòng ngoài = C2(s) * G_p(s) (xấp xỉ C2 ≈ 1 trong tính toán,
+# nhưng ở đây ta dùng C2 để mô phỏng chính xác)
+# Để mô phỏng cascade thực sự, ta dùng G_eq = G_p (vì C2 ≈ 1 trong dải tần vòng ngoài)
+Geq_num, Geq_den = Gp_num, Gp_den
+
+# PID vòng ngoài R1(s)
+R1_num, R1_den = pid_controller(Kp1, Ti1, Td1)
+
+# Vòng kín vòng ngoài: C1(s)
+C1_num, C1_den = closed_loop(R1_num, R1_den, Geq_num, Geq_den)
+
+# ============================================================
+# MÔ PHỎNG ĐÁP ỨNG BẬC THANG
+# ============================================================
+
+t_sim_vong_trong = np.linspace(0.0, 50.0, 2000)
+sys_c2 = sig.TransferFunction(C2_num, C2_den)
+_, y2 = sig.step(sys_c2, T=t_sim_vong_trong)
+
+t_sim_vong_ngoai = np.linspace(0.0, 60.0, 2000)
+sys_c1 = sig.TransferFunction(C1_num, C1_den)
+_, y1 = sig.step(sys_c1, T=t_sim_vong_ngoai)
+
+# ============================================================
+# VẼ HÌNH
+# ============================================================
+
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8))
+fig.patch.set_facecolor('#f9f9f9')
+
+# ---- Subplot 1: Vòng trong (lưu lượng dầu) ----
+ax1.plot(t_sim_vong_trong, y2, color='#1976D2', linewidth=2.5,
+         label=r'Đáp ứng $y_2(t)$ (lưu lượng dầu)')
+ax1.axhline(1.0, color='#388E3C', linestyle='--', linewidth=1.8,
+            label=r'Tín hiệu đặt $r_2(t) = 1$', zorder=2)
+ax1.fill_between(t_sim_vong_trong, y2, 1.0,
+                 where=(y2 < 1.0), alpha=0.15, color='#1976D2')
+ax1.set_title('Đáp ứng quá độ vòng điều khiển lưu lượng dầu (Vòng trong)',
+              fontsize=13, fontweight='bold', pad=10)
+ax1.set_xlabel('Thời gian (s)', fontsize=11)
+ax1.set_ylabel('Lưu lượng chuẩn hóa', fontsize=11)
+ax1.set_xlim(0, 50)
+ax1.set_ylim(0, 1.18)
+ax1.grid(True, linestyle=':', alpha=0.5)
+ax1.legend(fontsize=10, loc='lower right',
+           facecolor='white', edgecolor='lightgray', framealpha=0.9)
+ax1.set_facecolor('#fafafa')
+
+# Thêm chú thích thông số
+textstr1 = (r'$K_v=0.8776,\;T_v=4.96s,\;L_v=0.86s$' + '\n'
+            r'$K_{p2}=3.27,\;T_{i2}=4.96s$')
+ax1.text(0.55, 0.15, textstr1, transform=ax1.transAxes,
+         fontsize=9, verticalalignment='bottom',
+         bbox=dict(boxstyle='round,pad=0.4', facecolor='white',
+                   edgecolor='lightgray', alpha=0.9))
+
+# ---- Subplot 2: Vòng ngoài (áp suất hơi) ----
+ax2.plot(t_sim_vong_ngoai, y1, color='#D32F2F', linewidth=2.5,
+         label=r'Đáp ứng $y_1(t)$ (áp suất hơi)')
+ax2.axhline(1.0, color='#388E3C', linestyle='--', linewidth=1.8,
+            label=r'Tín hiệu đặt $z(t) = 1$', zorder=2)
+ax2.fill_between(t_sim_vong_ngoai, y1, 1.0,
+                 where=(y1 < 1.0), alpha=0.15, color='#D32F2F')
+ax2.set_title('Đáp ứng quá độ vòng điều khiển áp suất hơi (Hai vòng vòng kín)',
+              fontsize=13, fontweight='bold', pad=10)
+ax2.set_xlabel('Thời gian (s)', fontsize=11)
+ax2.set_ylabel('Áp suất hơi chuẩn hóa', fontsize=11)
+ax2.set_xlim(0, 60)
+ax2.set_ylim(0, 1.18)
+ax2.grid(True, linestyle=':', alpha=0.5)
+ax2.legend(fontsize=10, loc='lower right',
+           facecolor='white', edgecolor='lightgray', framealpha=0.9)
+ax2.set_facecolor('#fafafa')
+
+# Thêm chú thích thông số
+textstr2 = (r'$K_p=1.227,\;T_{1p}=T_{2p}\approx5.99s,\;L_p=3.95s$' + '\n'
+            r'$K_{p1}=1.27,\;T_{i1}=11.97s,\;T_{d1}=2.99s$')
+ax2.text(0.42, 0.15, textstr2, transform=ax2.transAxes,
+         fontsize=9, verticalalignment='bottom',
+         bbox=dict(boxstyle='round,pad=0.4', facecolor='white',
+                   edgecolor='lightgray', alpha=0.9))
+
+# Đường đứt gạch cho vòng trong trên hình vòng ngoài (tỷ lệ thời gian)
+# Vòng trong hội tụ nhanh hơn nhiều → đường tham chiếu nhanh
+ax2_t = t_sim_vong_trong
+ax2.plot(ax2_t, y2, color='#1976D2', linewidth=1.5, linestyle='-.',
+         alpha=0.6, label=r'Đáp ứng vòng trong (tham chiếu)')
+
+plt.tight_layout(pad=2.5)
+
+out_path = "/Users/minhz/Desktop/HUST/KS/Phân tích và tổng hợp hệ thống điều khiển quá trình nhiệt/btl-dk/Hinhve/step_response.png"
+plt.savefig(out_path, dpi=300, bbox_inches='tight',
+            facecolor=fig.get_facecolor())
+print(f"Đã lưu: {out_path}")

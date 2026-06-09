@@ -5,30 +5,30 @@
 
 \section{Triết lý thiết kế hệ thống điều khiển}
 
-\subsection{Cấu trúc điều khiển Cascade}
+\subsection{Cấu trúc điều khiển hai vòng}
 
 Từ những phân tích về đặc tính công nghệ của hệ thống cấp dầu nhiên liệu ở Chương 1, có thể thấy rõ hệ thống mang tính chất của một quá trình nhiệt động học phức tạp, bao hàm hai phân hệ có bản chất vật lý và tốc độ đáp ứng hoàn toàn khác biệt. Phân hệ van điều khiển lưu lượng dầu mang đặc tính cơ - thủy lực, có khả năng phản ứng rất nhanh chóng và linh hoạt với các lệnh thay đổi độ mở. Trong khi đó, phân hệ lò hơi sinh áp suất lại đặc trưng bởi quá trình truyền nhiệt và biến đổi pha (từ lỏng sang hơi), mang bản chất quán tính lớn và thời gian trễ vận chuyển đáng kể. 
 
 Nếu áp dụng cấu trúc điều khiển đơn vòng (Single Loop) truyền thống, trong đó bộ điều khiển nhận tín hiệu sai lệch áp suất hơi và xuất lệnh trực tiếp đến van điều khiển dầu, hệ thống sẽ gặp khó khăn nghiêm trọng trong việc duy trì tính ổn định. Lý do là bởi khi có các nhiễu loạn thủy lực (ví dụ áp lực bơm dầu thay đổi) làm lưu lượng dầu sai lệch, bộ điều khiển đơn vòng không thể phát hiện ngay lập tức. Hệ thống phải chờ một thời gian trễ khá dài cho đến khi lượng dầu sai lệch này làm thay đổi quá trình cháy, ảnh hưởng đến nhiệt lượng truyền vào các dàn ống và cuối cùng làm áp suất hơi dao động, thì bộ điều khiển mới bắt đầu có phản ứng. Quá trình khắc phục chậm trễ này thường dẫn đến sự mất ổn định và dao động biên độ lớn, gây mất an toàn cho tuabin và các đường ống áp lực.
 
-Để giải quyết triệt để bài toán này, cấu trúc điều khiển cấp tầng (Cascade Control) được lựa chọn làm triết lý thiết kế cốt lõi. Sơ đồ cấu trúc Cascade phân tách hệ thống thành hai vòng điều khiển lồng ghép vào nhau:
+Để giải quyết triệt để bài toán này, cấu trúc điều khiển cấp tầng (Cascade Control) được lựa chọn làm triết lý thiết kế cốt lõi. Sơ đồ cấu trúc hai vòng phân tách hệ thống thành hai vòng điều khiển lồng ghép vào nhau:
 \begin{itemize}
     \item \textbf{Vòng trong (Vòng lưu lượng):} Sử dụng bộ điều khiển $R_2$ đóng vai trò điều khiển lưu lượng dầu nhiên liệu. Bộ điều khiển này nhận tín hiệu sai lệch giữa giá trị lưu lượng đặt (được cung cấp từ vòng ngoài) và giá trị lưu lượng thực tế đo được bởi cảm biến trên đường ống. Lệnh xuất ra từ $R_2$ tác động trực tiếp vào van điều khiển nhằm duy trì lưu lượng dầu chính xác theo yêu cầu.
     \item \textbf{Vòng ngoài (Vòng áp suất):} Sử dụng bộ điều khiển $R_1$ đóng vai trò là bộ điều khiển chủ đạo (Master Controller). Nó theo dõi sai lệch giữa áp suất hơi đặt và áp suất hơi thực tế đầu ra của lò. Thay vì điều khiển trực tiếp van, bộ điều khiển $R_1$ tính toán mức nhiên liệu cần thiết và xuất ra tín hiệu làm giá trị đặt (Setpoint) cung cấp cho vòng trong.
 \end{itemize}
 
-Nguyên tắc hoạt động của cấu trúc Cascade có thể được minh họa bằng sơ đồ khối như trên Hình~\ref{fig:vong_dieu_khien}. Tín hiệu Setpoint áp suất hơi $SP_P$ được so sánh với áp suất hơi thực tế $P_{actual}$ để tạo ra sai lệch $e_P$. Bộ điều khiển $R_1$ xử lý sai lệch này và xuất ra giá trị đặt lưu lượng $SP_F$. Bộ điều khiển $R_2$ so sánh $SP_F$ với lưu lượng thực tế $F_{actual}$, tạo ra sai lệch $e_F$ và tính toán tín hiệu điều khiển $u$ cho van FCV. Đối tượng van $G_v(s)$ biến đổi tín hiệu $u$ thành lưu lượng dầu thực tế $F$, và đối tượng lò hơi $G_p(s)$ biến đổi lưu lượng dầu thành áp suất hơi $P$.
+Nguyên tắc hoạt động của cấu trúc hai vòng có thể được minh họa bằng sơ đồ khối như trên Hình~\ref{fig:vong_dieu_khien}. Tín hiệu Setpoint áp suất hơi $SP_P$ được so sánh với áp suất hơi thực tế $P_{actual}$ để tạo ra sai lệch $e_P$. Bộ điều khiển $R_1$ xử lý sai lệch này và xuất ra giá trị đặt lưu lượng $SP_F$. Bộ điều khiển $R_2$ so sánh $SP_F$ với lưu lượng thực tế $F_{actual}$, tạo ra sai lệch $e_F$ và tính toán tín hiệu điều khiển $u$ cho van FCV. Đối tượng van $G_v(s)$ biến đổi tín hiệu $u$ thành lưu lượng dầu thực tế $F$, và đối tượng lò hơi $G_p(s)$ biến đổi lưu lượng dầu thành áp suất hơi $P$.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.90\textwidth]{Hinhve/vong-dieu-khien.png}
-    \caption{Sơ đồ cấu trúc hệ thống điều khiển Cascade hai vòng}
+    \caption{Sơ đồ cấu trúc hệ điều khiển hai vòng}
     \label{fig:vong_dieu_khien}
 \end{figure}
 
-Điều kiện tiên quyết để cấu trúc Cascade phát huy hiệu quả là tốc độ đáp ứng của vòng trong phải nhanh hơn đáng kể so với vòng ngoài. Theo lý thuyết điều khiển quá trình, tỷ lệ giữa thời gian đáp ứng của vòng ngoài và vòng trong nên lớn hơn 5:1 để đảm bảo hai vòng hoạt động độc lập tương đối. Trong hệ thống cấp dầu nhiên liệu, vòng trong có thời gian trễ và hằng số thời gian chỉ vài giây, trong khi vòng ngoài có thời gian đáp ứng lên đến hàng chục giây, thỏa mãn tỷ lệ này với biên độ an toàn lớn.
+Điều kiện tiên quyết để cấu trúc hai vòng phát huy hiệu quả là tốc độ đáp ứng của vòng trong phải nhanh hơn đáng kể so với vòng ngoài. Theo lý thuyết điều khiển quá trình, tỷ lệ giữa thời gian đáp ứng của vòng ngoài và vòng trong nên lớn hơn 5:1 để đảm bảo hai vòng hoạt động độc lập tương đối. Trong hệ thống cấp dầu nhiên liệu, vòng trong có thời gian trễ và hằng số thời gian chỉ vài giây, trong khi vòng ngoài có thời gian đáp ứng lên đến hàng chục giây, thỏa mãn tỷ lệ này với biên độ an toàn lớn.
 
-\subsection{Vai trò và ưu điểm của cấu trúc Cascade}
+\subsection{Vai trò và ưu điểm của cấu trúc hai vòng}
 
 Triết lý phân tách cấu trúc thành hai vòng điều khiển mang lại những ưu điểm kỹ thuật vượt trội, hoàn toàn phù hợp với các hệ thống nhiệt điện quy mô lớn:
 \begin{itemize}
@@ -38,7 +38,7 @@ Triết lý phân tách cấu trúc thành hai vòng điều khiển mang lại 
     \item \textbf{Giảm quá trình quá độ của vòng ngoài:} Nhờ vòng trong xử lý nhanh các biến động, vòng ngoài chỉ cần can thiệp đối với các nhiễu tần số thấp (như thay đổi phụ tải lớn), từ đó giảm đáng kể biên độ dao động và thời gian xác lập của áp suất hơi.
 \end{itemize}
 
-So với các cấu trúc điều khiển khác, cấu trúc Cascade đặc biệt phù hợp với hệ thống cấp dầu nhiên liệu vì nó khai thác tối đa ưu thế đáp ứng nhanh của vòng lưu lượng trong khi vẫn đảm bảo điều khiển chặt chẽ biến công nghệ quan trọng nhất là áp suất hơi. Các phương pháp điều khiển bổ trợ khác như điều khiển feedforward (điều khiển theo nhiễu) có thể được phối hợp với cấu trúc Cascade trong các phiên bản nâng cao, tuy nhiên trong phạm vi đồ án này, trọng tâm thiết kế được tập trung vào cấu trúc Cascade với bộ điều khiển PID/PI.
+So với các cấu trúc điều khiển khác, cấu trúc hai vòng đặc biệt phù hợp với hệ thống cấp dầu nhiên liệu vì nó khai thác tối đa ưu thế đáp ứng nhanh của vòng lưu lượng trong khi vẫn đảm bảo điều khiển chặt chẽ biến công nghệ quan trọng nhất là áp suất hơi. Các phương pháp điều khiển bổ trợ khác như điều khiển feedforward (điều khiển theo nhiễu) có thể được phối hợp với cấu trúc hai vòng trong các phiên bản nâng cao, tuy nhiên trong phạm vi đồ án này, trọng tâm thiết kế được tập trung vào cấu trúc hai vòng với bộ điều khiển PID/PI.
 
 \section{Luận chứng lựa chọn thiết bị}
 
@@ -54,6 +54,7 @@ Bảng \ref{tab:nguong_hoat_dong} tổng hợp các ngưỡng vận hành và b�
 \centering
 \caption{Các ngưỡng vận hành và bảo vệ của hệ thống}
 \label{tab:nguong_hoat_dong}
+\resizebox{\textwidth}{!}{
 \begin{tabular}{|l|c|c|c|c|}
 \hline
 \textbf{Thông số} & \textbf{Vùng an toàn} & \textbf{Báo động Low} & \textbf{Báo động High} & \textbf{Ngưỡng MFT}\\ \hline
@@ -62,6 +63,7 @@ Lưu lượng dầu (t/h) & $0$--$15$ & $< 1.5$ & $> 13$ & $< 0.8$\\ \hline
 Nhiệt độ dầu FO ($^\circ$C) & $130$--$150$ & $< 120$ & $> 160$ & $< 100$\\ \hline
 Áp suất dầu cấp (bar) & $18$--$28$ & $< 15$ & $> 30$ & $< 12$\\ \hline
 \end{tabular}
+}
 \end{table}
 
 Nguyên tắc thiết lập các ngưỡng dựa trên phương pháp phân tích rủi ro (Risk Assessment) kết hợp với kinh nghiệm vận hành thực tế. Khoảng cách giữa ngưỡng báo động và ngưỡng MFT được thiết kế đủ rộng để cung cấp cho người vận hành thời gian phản ứng trước khi hệ thống bảo vệ can thiệp tự động. Đồng thời, khoảng cách giữa ngưỡng báo động High và ngưỡng MFT phải đủ để tránh tình trạng "alarm fatigue" -- hiện tượng báo động High kích hoạt quá thường xuyên do biên độ dao động bình thường.
@@ -74,7 +76,7 @@ Nguyên tắc thiết lập các ngưỡng dựa trên phương pháp phân tíc
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.70\textwidth]{Hinhve/coriolis_flowmeter.png}
+    \includegraphics[width=0.90\textwidth]{Hinhve/coriolis_flowmeter.png}
     \caption{Cảm biến lưu lượng khối lượng Coriolis}
     \label{fig:coriolis}
 \end{figure}
@@ -92,7 +94,7 @@ Nguyên lý đo của lưu lượng kế Coriolis dựa trên hiệu ứng Corio
 
 Cơ cấu chấp hành của hệ thống là van điều khiển lưu lượng (Control Valve). Trong công nghiệp nhiệt điện, van điều khiển dẫn động bằng khí nén (Pneumatic Control Valve) được sử dụng rộng rãi nhờ tốc độ đóng mở nhanh và đáp ứng định vị chính xác thông qua bộ định vị van thông minh (Smart Positioner). Hơn nữa, van được thiết kế theo cấu hình "Fail-Close" (thường đóng); nghĩa là khi xảy ra sự cố mất nguồn cung cấp khí nén hoặc đứt cáp tín hiệu điều khiển, lực lò xo sẽ tự động đẩy trục van về vị trí đóng hoàn toàn. Cơ chế này đảm bảo cắt đứt dòng nhiên liệu đi vào lò, ngăn ngừa rủi ro cháy nổ không kiểm soát, tuân thủ nguyên tắc an toàn thiết kế "Fail-Safe".
 
-Hình~\ref{fig:control_valve} minh họa van điều khiển tuyến tính với bộ định vị thông minh. Đặc tính động học của van được đặc trưng bởi hàm truyền bậc nhất có trễ (FOPDT), phù hợp với mô hình nhận dạng sẽ được trình bày ở Chương 3.
+Hình~\ref{fig:control_valve} minh họa van điều khiển tuyến tính với bộ định vị thông minh. Đặc tính động học của van được đặc trưng bởi hàm truyền bậc nhất có trễ (QTB1T), phù hợp với mô hình nhận dạng sẽ được trình bày ở Chương 3.
 
 \begin{figure}[htbp]
     \centering
@@ -118,11 +120,11 @@ Trước khi đi vào chi tiết thiết kế, cần phân tích và so sánh c�
 
 Bảng \ref{tab:so_sanh_ppdk} tổng hợp kết quả so sánh định tính giữa các phương pháp tổng hợp bộ điều khiển phổ biến bao gồm: phương pháp Ziegler-Nichols (ZN), phương pháp IMC (Internal Model Control), và phương pháp tổng hợp bền vững tối ưu (Optimal Robust Control). Việc so sánh được thực hiện trên các tiêu chí: độ quá điều chỉnh (overshoot), thời gian xác lập, khả năng kháng nhiễu, độ bền vững với sự thay đổi thông số đối tượng, độ phức tạp tính toán, và khả năng triển khai thực tế trên DCS/PLC.
 
-\begin{landscape}
 \begin{table}[htbp]
 \centering
 \caption{So sánh các phương pháp tổng hợp bộ điều khiển}
 \label{tab:so_sanh_ppdk}
+\resizebox{\textwidth}{!}{
 \begin{tabular}{|l|c|c|c|c|c|c|}
 \hline
 \textbf{Phương pháp} & \textbf{Độ quá điều chỉnh} & \textbf{Thời gian xác lập} & \textbf{Kháng nhiễu} & \textbf{Độ bền vững} & \textbf{Tính toán} & \textbf{Triển khai}\\ \hline
@@ -130,8 +132,8 @@ Ziegler-Nichols (PID) & Cao (10\%--30\%) & Trung bình & Trung bình & Thấp & 
 IMC (PI cho van) & Thấp (5\%--10\%) & Nhanh & Tốt & Trung bình & Trung bình & Dễ\\ \hline
 Bền vững tối ưu (PID) & Rất thấp ($\leq 5\%$) & Tối ưu & Rất tốt & Cao & Phức tạp hơn & Trung bình\\ \hline
 \end{tabular}
+}
 \end{table}
-\end{landscape}
 
 Phương pháp Ziegler-Nichols có ưu điểm là đơn giản, dễ áp dụng, không yêu cầu mô hình toán học chính xác của đối tượng. Tuy nhiên, phương pháp này thường cho hệ số khuếch đại cao và thời gian tích phân nhỏ, dẫn đến đáp ứng quá độ có overshoot đáng kể và dễ gây dao động khi thông số đối tượng thay đổi. Với hệ thống nhiệt điện đòi hỏi độ quá điều chỉnh nhỏ ($\leq 5\%$) để tránh ứng suất cơ học trên đường ống, phương pháp Ziegler-Nichols không phải là lựa chọn tối ưu.
 
@@ -188,27 +190,20 @@ Bảng \ref{tab:so_lieu_van} và Bảng \ref{tab:so_lieu_ap_suat} trình bày m�
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.85\textwidth]{Hinhve/van-dap-ung-xung-1,6t.png}
+    \includegraphics[width=0.85\textwidth]{Hinhve/dac-tinh-van-dap-ung-xung-1,6t.png}
     \caption{Đáp ứng bậc thang thực nghiệm của đối tượng van điều khiển lưu lượng dầu}
     \label{fig:van_dap_ung_xung_2}
 \end{figure}
 
-Đặc điểm của các tập số liệu này thể hiện tính chất quá độ điển hình của các đối tượng công nghiệp: có thời gian trễ ban đầu và đường cong đáp ứng hình chữ S tiệm cận dần về giá trị xác lập. Nguồn số liệu mang tính thực tiễn cao này sẽ là dữ liệu đầu vào trực tiếp cho thuật toán nhận dạng phi tuyến, giúp xác định các thông số động học chính xác cho mô hình FOPDT và SOPDT.
+Đặc điểm của các tập số liệu này thể hiện tính chất quá độ điển hình của các đối tượng công nghiệp: có thời gian trễ ban đầu và đường cong đáp ứng hình chữ S tiệm cận dần về giá trị xác lập. Nguồn số liệu mang tính thực tiễn cao này sẽ là dữ liệu đầu vào trực tiếp cho thuật toán nhận dạng phi tuyến, giúp xác định các thông số động học chính xác cho mô hình QTB1T và QTB2T.
 
-Hình~\ref{fig:van_dap_ung_xung} thể hiện đáp ứng bậc thang gốc (raw data) của đối tượng van, cho thấy dữ liệu sau khi tiền xử lý đã loại bỏ phần lớn nhiễu ngẫu nhiên và giữ được hình dạng đặc tính động học chuẩn xác.
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.85\textwidth]{Hinhve/van-dap-ung-xung-1,6t.png}
-    \caption{Đáp ứng bậc thang thực nghiệm của đối tượng van điều khiển lưu lượng}
-    \label{fig:van_dap_ung_xung}
-\end{figure}
+Hình~\ref{fig:van_dap_ung_xung_2} thể hiện đáp ứng bậc thang gốc (raw data) của đối tượng van, cho thấy dữ liệu sau khi tiền xử lý đã loại bỏ phần lớn nhiễu ngẫu nhiên và giữ được hình dạng đặc tính động học chuẩn xác.
 
 \section{Mô hình toán học đối tượng điều khiển}
 
-Dựa trên phân tích đặc tính động học từ dữ liệu thực nghiệm, hai mô hình toán học được xây dựng để đại diện cho hai đối tượng điều khiển trong hệ thống Cascade.
+Dựa trên phân tích đặc tính động học từ dữ liệu thực nghiệm, hai mô hình toán học được xây dựng để đại diện cho hai đối tượng điều khiển trong hệ điều khiển hai vòng.
 
-Đối với vòng trong, đối tượng van điều khiển lưu lượng có đặc tính đáp ứng nhanh với thời gian trễ nhỏ. Dựa trên hình dạng đáp ứng bậc thang, mô hình FOPDT (First-Order Plus Dead Time) được xác định là phù hợp:
+Đối với vòng trong, đối tượng van điều khiển lưu lượng có đặc tính đáp ứng nhanh với thời gian trễ nhỏ. Dựa trên hình dạng đáp ứng bậc thang, mô hình QTB1T (First-Order Plus Dead Time) được xác định là phù hợp:
 
 \begin{equation}
     G_v(s) = \frac{K_v}{T_v s + 1} e^{-L_v s}
@@ -216,7 +211,7 @@ Dựa trên phân tích đặc tính động học từ dữ liệu thực nghi�
 
 trong đó $K_v$ là hệ số khuếch đại tĩnh, $T_v$ là hằng số thời gian quán tính, và $L_v$ là thời gian trễ vận chuyển. Mô hình này có ba thông số cần xác định thông qua thuật toán nhận dạng tối ưu hóa.
 
-Đối với vòng ngoài, quá trình sinh hơi trong lò hơi có đặc tính đáp ứng chậm với đường cong dạng chữ S rõ rệt. Mô hình SOPDT (Second-Order Plus Dead Time) được lựa chọn để phản ánh đặc tính hai giai đoạn của quá trình truyền nhiệt:
+Đối với vòng ngoài, quá trình sinh hơi trong lò hơi có đặc tính đáp ứng chậm với đường cong dạng chữ S rõ rệt. Mô hình QTB2T (Second-Order Plus Dead Time) được lựa chọn để phản ánh đặc tính hai giai đoạn của quá trình truyền nhiệt:
 
 \begin{equation}
     G_p(s) = \frac{K_p}{(T_{1p} s + 1)(T_{2p} s + 1)} e^{-L_p s}
@@ -224,6 +219,51 @@ trong đó $K_v$ là hệ số khuếch đại tĩnh, $T_v$ là hằng số th�
 
 trong đó $K_p$ là hệ số khuếch đại, $T_{1p}$ và $T_{2p}$ là hai hằng số thời gian quán tính, và $L_p$ là thời gian trễ. Hai hằng số thời gian phản ánh hai giai đoạn trong quá trình truyền nhiệt: giai đoạn truyền nhiệt từ ngọn lửa đến bề mặt ống (bức xạ), và giai đoạn truyền nhiệt từ bề mặt ống đến nước trong ống (đối lưu).
 
-Việc lựa chọn mô hình FOPDT cho van và SOPDT cho lò hơi dựa trên cơ sở lý thuyết và thực nghiệm. Mô hình FOPDT là xấp xỉ đơn giản nhưng đủ chính xác đối với các đối tượng có đặc tính bậc thấp, trong khi mô hình SOPDT phản ánh tốt hơn đặc tính hai giai đoạn của quá trình nhiệt trong lò hơi. Các thông số cụ thể của mô hình sẽ được xác định bằng thuật toán nhận dạng tối ưu hóa phi tuyến trong Chương 3.
+Hình~\ref{fig:so_do_ham_truyen} minh họa sơ đồ khối hàm truyền của hai đối tượng điều khiển.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[
+        % Sử dụng thư viện positioning để định vị tương đối chính xác hơn
+        node distance=1.5cm and 1.2cm,
+        inner block/.style={draw, rectangle, minimum width=4.5cm, minimum height=1.2cm, align=center, thick},
+        outer block/.style={draw, rectangle, minimum width=4.5cm, minimum height=1.2cm, align=center, thick},
+        arrow/.style={-Latex, thick},
+        label style/.style={font=\bfseries\small, anchor=east},
+        io/.style={font=\small}
+    ]
+        %% HÀNG 1: VÒNG TRONG (VAN)
+        % Nhãn dòng 1
+        \node[label style] (lblVan) at (0, 2) {Vòng trong (Van):};
+        % Tín hiệu vào uv
+        \node[io, right=0.5cm of lblVan] (uv) {$u_v$};
+        % Khối Gv
+        \node[inner block, right=of uv] (Gv) {$G_v(s)=\dfrac{K_v}{T_v s+1}\,e^{-L_v s}$};
+        % Tín hiệu ra F(s)
+        \node[io, right=of Gv] (Fv) {$F(s)$};
+
+        %% HÀNG 2: VÒNG NGOÀI (LÒ)
+        % Nhãn dòng 2 (đặt thẳng hàng dưới nhãn 1)
+        \node[label style] (lblLo) at (0, 0) {Vòng ngoài (Lò):};
+        % Khối Gp (đặt thẳng hàng dưới khối Gv)
+        \node[outer block] (Gp) at (Gv |- lblLo) {$G_p(s)=\dfrac{K_p}{(T_{1p}s+1)(T_{2p}s+1)}\,e^{-L_p s}$};
+        % Tín hiệu ra P(s)
+        \node[io, right=of Gp] (Pp) {$P(s)$};
+
+        %% ĐƯỜNG MŨI TÊN
+        \draw[arrow] (uv) -- (Gv);
+        \draw[arrow] (Gv) -- (Fv);
+        \draw[arrow] (Gp) -- (Pp);
+        
+        % Đường nối từ kết quả F(s) của vòng trong hạ xuống làm đầu vào cho vòng ngoài Gp
+        % (Sửa lại logic: Đầu ra của Van chính là đầu vào của Lò)
+        \draw[arrow] (Gv) -- (Fv) |- (Gp); 
+        
+    \end{tikzpicture}
+    \caption{Sơ đồ khối hàm truyền của các đối tượng điều khiển}
+    \label{fig:so_do_ham_truyen}
+\end{figure}
+
+Việc lựa chọn mô hình QTB1T cho van và QTB2T cho lò hơi dựa trên cơ sở lý thuyết và thực nghiệm. Mô hình QTB1T là xấp xỉ đơn giản nhưng đủ chính xác đối với các đối tượng có đặc tính bậc thấp, trong khi mô hình QTB2T phản ánh tốt hơn đặc tính hai giai đoạn của quá trình nhiệt trong lò hơi. Các thông số cụ thể của mô hình sẽ được xác định bằng thuật toán nhận dạng tối ưu hóa phi tuyến trong Chương 3.
 
 \end{document}

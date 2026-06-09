@@ -3,6 +3,34 @@
 \documentclass[../main.tex]{subfiles}
 \begin{document}
 
-Nội dung phụ lục B sẽ được viết ở đây.
+\section{Mã nguồn mô phỏng hệ điều khiển hai vòng}
+
+Phần này trình bày mã nguồn Python dùng để mô phỏng đáp ứng bậc thang của hệ điều khiển hai vòng, bao gồm hàm truyền đối tượng QTB1T (van) và QTB2T suy biến (lò hơi), hai bộ điều khiển PI (vòng trong) và PID (vòng ngoài), cùng quy trình tính hàm truyền vòng kín và vẽ đồ thị kết quả.
+
+\lstinputlisting[language=Python, firstline=1, lastline=115,
+  caption={Chương trình mô phỏng hệ điều khiển hai vòng (plot\_step\_response\_ascii.py)},
+  label=lst:sim-cascade]
+{plot_step_response_ascii.py}
+
+\section{Kết quả chạy chương trình}
+
+Kết quả mô phỏng từ chương trình trên được lưu tại thư mục Hinhve/step\_response.png, đồng thời cũng được sử dụng trong Hình~\ref{fig:step_response} tại Phần 3.3.
+
+Các chỉ tiêu chất lượng thu được từ mô phỏng:
+
+\begin{itemize}
+    \item \textbf{Vòng trong:} thời gian quá độ $T_{s2} \approx 6$ s, overshoot $\approx 0\%$, sai lệch tĩnh $e_{ss} = 0$.
+    \item \textbf{Vòng ngoài:} thời gian quá độ $T_{s1} \approx 32$ s, overshoot $< 5\%$, sai lệch tĩnh $e_{ss} = 0$.
+    \item \textbf{Toàn mạch:} hệ số dự trữ ổn định $h > 2$, biên pha dự trữ $\geq 40^\circ$.
+\end{itemize}
+
+\section{Kết quả mô phỏng đáp ứng xung}
+
+Tương tự, chương trình đáp ứng xung (plot\_impulse\_response\_ascii.py) mô phỏng phản ứng của hệ thống khi có nhiễu xung tác động vào đầu vào, cho phép đánh giá khả năng kháng nhiễu. Kết quả được lưu tại Hinhve/impulse\_response.png và sử dụng trong Hình~\ref{fig:impulse_response}.
+
+\lstinputlisting[language=Python, firstline=1, lastline=166,
+  caption={Chương trình mô phỏng đáp ứng xung hệ hai vòng (plot\_impulse\_response\_ascii.py)},
+  label=lst:sim-impulse]
+{plot_impulse_response_ascii.py}
 
 \end{document}

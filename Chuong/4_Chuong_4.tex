@@ -7,13 +7,13 @@
 
 Quá trình thực hiện bài tập lớn về phân tích và tổng hợp hệ thống điều khiển lưu lượng dầu nhiên liệu và phụ tải lò hơi đã hoàn thành trọn vẹn các yêu cầu đề ra, từ khâu khảo sát thực trạng công nghệ và xây dựng sơ đồ điều khiển đến mô phỏng kiểm chứng bằng phần mềm.
 
-Về giải pháp kỹ thuật, hệ thống đã được thiết kế theo cấu trúc điều khiển hai vòng (cascade) phân cấp chặt chẽ: vòng trong nhanh điều chỉnh lưu lượng dầu thông qua van FCV nhằm loại bỏ các nhiễu thủy lực đầu vào, vòng ngoài chậm điều chỉnh áp suất hơi của bộ phận sinh hơi. Cấu trúc điều khiển cascade này là phương án tối ưu, đáp ứng hoàn hảo các yêu cầu công nghệ nhiệt điện.
+Về giải pháp kỹ thuật, hệ thống đã được thiết kế theo cấu trúc điều khiển hai vòng (cascade) phân cấp chặt chẽ: vòng trong nhanh điều chỉnh lưu lượng dầu thông qua van FCV nhằm loại bỏ các nhiễu thủy lực đầu vào, vòng ngoài chậm điều chỉnh áp suất hơi của bộ phận sinh hơi. Cấu trúc điều khiển hai vòng này là phương án tối ưu, đáp ứng hoàn hảo các yêu cầu công nghệ nhiệt điện.
 
-Quá trình nghiên cứu đã mang lại những kết quả khả quan trong cả hai khâu nhận dạng và thiết kế bộ điều khiển. Đối với bài toán nhận dạng, nhóm đã số hóa và xây dựng thành công mô hình động học cho hai đối tượng chính yếu dựa trên bộ dữ liệu thực nghiệm đã qua làm sạch bằng công cụ Automeris WebPlotDigitizer và ngôn ngữ lập trình Python. Cụ thể, động học vòng trong của van điều khiển được mô tả chính xác thông qua hàm truyền quán tính bậc nhất có trễ (FOPDT) như sau:
+Quá trình thực hiện bài tập lớn đã mang lại những kết quả khả quan trong cả hai khâu nhận dạng và thiết kế bộ điều khiển. Đối với bài toán nhận dạng, nhóm đã số hóa và xây dựng thành công mô hình động học cho hai đối tượng chính yếu dựa trên bộ dữ liệu thực nghiệm đã qua làm sạch bằng công cụ Automeris WebPlotDigitizer và ngôn ngữ lập trình Python. Cụ thể, động học vòng trong của van điều khiển được mô tả chính xác thông qua hàm truyền quán tính bậc nhất có trễ (QTB1T) như sau:
 \begin{equation}
     O_2(s) = \frac{0{,}8836}{4{,}8694s + 1} e^{-0{,}8213s}
 \end{equation}
-Bên cạnh đó, động học vòng ngoài của bộ phận sinh hơi được biểu diễn phù hợp nhất dưới dạng hàm truyền quán tính bậc hai có trễ (SOPDT) suy biến:
+Bên cạnh đó, động học vòng ngoài của bộ phận sinh hơi được biểu diễn phù hợp nhất dưới dạng hàm truyền quán tính bậc hai có trễ (QTB2T) suy biến:
 \begin{equation}
     O_1(s) = \frac{1{,}2147}{(6{,}0356s + 1)^2} e^{-4{,}0457s}
 \end{equation}
@@ -22,7 +22,7 @@ Dựa trên các mô hình toán học đã được xác lập vững chắc, p
 
 \section{Kết luận về hiệu quả sản xuất, kinh tế-xã hội và môi trường}
 
-Việc triển khai thành công hệ thống điều khiển cascade tự động cho lưu lượng dầu nhiên liệu và phụ tải lò hơi mang lại những lợi ích toàn diện, có thể đánh giá trên hai phương diện chính. Về mặt hiệu quả sản xuất và kinh tế, khả năng điều khiển chính xác lưu lượng dầu cùng áp suất hơi đóng vai trò cốt lõi trong việc tối ưu hóa hiệu suất của buồng đốt. Quá trình này giúp giảm thiểu đáng kể lượng dầu HFO tiêu thụ trong các giai đoạn khởi động lò, trực tiếp cắt giảm chi phí nhiên liệu và chi phí vận hành tổng thể cho nhà máy. Thêm vào đó, việc khống chế tốt độ vọt lố và duy trì sự ổn định của áp suất hơi nước đã loại bỏ hoàn toàn các nguy cơ quá tải nhiệt cục bộ. Sự ổn định này giúp ngăn chặn các hiện tượng hỏng hóc tiềm ẩn tại hệ thống ống sinh hơi, góp phần nâng cao tuổi thọ của thiết bị và tiết kiệm đáng kể các khoản chi phí bảo trì định kỳ. 
+Việc triển khai thành công hệ điều khiển hai vòng tự động cho lưu lượng dầu nhiên liệu và phụ tải lò hơi mang lại những lợi ích toàn diện, có thể đánh giá trên hai phương diện chính. Về mặt hiệu quả sản xuất và kinh tế, khả năng điều khiển chính xác lưu lượng dầu cùng áp suất hơi đóng vai trò cốt lõi trong việc tối ưu hóa hiệu suất của buồng đốt. Quá trình này giúp giảm thiểu đáng kể lượng dầu HFO tiêu thụ trong các giai đoạn khởi động lò, trực tiếp cắt giảm chi phí nhiên liệu và chi phí vận hành tổng thể cho nhà máy. Thêm vào đó, việc khống chế tốt độ vọt lố và duy trì sự ổn định của áp suất hơi nước đã loại bỏ hoàn toàn các nguy cơ quá tải nhiệt cục bộ. Sự ổn định này giúp ngăn chặn các hiện tượng hỏng hóc tiềm ẩn tại hệ thống ống sinh hơi, góp phần nâng cao tuổi thọ của thiết bị và tiết kiệm đáng kể các khoản chi phí bảo trì định kỳ. 
 
 Bên cạnh lợi ích kinh tế, hệ thống còn mang lại những đóng góp tích cực về mặt xã hội và môi trường. Nhờ duy trì tỷ lệ nhiên liệu - không khí luôn ở trạng thái lý tưởng, quá trình đốt cháy được diễn ra hoàn toàn, làm giảm triệt để sự phát thải các loại khí độc hại gây ô nhiễm không khí như $\text{CO}$, $\text{NO}_x$, $\text{SO}_x$ và muội than. Hơn thế nữa, sự hiện diện của các mạch điều khiển liên khóa bảo vệ thông minh, chẳng hạn như cơ chế tự động ngắt bơm khi mức dầu xuống cực thấp (mức LL) hay tự động khóa van nạp khi phát hiện nguy cơ tràn bể (mức HH), đã tạo ra một lá chắn an toàn vững chắc. Các cơ chế này giúp ngăn chặn từ xa mọi rủi ro về rò rỉ nhiên liệu, bảo đảm an toàn cháy nổ ở mức cao nhất và loại bỏ hoàn toàn nguy cơ ô nhiễm nguồn nước tại khu vực lân cận nhà máy.
 

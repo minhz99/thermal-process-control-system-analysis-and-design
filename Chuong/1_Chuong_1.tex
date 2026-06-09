@@ -61,13 +61,6 @@ Về nhiệt độ dầu nhiên liệu, đối với dầu FO (Heavy Fuel Oil) c
 
 Áp suất dầu tại đầu ra của bơm cấp dầu (trước khi vào van điều khiển) cần được duy trì ổn định trong khoảng 15--30 bar tùy theo thiết kế của hệ thống phun. Sự biến động áp suất nguồn cấp nếu không được bù trừ sẽ gây ra sự thay đổi lưu lượng dầu thực tế ngay cả khi van điều khiển giữ nguyên vị trí, tạo thành nhiễu tác động lên vòng trong của hệ thống điều khiển.
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.90\textwidth]{Hinhve/bo-phan-sinh-hoi.png}
-    \caption{Sơ đồ các phần tử chính của lò hơi trong nhà máy nhiệt điện}
-    \label{fig:bo_phan_sinh_hoi}
-\end{figure}
-
 \section{Vai trò, ý nghĩa của hệ thống và thông số quá trình}
 
 Hệ thống điều khiển cấp dầu nhiên liệu mang ý nghĩa quyết định đối với tính linh hoạt và độ tin cậy của toàn bộ nhà máy nhiệt điện. Trong bối cảnh vận hành thực tế, khi tổ máy nhận lệnh thay đổi phụ tải từ trung tâm điều độ hệ thống điện, lò hơi phải lập tức đáp ứng bằng cách thay đổi lượng hơi cung cấp. Thông số áp suất hơi chính là thước đo độ chênh lệch giữa công suất sinh hơi của lò và công suất tiêu thụ của tuabin. Do đó, việc duy trì áp suất hơi luôn bám sát giá trị đặt đảm bảo cho tổ máy vận hành an toàn, ngăn ngừa sự cố nhảy lò do áp suất vượt ngưỡng tác động của van an toàn.
@@ -84,13 +77,13 @@ Hệ thống hoạt động trong môi trường công nghiệp phức tạp, do
 
 Đối với áp suất hơi, nhiễu tải (Load Disturbance) là yếu tố tác động thường xuyên và mạnh mẽ nhất. Khi van điều chỉnh hơi vào tuabin mở rộng hoặc thu hẹp theo nhu cầu công suất phát điện, lưu lượng hơi thoát ra khỏi lò thay đổi đột ngột, làm phá vỡ cân bằng vật chất và năng lượng trong bao hơi, dẫn đến sự sụt giảm hoặc gia tăng áp suất hơi một cách nhanh chóng. Thêm vào đó, những biến động trong quá trình cháy, chẳng hạn như chất lượng gió cấp không ổn định, hàm lượng nhiệt của bản thân nhiên liệu thay đổi, hay bức xạ nhiệt bị suy giảm do hiện tượng đóng xỉ trên bề mặt ống sinh hơi, đều làm thay đổi khả năng truyền nhiệt và tác động chậm lên áp suất hơi.
 
-Đối với lưu lượng dầu nhiên liệu, các yếu tố nhiễu chủ yếu mang tính chất thủy lực và cơ học. Sự sụt áp trên đường ống cấp dầu do rò rỉ hoặc do bơm dầu vận hành không ổn định sẽ làm thay đổi chênh lệch áp suất qua van điều khiển (pressure drop). Theo đặc tính thủy lực, khi chênh áp qua van thay đổi, lưu lượng dầu thực tế sẽ dao động ngay cả khi độ mở của van vẫn được giữ nguyên. Ngoài ra, sự biến thiên nhiệt độ của dầu nhiên liệu làm thay đổi độ nhớt, gây ảnh hưởng trực tiếp đến hệ số lưu lượng ($C_v$) của van và tạo ra sự phi tuyến trong đặc tính tĩnh của đối tượng vòng trong. Hình~\ref{fig:so-do-cong-nghe} minh họa sơ đồ công nghệ tổng quan của hệ thống cấp dầu nhiên liệu.
+Đối với lưu lượng dầu nhiên liệu, các yếu tố nhiễu chủ yếu mang tính chất thủy lực và cơ học. Sự sụt áp trên đường ống cấp dầu do rò rỉ hoặc do bơm dầu vận hành không ổn định sẽ làm thay đổi chênh lệch áp suất qua van điều khiển (pressure drop). Theo đặc tính thủy lực, khi chênh áp qua van thay đổi, lưu lượng dầu thực tế sẽ dao động ngay cả khi độ mở của van vẫn được giữ nguyên. Ngoài ra, sự biến thiên nhiệt độ của dầu nhiên liệu làm thay đổi độ nhớt, gây ảnh hưởng trực tiếp đến hệ số lưu lượng ($C_v$) của van và tạo ra sự phi tuyến trong đặc tính tĩnh của đối tượng vòng trong. Hình~\ref{fig:so-do-cong-nghe-schematic} minh họa sơ đồ công nghệ tổng quan của hệ thống cấp dầu nhiên liệu.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.90\textwidth]{Hinhve/so-do-cong-nghe.png}
     \caption{Sơ đồ công nghệ hệ thống cấp dầu nhiên liệu}
-    \label{fig:so-do-cong-nghe}
+    \label{fig:so-do-cong-nghe-schematic}
 \end{figure}
 
 Bên cạnh các nhiễu kỹ thuật, điều kiện môi trường bên ngoài cũng gây ảnh hưởng đáng kể. Nhiệt độ môi trường xung quanh ảnh hưởng đến hiệu suất của bơm cấp dầu và công suất làm mát của bộ gia nhiệt dầu. Độ nhớt của dầu FO đặc biệt nhạy cảm với nhiệt độ môi trường trong khoảng 10--30°C. Vào mùa đông, nếu hệ thống gia nhiệt không đủ công suất, dầu FO có thể đặc lại và gây tắc nghẽn đường ống hoặc bộ lọc, dẫn đến sụt áp bất thường và dao động lưu lượng. Hiện tượng này đặc biệt nghiêm trọng đối với các nhà máy nhiệt điện vùng khí hậu lạnh.
@@ -99,7 +92,7 @@ Bên cạnh các nhiễu kỹ thuật, điều kiện môi trường bên ngoài
 
 Xuất phát từ phân tích về sự chênh lệch lớn trong đặc tính động học giữa quá trình thủy lực của lưu lượng dầu (nhanh) và quá trình nhiệt động của áp suất hơi (chậm, có trễ), cấu trúc điều khiển đơn vòng (Single Loop) kinh điển sẽ không thể đáp ứng được các tiêu chuẩn khắt khe về chất lượng điều khiển. Việc sử dụng bộ điều khiển phản hồi duy nhất cho một đối tượng có quán tính và trễ lớn thường dẫn đến hiện tượng trượt quá mức (overshoot) và dao động kéo dài, gây nguy cơ mất an toàn vận hành.
 
-Để khắc phục nhược điểm này, hệ thống đo lường và điều khiển được thiết kế theo cấu trúc điều khiển Cascade (cấp tầng), bao gồm hai vòng điều khiển lồng ghép vào nhau:
+Để khắc phục nhược điểm này, hệ thống đo lường và điều khiển được thiết kế theo cấu trúc điều khiển hai vòng (cấp tầng), bao gồm hai vòng điều khiển lồng ghép vào nhau:
 \begin{itemize}
     \item \textbf{Vòng ngoài (Vòng chính - Master Loop):} Nhận nhiệm vụ giám sát và điều khiển áp suất hơi mới. Cảm biến áp suất (PT) liên tục đo lường áp suất hơi tại đầu ra của lò, truyền tín hiệu về bộ điều khiển áp suất. Bộ điều khiển này so sánh giá trị thực tế với giá trị đặt (Setpoint) và tính toán ra một tín hiệu đầu ra. Tín hiệu này không đi trực tiếp đến cơ cấu chấp hành mà đóng vai trò là giá trị đặt về lưu lượng dầu nhiên liệu cho vòng trong.
     \item \textbf{Vòng trong (Vòng phụ - Slave Loop):} Đảm nhận việc điều khiển lưu lượng dầu nhiên liệu. Bộ điều khiển lưu lượng nhận giá trị đặt từ vòng ngoài, so sánh nó với lưu lượng thực tế đo được từ cảm biến lưu lượng (FT) lắp trên đường ống cấp dầu. Từ đó, bộ điều khiển tính toán và xuất tín hiệu thao tác trực tiếp đến van điều khiển lưu lượng (FCV) nhằm thay đổi tiết diện lưu thông, điều tiết chính xác lượng dầu đi vào lò hơi.
@@ -110,7 +103,7 @@ Sơ đồ công nghệ tổng quan của hệ thống được minh họa trên 
 \begin{figure}[htbp]
     \centering
     \begin{tikzpicture}[
-        scale=0.95,
+        scale=1.1,
         every node/.style={transform shape},
         equipment/.style={draw, rectangle, minimum width=2.2cm, minimum height=1.0cm, align=center, thick, fill=white, font=\sffamily\small},
         pipe/.style={thick, draw=cyan!70!black},
@@ -147,15 +140,15 @@ Sơ đồ công nghệ tổng quan của hệ thống được minh họa trên 
         \draw[pipe] (1.3, 0) -- (1.3, 1.0);
         
         \draw[thick, draw=cyan!70!black, {Latex}-{Latex}] (0.0, 1.0) -- (2.6, 1.0);
-        \node[above, font=\sffamily\small] at (1.3, 1.0) {Đến cụm van điều khiển (Lò hơi)};
+        \node[above, font=\sffamily\small] at (1.0, 1.0) {Đến cụm van đk};
     \end{tikzpicture}
     \caption{Sơ đồ công nghệ tổng quan hệ thống cấp dầu nhiên liệu}
     \label{fig:so_do_cong_nghe}
 \end{figure}
 
-Việc áp dụng triệt để nguyên lý phân cấp trong đo lường và điều khiển là nền tảng cốt lõi giúp hệ thống vượt qua các thách thức về đặc tính trễ và nhiễu loạn của lò hơi. Sơ đồ cấu trúc điều khiển Cascade này sẽ tiếp tục được phân tích chuyên sâu về mặt triết lý thiết kế và làm cơ sở cho quá trình mô hình hóa toán học, tổng hợp thuật toán điều khiển ở các Chương 2 và Chương 3.
+Việc áp dụng triệt để nguyên lý phân cấp trong đo lường và điều khiển là nền tảng cốt lõi giúp hệ thống vượt qua các thách thức về đặc tính trễ và nhiễu loạn của lò hơi. Sơ đồ cấu trúc điều khiển hai vòng này sẽ tiếp tục được phân tích chuyên sâu về mặt triết lý thiết kế và làm cơ sở cho quá trình mô hình hóa toán học, tổng hợp thuật toán điều khiển ở các Chương 2 và Chương 3.
 
-\section{Hệ thống P\&ID và phân tích các biến trong hệ thống}
+\section{Hệ thống P\&ID}
 
 \subsection{Sơ đồ P\&ID của hệ thống cấp dầu nhiên liệu}
 
@@ -214,13 +207,13 @@ Hệ thống MFT phát ra lệnh dừng cấp nhiên liệu khẩn cấp khi cá
 
 Khi lệnh MFT được phát ra, chuỗi hành động sau được thực hiện một cách tuần tự: van cắt nhanh dầu chính (SV-01) đóng hoàn toàn trong vòng 1 giây; van cắt nhanh dầu hỗ trợ đóng; bơm cấp dầu dừng; van xả khí đốt mở ra xả khí thoát khỏi buồng đốt; quạt tăng áp giảm tốc đến mức tối thiểu duy trì thông gió thoáng buồng đốt. Tất cả các hành động này được thiết kế để ngăn ngừa tích tụ nhiên liệu chưa đốt cháy trong buồng đốt -- một tình huống có thể dẫn đến nổ bục khi gặp nguồn kích hoạt.
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.90\textwidth]{Hinhve/hien-trang-khu-vuc-nha-may-rac.png}
-    \caption{Hiện trạng khu vực nhà máy nhiệt điện}
-    \label{fig:hien_trang_nha_may}
-\end{figure}
+% \begin{figure}[htbp]
+%     \centering
+%     % \includegraphics[width=0.90\textwidth]{Hinhve/hien-trang-khu-vuc-nha-may-rac.png}
+%     \caption{Hiện trạng khu vực nhà máy nhiệt điện}
+%     \label{fig:hien_trang_nha_may}
+% \end{figure}
 
-Việc áp dụng triệt để nguyên lý phân cấp trong đo lường và điều khiển là nền tảng cốt lõi giúp hệ thống vượt qua các thách thức về đặc tính trễ và nhiễu loạn của lò hơi. Sơ đồ cấu trúc điều khiển Cascade này sẽ tiếp tục được phân tích chuyên sâu về mặt triết lý thiết kế và làm cơ sở cho quá trình mô hình hóa toán học, tổng hợp thuật toán điều khiển ở các Chương 2 và Chương 3.
+Việc áp dụng triệt để nguyên lý phân cấp trong đo lường và điều khiển là nền tảng cốt lõi giúp hệ thống vượt qua các thách thức về đặc tính trễ và nhiễu loạn của lò hơi. Sơ đồ cấu trúc điều khiển hai vòng này sẽ tiếp tục được phân tích chuyên sâu về mặt triết lý thiết kế và làm cơ sở cho quá trình mô hình hóa toán học, tổng hợp thuật toán điều khiển ở các Chương 2 và Chương 3.
 
 \end{document}

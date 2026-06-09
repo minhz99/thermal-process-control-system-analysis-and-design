@@ -6,7 +6,7 @@
 
 \section*{A.1 Mã nguồn Python tiền xử lý dữ liệu và nhận dạng hệ thống}
 
-Phần này trình bày mã nguồn Python dùng để làm sạch dữ liệu thực nghiệm (sắp xếp tăng dần theo thời gian, tịnh tiến về mốc $t=0$) và áp dụng phương pháp tối ưu hóa bình phương tối thiểu kết hợp quét lưới (grid search) để nhận dạng tham số mô hình FOPDT cho van và SOPDT cho bộ phận sinh hơi.
+Phần này trình bày mã nguồn Python dùng để làm sạch dữ liệu thực nghiệm (sắp xếp tăng dần theo thời gian, tịnh tiến về mốc $t=0$) và áp dụng phương pháp tối ưu hóa bình phương tối thiểu kết hợp quét lưới (grid search) để nhận dạng tham số mô hình QTB1T cho van và QTB2T cho bộ phận sinh hơi.
 
 \begin{lstlisting}[language=Python, caption={Chương trình Python nhận dạng hệ thống}, label={lst:python_id}]
 import numpy as np
@@ -26,24 +26,24 @@ def sopdt_shape(t, T, L):
     return (1.0 - np.exp(-t_shift / T) * (1.0 + t_shift / T)) * (t >= L)
 
 # 3. Thuat toan quet luoi va binh phuong toi thieu (LSE) de tim tham so
-def fit_model(t, y, model_type="FOPDT"):
+def fit_model(t, y, model_type="QTB1T"):
     total_time = t[-1] - t[0]
     best_rmse = float('inf')
     best_params = None
-    
+
     # Tao luoi gia tri quet cho hang so thoi gian T va thoi gian tre L
     T_grid = np.geomspace(0.1, total_time, 100)
     L_grid = np.linspace(0.0, total_time * 0.5, 50)
-    
+
     for T in T_grid:
         for L in L_grid:
-            shape = fopdt_shape(t, T, L) if model_type == "FOPDT" else sopdt_shape(t, T, L)
+            shape = fopdt_shape(t, T, L) if model_type == "QTB1T" else sopdt_shape(t, T, L)
             # Tim y0 (offset) va K (gain) bang thuat toan binh phuong toi thieu tuyen tinh
             design = np.column_stack([np.ones_like(shape), shape])
             coeffs, _, _, _ = np.linalg.lstsq(design, y, rcond=None)
             y_hat = design @ coeffs
             rmse = np.sqrt(np.mean((y - y_hat)**2))
-            
+
             if rmse < best_rmse:
                 best_rmse = rmse
                 best_params = {"y0": coeffs[0], "K": coeffs[1], "T": T, "L": L}
@@ -51,17 +51,17 @@ def fit_model(t, y, model_type="FOPDT"):
 
 # 4. Chay nhan dang cho hai doi tuong
 if __name__ == '__main__':
-    # Nhan dang van dieu khien (FOPDT)
+    # Nhan dang van dieu khien (QTB1T)
     t_v, y_v = load_data("van-dap-ung-xung-1,6t.csv")
-    params_v, rmse_v = fit_model(t_v, y_v, "FOPDT")
+    params_v, rmse_v = fit_model(t_v, y_v, "QTB1T")
     # Vi tin hieu kich thich dau vao la Delta U = 1.6 t/h, chia K cho 1.6 de tim K2
     params_v['K'] = params_v['K'] / 1.6
     print("Ket qua nhan dang van:")
     print(f"  y0 = {params_v['y0']:.4f}, K = {params_v['K']:.4f}, T = {params_v['T']:.4f}, L = {params_v['L']:.4f}")
-    
-    # Nhan dang bo phan sinh hoi (SOPDT)
+
+    # Nhan dang bo phan sinh hoi (QTB2T)
     t_b, y_b = load_data("ap-suat-hoi.csv")
-    params_b, rmse_b = fit_model(t_b, y_b, "SOPDT")
+    params_b, rmse_b = fit_model(t_b, y_b, "QTB2T")
     print("Ket qua nhan dang bo phan sinh hoi:")
     print(f"  y0 = {params_b['y0']:.4f}, K = {params_b['K']:.4f}, T = {params_b['T']:.4f}, L = {params_b['L']:.4f}")
 \end{lstlisting}
