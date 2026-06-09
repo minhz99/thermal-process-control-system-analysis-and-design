@@ -18,6 +18,27 @@ Như vậy, toàn bộ chu trình từ lúc cấp dầu đến khi sinh hơi t�
     \label{fig:hmi_fuel_oil}
 \end{figure}
 
+\subsection{Tổng quan về nhà máy nhiệt điện đốt than}
+
+Nhà máy nhiệt điện đốt than phun (PC) là loại hình nhà máy nhiệt điện phổ biến nhất trên thế giới, chiếm tỷ trọng lớn trong tổng công suất lắp đặt của hệ thống điện nhiều quốc gia. Nguyên lý hoạt động cơ bản của nhà máy nhiệt điện dựa trên chu trình Rankine: nước được gia nhiệt trong lò hơi để tạo thành hơi nước ở áp suất và nhiệt độ cao, hơi nước này được dẫn vào tuabin hơi để sinh công cơ học, và cuối cùng máy phát điện gắn trực tiếp với trục tuabin chuyển đổi công suất cơ thành điện năng. Sau khi qua tuabin, hơi thoát được ngưng tụ trong bình ngưng thành nước ngưng, sau đó nước ngưng được bơm cấp trả về lò hơi qua các bộ hâm nước để tái tham gia chu trình.
+
+Trong chu trình nhiệt động kể trên, lò hơi đóng vai trò là trái tim của toàn nhà máy. Theo số liệu từ các nhà máy nhiệt điện hiện hành tại Việt Nam, lò hơi của tổ máy nhiệt điện đốt than có công suất nhiệt danh nghĩa thường dao động từ 900 MW đến 1200 MW nhiệt (thí dụ lò hơi có công suất 3030 tấn hơi/giờ ở áp suất 185 bar, nhiệt độ 541°C đối với các tổ máy 300 MW). Hiệu suất nhiệt của chu trình Rankine lý thuyết bị giới hạn bởi nhiệt độ trung bình nguồn nóng và nhiệt độ trung bình nguồn lạnh; trên thực tế, hiệu suất toàn nhà máy (bao gồm các tổn thất cơ nhiệt, điện tự dùng) dao động trong khoảng 33\%--42\% tùy theo công nghệ và tuổi thọ thiết bị.
+
+Các phần tử chính của lò hơi bao gồm: buồng đốt (furnace) nơi diễn ra quá trình cháy, các dàn ống sinh hơi (water-wall tubes) bao quanh buồng đốt hấp thụ nhiệt bức xạ, bộ quá nhiệt (superheater) nâng nhiệt độ hơi bão hòa lên trên nhiệt độ bão hòa, bộ hâm nước (economizer) gia nhiệt nước cấp bằng nhiệt khói thoát, và bộ sấy không khí (air heater) gia nhiệt không khí cấp cho buồng đốt bằng nhiệt khói còn lại. Mỗi phần tử này đều được thiết kế để tối đa hóa việc thu hồi năng lượng từ quá trình đốt cháy nhiên liệu.
+
+Hệ thống cấp than phun (Pulverized Coal Feeding System) và hệ thống cấp dầu nhiên liệu (Fuel Oil System) cùng chia sẻ nhiệm vụ cung cấp năng lượng hóa học cho buồng đốt. Trong vận hành bình thường ở phụ tải cao, than bột nghiền mịn được phun vào buồng đốt qua các vòi đốt than và đốt cháy gần như hoàn toàn. Dầu nhiên liệu đóng vai trò bổ trợ: khởi động lò từ nguội (do than bột không thể tự bắt lửa ở nhiệt độ môi trường), hỗ trợ đốt cháy than ở chế độ phụ tải thấp (thường dưới 30\% công suất danh nghĩa) khi ngọn lửa than trở nên không ổn định, và làm nhiên liệu dự phòng khẩn cấp khi hệ thống cấp than gặp sự cố kỹ thuật.
+
+Về mặt quy trình vận hành, chuỗi sự kiện từ khi khởi động đến khi nhận phụ tải đầy của một tổ máy nhiệt điện đốt than bao gồm nhiều giai đoạn liên hoàn. Giai đoạn tiền khởi động (pre-startup) bao gồm kiểm tra hệ thống, xả khí, bơm nước cấp, khởi động quạt gió. Giai đoạn mồi lửa (light-up) sử dụng dầu nhiên liệu để đốt cháy trong buồng lửa, gia nhiệt dần lò hơi và nâng áp suất trong bao hơi. Khi nhiệt độ buồng đốt đạt ngưỡng đủ cao (thường trên 800°C trong môi trường giàu oxy), các vòi đốt than được mở dần và dầu nhiên liệu được giảm dần. Giai đoạn tăng tải (loading) tiếp tục tăng lưu lượng than và giảm lưu lượng dầu hỗ trợ cho đến khi tổ máy đạt phụ tải mục tiêu. Tại mỗi giai đoạn, áp suất hơi mới và lưu lượng dầu nhiên liệu là hai thông số then chốt cần được giám sát và điều khiển chặt chẽ.
+
+Nhìn tổng thể, vai trò của hệ thống cấp dầu nhiên liệu tuy chỉ mang tính bổ trợ trong chuỗi năng lượng của nhà máy nhiệt điện, nhưng lại có ý nghĩa sống còn trong các giai đoạn chuyển tiếp và xử lý sự cố. Tính sẵn sàng vận hành và độ tin cậy của hệ thống này là điều kiện tiên quyết để toàn bộ chu trình nhiệt điện có thể khởi động và dừng máy an toàn.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.90\textwidth]{Hinhve/bt-nhom-1.jpg}
+    \caption{Sơ đồ tổng quan nhà máy nhiệt điện đốt than phun}
+    \label{fig:nha_may_nhiet_dien}
+\end{figure}
+
 \section{Các thông số điều khiển và giám sát của hệ thống}
 
 Để hệ thống cấp dầu nhiên liệu hoạt động an toàn và đạt hiệu suất cao, quá trình vận hành đòi hỏi sự giám sát và điều khiển liên tục các thông số kỹ thuật trọng yếu. Dựa trên đặc tính vật lý và yêu cầu của quá trình cháy, các thông số này được phân loại thành biến điều khiển chính, biến điều khiển phụ và các biến giám sát an toàn.
@@ -28,11 +49,34 @@ Lưu lượng dầu nhiên liệu (Fuel Oil Flow) là thông số điều khiể
 
 Ngoài hai thông số điều khiển cốt lõi nêu trên, nhiệt độ và áp suất dầu cấp trên đường ống cũng là những thông số giám sát mang tính bắt buộc. Nhiệt độ dầu quyết định độ nhớt động học; nếu nhiệt độ quá thấp, dầu sẽ khó tơi hóa khi phun, gây ra hiện tượng nhỏ giọt và khói đen. Ngược lại, nhiệt độ quá cao có thể gây đóng cặn carbon trong ống và béc phun. Áp suất dầu cấp cần được giữ ổn định ở đầu vào của van điều khiển nhằm tạo ra động năng đủ lớn để xé tơi màng dầu, đồng thời tránh hiện tượng xâm thực (cavitation) làm hư hỏng cấu trúc van.
 
+\subsection{Các thông số kỹ thuật chính của hệ thống}
+
+Để xác định rõ phạm vi vận hành an toàn, cần phải thiết lập các giới hạn kỹ thuật cho từng thông số trọng yếu. Các giá trị này được xây dựng dựa trên thiết kế ban đầu của nhà máy, kết hợp với kinh nghiệm vận hành thực tế và các tiêu chuẩn an toàn công nghiệp như ASME Section I (Boiler and Pressure Vessel Code) và tiêu chuẩn Việt Nam TCVN.
+
+Đối với áp suất hơi mới, giá trị danh nghĩa phụ thuộc vào thiết kế của tổ máy. Trong các nhà máy nhiệt điện đốt than công suất lớn tại Việt Nam (từ 300 MW trở lên), áp suất hơi mới thường dao động trong khoảng 130--185 bar. Cụ thể, các tổ máy 300 MW thường vận hành ở áp suất danh nghĩa khoảng 155 bar, trong khi các tổ máy 600 MW có thể đạt 185 bar. Vùng hoạt động cho phép thường được giới hạn trong $\pm5\%$ giá trị định mức. Các ngưỡng bảo vệ được thiết lập ở mức cao hơn giá trị định mức tối đa 10\% để tránh kích hoạt nhảy lò do dao động ngắn hạn không đáng kể.
+
+Đối với lưu lượng dầu nhiên liệu, phạm vi điều chỉnh được thiết kế từ giá trị cực tiểu có thể duy trì ngọn lửa ổn định (thường khoảng 20\% công suất thiết kế của cụm vòi đốt dầu) đến giá trị cực đại cho phép tại chế độ khởi động. Tốc độ thay đổi lưu lượng dầu (ramping rate) bị giới hạn nhằm tránh hiện tượng sốc nhiệt (thermal shock) đối với các bề mặt kim loại trong buồng đốt. Thông thường, tốc độ tăng hoặc giảm lưu lượng dầu không vượt quá 5\%--10\% giá trị danh nghĩa mỗi phút.
+
+Về nhiệt độ dầu nhiên liệu, đối với dầu FO (Heavy Fuel Oil) có độ nhớt cao ở trạng thái lạnh, nhiệt độ gia nhiệt thường được duy trì trong khoảng 130--150°C để đạt độ nhớt động học khoảng 10--15 cSt, phù hợp cho quá trình phun sương. Đối với dầu DO (Diesel Oil), nhiệt độ vận hành thường thấp hơn, khoảng 40--60°C. Bộ gia nhiệt dầu (oil heater) sử dụng hơi có áp suất thấp hoặc điện trở gia nhiệt làm nguồn cấp nhiệt.
+
+Áp suất dầu tại đầu ra của bơm cấp dầu (trước khi vào van điều khiển) cần được duy trì ổn định trong khoảng 15--30 bar tùy theo thiết kế của hệ thống phun. Sự biến động áp suất nguồn cấp nếu không được bù trừ sẽ gây ra sự thay đổi lưu lượng dầu thực tế ngay cả khi van điều khiển giữ nguyên vị trí, tạo thành nhiễu tác động lên vòng trong của hệ thống điều khiển.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.90\textwidth]{Hinhve/bo-phan-sinh-hoi.png}
+    \caption{Sơ đồ các phần tử chính của lò hơi trong nhà máy nhiệt điện}
+    \label{fig:bo_phan_sinh_hoi}
+\end{figure}
+
 \section{Vai trò, ý nghĩa của hệ thống và thông số quá trình}
 
 Hệ thống điều khiển cấp dầu nhiên liệu mang ý nghĩa quyết định đối với tính linh hoạt và độ tin cậy của toàn bộ nhà máy nhiệt điện. Trong bối cảnh vận hành thực tế, khi tổ máy nhận lệnh thay đổi phụ tải từ trung tâm điều độ hệ thống điện, lò hơi phải lập tức đáp ứng bằng cách thay đổi lượng hơi cung cấp. Thông số áp suất hơi chính là thước đo độ chênh lệch giữa công suất sinh hơi của lò và công suất tiêu thụ của tuabin. Do đó, việc duy trì áp suất hơi luôn bám sát giá trị đặt đảm bảo cho tổ máy vận hành an toàn, ngăn ngừa sự cố nhảy lò do áp suất vượt ngưỡng tác động của van an toàn.
 
 Mặt khác, việc chọn lưu lượng dầu làm thông số điều khiển phụ mang lại khả năng kháng nhiễu vượt trội cho hệ thống. Thay vì chờ đợi áp suất hơi biến thiên (thường mất thời gian dài do quán tính nhiệt của lò hơi rất lớn) mới tiến hành bù trừ lượng nhiên liệu, hệ thống đo lường lưu lượng dầu cho phép phát hiện tức thời những biến động bên trong hệ thống thủy lực, chẳng hạn như dao động áp lực bơm cấp dầu hoặc hiện tượng kẹt cơ khí của van điều khiển. Nhờ đó, thao tác điều chỉnh được thực hiện ngay lập tức, triệt tiêu nhiễu từ trong trứng nước trước khi chúng có cơ hội lan truyền và gây ảnh hưởng lên áp suất hơi của vòng ngoài.
+
+Trong quá trình khởi động tổ máy, hệ thống cấp dầu còn đóng vai trò duy trì sự ổn định của ngọn lửa trong buồng đốt. Khi lò hơi còn ở trạng thái lạnh và than bột chưa thể tự bắt lửa, dầu nhiên liệu cung cấp nguồn nhiệt ban đầu để gia nhiệt gRADually cho các bề mặt ống sinh hơi. Khi nhiệt độ buồng đốt đạt đến ngưỡng nhảy lửa của than (thường trên 800°C), hệ thống cấp than bắt đầu được kích hoạt. Trong suốt giai đoạn chuyển tiếp từ đốt dầu sang đốt than hoàn toàn, hệ thống điều khiển cấp dầu phải duy trì sự phối hợp nhịp nhàng, tránh hiện tượng dao động công suất lò do sự chênh lệch đặc tính cháy giữa dầu và than.
+
+Ý nghĩa kinh tế của hệ thống cũng không kém phần quan trọng. Dầu nhiên liệu có giá thành cao hơn đáng kể so với than, do đó việc điều khiển tối ưu lượng dầu tiêu thụ trong các giai đoạn khởi động và hỗ trợ đốt than là yếu tố ảnh hưởng trực tiếp đến chi phí vận hành của nhà máy. Một hệ thống điều khiển có chất lượng cao giúp giảm thiểu thời gian vận hành ở chế độ đốt dầu, từ đó tiết kiệm chi phí nhiên liệu và giảm lượng phát thải.
 
 \section{Các yếu tố ảnh hưởng đến thông số quá trình}
 
@@ -40,7 +84,16 @@ Hệ thống hoạt động trong môi trường công nghiệp phức tạp, do
 
 Đối với áp suất hơi, nhiễu tải (Load Disturbance) là yếu tố tác động thường xuyên và mạnh mẽ nhất. Khi van điều chỉnh hơi vào tuabin mở rộng hoặc thu hẹp theo nhu cầu công suất phát điện, lưu lượng hơi thoát ra khỏi lò thay đổi đột ngột, làm phá vỡ cân bằng vật chất và năng lượng trong bao hơi, dẫn đến sự sụt giảm hoặc gia tăng áp suất hơi một cách nhanh chóng. Thêm vào đó, những biến động trong quá trình cháy, chẳng hạn như chất lượng gió cấp không ổn định, hàm lượng nhiệt của bản thân nhiên liệu thay đổi, hay bức xạ nhiệt bị suy giảm do hiện tượng đóng xỉ trên bề mặt ống sinh hơi, đều làm thay đổi khả năng truyền nhiệt và tác động chậm lên áp suất hơi.
 
-Đối với lưu lượng dầu nhiên liệu, các yếu tố nhiễu chủ yếu mang tính chất thủy lực và cơ học. Sự sụt áp trên đường ống cấp dầu do rò rỉ hoặc do bơm dầu vận hành không ổn định sẽ làm thay đổi chênh lệch áp suất qua van điều khiển (pressure drop). Theo đặc tính thủy lực, khi chênh áp qua van thay đổi, lưu lượng dầu thực tế sẽ dao động ngay cả khi độ mở của van vẫn được giữ nguyên. Ngoài ra, sự biến thiên nhiệt độ của dầu nhiên liệu làm thay đổi độ nhớt, gây ảnh hưởng trực tiếp đến hệ số lưu lượng ($C_v$) của van và tạo ra sự phi tuyến trong đặc tính tĩnh của đối tượng vòng trong.
+Đối với lưu lượng dầu nhiên liệu, các yếu tố nhiễu chủ yếu mang tính chất thủy lực và cơ học. Sự sụt áp trên đường ống cấp dầu do rò rỉ hoặc do bơm dầu vận hành không ổn định sẽ làm thay đổi chênh lệch áp suất qua van điều khiển (pressure drop). Theo đặc tính thủy lực, khi chênh áp qua van thay đổi, lưu lượng dầu thực tế sẽ dao động ngay cả khi độ mở của van vẫn được giữ nguyên. Ngoài ra, sự biến thiên nhiệt độ của dầu nhiên liệu làm thay đổi độ nhớt, gây ảnh hưởng trực tiếp đến hệ số lưu lượng ($C_v$) của van và tạo ra sự phi tuyến trong đặc tính tĩnh của đối tượng vòng trong. Hình~\ref{fig:so-do-cong-nghe} minh họa sơ đồ công nghệ tổng quan của hệ thống cấp dầu nhiên liệu.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.90\textwidth]{Hinhve/so-do-cong-nghe.png}
+    \caption{Sơ đồ công nghệ hệ thống cấp dầu nhiên liệu}
+    \label{fig:so-do-cong-nghe}
+\end{figure}
+
+Bên cạnh các nhiễu kỹ thuật, điều kiện môi trường bên ngoài cũng gây ảnh hưởng đáng kể. Nhiệt độ môi trường xung quanh ảnh hưởng đến hiệu suất của bơm cấp dầu và công suất làm mát của bộ gia nhiệt dầu. Độ nhớt của dầu FO đặc biệt nhạy cảm với nhiệt độ môi trường trong khoảng 10--30°C. Vào mùa đông, nếu hệ thống gia nhiệt không đủ công suất, dầu FO có thể đặc lại và gây tắc nghẽn đường ống hoặc bộ lọc, dẫn đến sụt áp bất thường và dao động lưu lượng. Hiện tượng này đặc biệt nghiêm trọng đối với các nhà máy nhiệt điện vùng khí hậu lạnh.
 
 \section{Sơ đồ hệ thống đo lường và điều khiển giám sát}
 
@@ -98,6 +151,74 @@ Sơ đồ công nghệ tổng quan của hệ thống được minh họa trên 
     \end{tikzpicture}
     \caption{Sơ đồ công nghệ tổng quan hệ thống cấp dầu nhiên liệu}
     \label{fig:so_do_cong_nghe}
+\end{figure}
+
+Việc áp dụng triệt để nguyên lý phân cấp trong đo lường và điều khiển là nền tảng cốt lõi giúp hệ thống vượt qua các thách thức về đặc tính trễ và nhiễu loạn của lò hơi. Sơ đồ cấu trúc điều khiển Cascade này sẽ tiếp tục được phân tích chuyên sâu về mặt triết lý thiết kế và làm cơ sở cho quá trình mô hình hóa toán học, tổng hợp thuật toán điều khiển ở các Chương 2 và Chương 3.
+
+\section{Hệ thống P\&ID và phân tích các biến trong hệ thống}
+
+\subsection{Sơ đồ P\&ID của hệ thống cấp dầu nhiên liệu}
+
+Sơ đồ P\&ID (Piping and Instrumentation Diagram) là tài liệu kỹ thuật thể hiện chi tiết toàn bộ các đường ống, thiết bị, van, cảm biến và các mối liên kết trong hệ thống. Trong hệ thống cấp dầu nhiên liệu, sơ đồ P\&ID bao gồm các nhóm thiết bị và phần tử chính được mô tả dưới đây.
+
+Nhóm bồn chứa và bơm bao gồm: bồn chứa dầu nhiên liệu chính (TK-01) có dung tích thiết kế phục vụ cho ít nhất 8 giờ vận hành liên tục ở công suất tối đa; bồn chứa dầu ngày (day tank) dung tích nhỏ hơn cung cấp dầu trực tiếp cho hệ thống bơm cấp; bơm cấp dầu (P-01A/B) loại bơm piston hoặc bơm cánh gạt có khả năng tạo áp suất đầu ra 25--35 bar; bơm tuần hoàn (circulation pump) duy trì dòng dầu tuần hoàn qua bộ gia nhiệt ngay cả khi van điều khiển chính đóng, nhằm đảm bảo nhiệt độ dầu đồng đều trong toàn hệ thống.
+
+Nhóm gia nhiệt bao gồm: bộ gia nhiệt sơ cấp (H-01) sử dụng hơi có áp suất 4--8 bar làm tác nhân gia nhiệt, nâng nhiệt độ dầu từ nhiệt độ môi trường lên khoảng 100--120°C; bộ gia nhiệt thứ cấp (H-02) tiếp tục nâng nhiệt độ lên đến 130--150°C để đạt độ nhớt phun tối ưu; van điều khiển nhiệt độ (TIC) điều chỉnh lưu lượng hơi gia nhiệt để duy trì nhiệt độ dầu đầu ra ổn định tại giá trị đặt.
+
+Nhóm van điều khiển chính bao gồm: van điều khiển lưu lượng dầu (FCV-01) là van điều khiển tuyến tính dẫn động khí nén, có đặc tính động lực học phù hợp cho việc điều khiển chính xác lưu lượng dầu phun; van cắt nhanh (Shut-off Valve) SV-01 hoạt động theo nguyên lý fail-close, đóng hoàn toàn khi nhận tín hiệu dừng khẩn cấp từ hệ thống bảo vệ MFT; van giảm áp (Pressure Relief Valve) PRV-01 bảo vệ đường ống khỏi quá áp trong trường hợp bơm hoạt động bất thường.
+
+Nhóm cảm biến bao gồm: cảm biến lưu lượng (FT-01) loại Coriolis Mass Flowmeter đo trực tiếp lưu lượng khối lượng dầu, loại bỏ ảnh hưởng của biến thiên nhiệt độ và độ nhớt; cảm biến áp suất (PT-01) lắp tại đầu ra của bơm cấp, cảm biến áp suất (PT-02) lắp ngay trước van điều khiển; cảm biến nhiệt độ (TT-01) lắp tại đầu ra của bộ gia nhiệt thứ cấp; cảm biến áp suất hơi mới (PT-03) lắp tại đường ống hơi mới sau lò hơi.
+
+Tất cả các tín hiệu cảm biến được truyền về trạm điều khiển trung tâm (DCS) qua các module đầu vào analog 4--20 mA. Tín hiệu điều khiển từ DCS được truyền ngược lại đến các van điều khiển thông qua các module đầu ra analog 4--20 mA, đảm bảo độ tin cậy trong truyền dẫn tín hiệu trong môi trường nhiễu công nghiệp nặng.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.70\textwidth]{Hinhve/FMP51.png}
+    \caption{Bộ chuyển đổi đo mức kiểu điện dung FMP51 trong hệ thống bồn chứa dầu}
+    \label{fig:FMP51}
+\end{figure}
+
+\subsection{Phân loại các biến trong hệ thống}
+
+Dựa trên vai trò trong vòng điều khiển, các biến trong hệ thống được phân thành các nhóm sau:
+
+Biến đầu ra (Output Variable) hay biến được điều khiển (Controlled Variable): áp suất hơi mới (P\textsubscript{steam}) là biến đầu ra chính mà hệ thống cần duy trì ổn định. Giá trị đặt (Setpoint) của biến này được xác định bởi yêu cầu vận hành của tổ máy. Biến này phản ánh sự cân bằng năng lượng tổng thể của lò hơi và là chỉ tiêu chất lượng hàng đầu.
+
+Biến đầu vào thao tác (Manipulated Variable): lưu lượng dầu nhiên liệu (F\textsubscript{fo}) là biến thao tác trực tiếp, được điều chỉnh bởi van FCV-01 theo tín hiệu từ bộ điều khiển vòng trong. Biến này nằm trong vòng điều khiển phụ và có tốc độ đáp ứng nhanh.
+
+Biến nhiễu (Disturbance Variables): bao gồm lưu lượng hơi thoát ra khỏi lò (F\textsubscript{steam,out}) phụ thuộc vào lệnh điều khiển công suất tuabin; chất lượng nhiên liệu (giá trị tỏa nhiệt riêng thay đổi theo đặc tính than); nhiệt độ gió cấp vào buồng đốt; trạng thái bề mặt truyền nhiệt (đóng xỉ, bám bẩn). Các biến nhiễu này tác động lên quá trình sinh áp suất với cường độ và tần suất khác nhau.
+
+Biến giám sát (Monitored Variables): nhiệt độ dầu sau bộ gia nhiệt (T\textsubscript{fo}), áp suất dầu tại các điểm đo trên đường ống (P\textsubscript{fo,in}, P\textsubscript{fo,valve}), mức dầu trong bồn chứa, trạng thái hoạt động của bơm cấp dầu. Các biến này không nằm trong vòng điều khiển chính nhưng được giám sát liên tục nhằm đảm bảo hệ thống hoạt động trong phạm vi an toàn.
+
+Biến bảo vệ (Protection Variables): áp suất hơi cao ngưỡng 1 (HAH - High-High Alarm Trigger), áp suất hơi thấp ngưỡng 1 (LAL - Low-Low Alarm Trigger), lưu lượng dầu thấp báo động (FLAL - Fuel Flow Low Alarm), nhiệt độ dầu thấp báo động (TLAL - Temperature Low Alarm). Khi các biến này vượt ngưỡng cho phép, hệ thống bảo vệ MFT được kích hoạt.
+
+\section{Hệ thống bảo vệ và liên động an toàn}
+
+\subsection{Nguyên tắc thiết kế an toàn}
+
+Hệ thống bảo vệ của hệ thống cấp dầu nhiên liệu được thiết kế theo nguyên tắc đa lớp (defense-in-depth), đảm bảo rằng sự cố hỏng hóc của bất kỳ lớp bảo vệ nào sẽ không dẫn đến mất kiểm soát hoàn toàn. Tiêu chuẩn thiết kế tuân thủ nghiêm ngặt các quy định của ASME B31.1 (Power Piping Code) và tiêu chuẩn NFPA 85 (Boiler and Combustion Systems Hazards Code) về hệ thống đốt.
+
+Lớp bảo vệ thứ nhất bao gồm các van an toàn cơ học (Safety Valve) trên các đoạn ống áp suất cao. Van an toàn áp suất hơi mới được hiệu chỉnh tự động xả hơi ra khí quyển khi áp suất vượt ngưỡng cho phép, ngăn ngừa hiện tượng bục nổ đường ống.
+
+Lớp bảo vệ thứ hai là các báo động và cảnh báo (Alarm and Warning) được thiết lập ở các ngưỡng High và Low trong phạm vi vận hành an toàn. Mục đích là cung cấp cho người vận hành đủ thời gian phản ứng trước khi sự cố leo thang đến mức nghiêm trọng. Thời gian trễ báo động (alarm delay) thường được thiết lập ở mức 2--5 giây để tránh báo động giả do dao động ngắn hạn của tín hiệu đo.
+
+Lớp bảo vệ thứ ba là hệ thống liên động (Interlock System) can thiệp tự động khi phát hiện tình trạng nguy hiểm. Hệ thống liên động có thể đóng van cắt nhanh, giảm tải lò, hoặc kích hoạt chuỗi dừng máy theo trình tự được lập trình sẵn.
+
+Lớp bảo vệ thứ tư là hệ thống MFT (Master Fuel Trip) hoạt động như lớp bảo vệ cuối cùng, cắt toàn bộ nguồn cấp nhiên liệu (cả dầu và than) khi phát hiện tình trạng nguy hiểm nghiêm trọng có thể gây hư hỏng thiết bị hoặc mất an toàn vận hành.
+
+\subsection{Các điều kiện kích hoạt bảo vệ MFT liên quan đến hệ thống dầu}
+
+Hệ thống MFT phát ra lệnh dừng cấp nhiên liệu khẩn cấp khi các điều kiện sau đây xảy ra, trong đó một số điều kiện liên quan trực tiếp đến hệ thống cấp dầu:
+
+Áp suất hơi mới vượt ngưỡng High-High (thường 110\% giá trị thiết kế tối đa), cho thấy nguy cơ quá áp nghiêm trọng trên hệ thống đường ống. Áp suất hơi mới xuống thấp ngưỡng Low-Low (thường 70\% giá trị danh nghĩa), cho thấy nguy cơ mất áp suất hơi nghiêm trọng có thể gây hiện tượng sôi khô trong bao hơi. Mức nước trong bao hơi xuống thấp ngưỡng an toàn (Low-Low Water Level), cho thấy nguy cơ hở bề mặt ống sinh hơi và tan chảy kim loại. Mất ngọn lửa buồng đốt (Loss of Flame), trong đó hệ thống cấp dầu đóng vai trò quan trọng trong việc nhận diện tình trạng này thông qua cảm biến Flame Scanner. Mất áp suất khí nén điều khiển (Air Pressure Low), khi nguồn khí nén cung cấp cho van điều khiển dầu giảm xuống dưới mức tối thiểu, van fail-close sẽ tự động đóng nhưng hệ thống bảo vệ vẫn phát lệnh MFT để đảm bảo an toàn kép.
+
+Khi lệnh MFT được phát ra, chuỗi hành động sau được thực hiện một cách tuần tự: van cắt nhanh dầu chính (SV-01) đóng hoàn toàn trong vòng 1 giây; van cắt nhanh dầu hỗ trợ đóng; bơm cấp dầu dừng; van xả khí đốt mở ra xả khí thoát khỏi buồng đốt; quạt tăng áp giảm tốc đến mức tối thiểu duy trì thông gió thoáng buồng đốt. Tất cả các hành động này được thiết kế để ngăn ngừa tích tụ nhiên liệu chưa đốt cháy trong buồng đốt -- một tình huống có thể dẫn đến nổ bục khi gặp nguồn kích hoạt.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.90\textwidth]{Hinhve/hien-trang-khu-vuc-nha-may-rac.png}
+    \caption{Hiện trạng khu vực nhà máy nhiệt điện}
+    \label{fig:hien_trang_nha_may}
 \end{figure}
 
 Việc áp dụng triệt để nguyên lý phân cấp trong đo lường và điều khiển là nền tảng cốt lõi giúp hệ thống vượt qua các thách thức về đặc tính trễ và nhiễu loạn của lò hơi. Sơ đồ cấu trúc điều khiển Cascade này sẽ tiếp tục được phân tích chuyên sâu về mặt triết lý thiết kế và làm cơ sở cho quá trình mô hình hóa toán học, tổng hợp thuật toán điều khiển ở các Chương 2 và Chương 3.

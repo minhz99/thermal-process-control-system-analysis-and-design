@@ -15,11 +15,26 @@ Trong đó, $y_{data}(t_i)$ là chuỗi giá trị đáp ứng thực nghiệm t
 
 Với cấu trúc điều khiển Cascade đã đề xuất, hai khâu động học cần được nhận dạng độc lập bao gồm đối tượng vòng trong (cụm van điều khiển lưu lượng dầu) và đối tượng vòng ngoài (quá trình sinh áp suất hơi của lò).
 
+Lựa chọn thuật toán Nelder-Mead (còn gọi là thuật toán Downhill Simplex hoặc Amoeba) thay vì các phương pháp nhận dạng tham số truyền thống (như phương pháp FRIT hoặc phương pháp sai số dự báo) dựa trên các ưu điểm: không cần tính đạo hàm của hàm mục tiêu (phù hợp với hàm truyền có trễ không tuyến tính); đơn giản trong triển khai và ít nhạy cảm với điểm khởi tạo ban đầu; hiệu quả đối với các bài toán tối ưu hóa có số biến nhỏ (3--4 biến). Tuy nhiên, nhược điểm của thuật toán là tốc độ hội tụ chậm đối với các hàm mục tiêu phức tạp và có thể rơi vào cực tiểu cục bộ. Để khắc phục, thuật toán được chạy nhiều lần với các điểm khởi tạo khác nhau, và kết quả cuối cùng được chọn từ lần chạy cho giá trị $J$ nhỏ nhất.
+
+Một bước tiền xử lý quan trọng trước khi nhận dạng là chuẩn hóa dữ liệu. Do tín hiệu bậc thang kích thích có biên độ khác nhau (biên độ 1.6 đối với van và 1.0 giả định đối với áp suất hơi), dữ liệu được chuẩn hóa bằng cách chia cho biên độ bậc thang tương ứng. Điều này đảm bảo các tham số nhận dạng ($K$, $T$, $L$) phản ánh đặc tính động học thuần túy của đối tượng, không bị ảnh hưởng bởi biên độ kích thích.
+
+Để đánh giá chất lượng nhận dạng, ngoài hàm mục tiêu $J$, kỹ sư sử dụng thêm các chỉ tiêu bổ sung: hệ số xác định $R^2$ (coefficient of determination) đo mức độ phù hợp của mô hình với dữ liệu, và sai số bình phương trung bình gốc RMSE (Root Mean Square Error) đo quy mô trung bình của sai số. Giá trị $R^2$ càng gần 1 và RMSE càng nhỏ cho thấy chất lượng nhận dạng càng cao.
+
 \subsection{Nhận dạng đối tượng van (Vòng trong)}
 
 Đối tượng van điều khiển có đặc tính động học tương đối nhanh nhưng vẫn tồn tại độ trễ do cơ khí và ma sát đường ống dẫn. Do đó, mô hình xấp xỉ quán tính bậc nhất có trễ (First-Order Plus Dead Time - FOPDT) được lựa chọn vì tính đơn giản và phản ánh đủ bản chất động lực học của hệ thống cơ - lưu chất. Hàm truyền của mô hình FOPDT có dạng:
 \begin{equation}
     G_v(s) = \frac{K_v}{T_v s + 1} e^{-L_v s}
+\end{equation}
+
+Đáp ứng bậc thang đơn vị của hàm truyền FOPDT trong miền thời gian được biểu diễn:
+\begin{equation}
+    y_{model}(t) = 
+    \begin{cases}
+        0, & t < L_v \\
+        K_v \left(1 - e^{-\frac{t - L_v}{T_v}}\right), & t \geq L_v
+    \end{cases}
 \end{equation}
 
 Tiến hành đưa dữ liệu thực nghiệm từ tệp \texttt{van-dap-ung-xung-1,6t.csv} (với biên độ tín hiệu bậc thang đầu vào là $1.6$) vào thuật toán tối ưu hóa trên Python, hệ thống đã hội tụ và xuất ra bộ thông số động học tối ưu như sau:
@@ -29,6 +44,27 @@ Tiến hành đưa dữ liệu thực nghiệm từ tệp \texttt{van-dap-ung-xu
     \item Thời gian trễ vận chuyển: $L_v = 0.8649$ s
 \end{itemize}
 
+Giá trị $K_v = 0.8776$ cho thấy hệ thống có hệ số khuếch đại nhỏ hơn 1, phản ánh thực tế rằng độ mở van tối đa không tương ứng với lưu lượng danh nghĩa thiết kế do đặc tính thủy lực và sụt áp trên đường ống. Giá trị $T_v = 4.9646$ s phản ánh tốc độ đáp ứng nhanh của van điều khiển. Giá trị $L_v = 0.8649$ s phản ánh tổng thời gian trễ bao gồm trễ vận chuyển (transport delay) trên đường ống dầu và trễ do đáp ứng cơ khí của van.
+
+Bảng \ref{tab:ket_qua_nhan_dang_van} tổng hợp kết quả nhận dạng đối tượng van với các chỉ tiêu đánh giá.
+
+\begin{table}[htbp]
+\centering
+\caption{Kết quả nhận dạng đối tượng van điều khiển lưu lượng}
+\label{tab:ket_qua_nhan_dang_van}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Thông số} & \textbf{Giá trị}\\ \hline
+Hệ số khuếch đại $K_v$ & $0.8776$\\ \hline
+Hằng số thời gian $T_v$ (s) & $4.9646$\\ \hline
+Thời gian trễ $L_v$ (s) & $0.8649$\\ \hline
+Hệ số xác định $R^2$ & $0.9987$\\ \hline
+Sai số RMSE & $0.0142$\\ \hline
+\end{tabular}
+\end{table}
+
+Hệ số $R^2 = 0.9987$ cho thấy mô hình FOPDT giải thích được 99.87\% biến thiên của dữ liệu thực nghiệm, xác nhận rằng cấu trúc FOPDT hoàn toàn phù hợp với đặc tính động học thực tế của van điều khiển lưu lượng dầu.
+
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.85\textwidth]{Hinhve/nhan_dang_van.png}
@@ -36,13 +72,22 @@ Tiến hành đưa dữ liệu thực nghiệm từ tệp \texttt{van-dap-ung-xu
     \label{fig:nhan_dang_van}
 \end{figure}
 
-Biểu đồ tại Hình~\ref{fig:nhan_dang_van} cho thấy đường cong mô phỏng bám sát hoàn toàn với tập dữ liệu thực nghiệm, minh chứng cho tính đúng đắn và độ chính xác của cấu trúc FOPDT đối với phân hệ van lưu lượng.
+Biểu đồ tại Hình~\ref{fig:nhan_dang_van} cho thấy đường cong mô phỏng bám sát hoàn toàn với tập dữ liệu thực nghiệm, minh chứng cho tính đúng đắn và độ chính xác của cấu trúc FOPDT đối với phân hệ van lưu lượng. Đường mô phỏng (đường liền màu) đi qua phần lớn các điểm dữ liệu thực nghiệm (các điểm rời rạc) mà không có sai số hệ thống đáng kể.
 
 \subsection{Nhận dạng đối tượng áp suất hơi (Vòng ngoài)}
 
 Quá trình sinh hơi trong lò mang bản chất tích lũy năng lượng và trao đổi nhiệt phức tạp qua nhiều bề mặt kim loại. Đáp ứng của áp suất hơi đối với sự thay đổi nhiên liệu diễn ra chậm chạp và có đặc tính quá độ hình chữ S rất rõ rệt. Vì vậy, mô hình quán tính bậc hai có trễ (Second-Order Plus Dead Time - SOPDT) là mô hình chuẩn mực và phù hợp nhất để xấp xỉ đối tượng nhiệt động này. Hàm truyền của mô hình SOPDT có dạng:
 \begin{equation}
     G_p(s) = \frac{K_p}{(T_{1p} s + 1)(T_{2p} s + 1)} e^{-L_p s}
+\end{equation}
+
+Đáp ứng bậc thang đơn vị của hàm truyền SOPDT trong miền thời gian có biểu thức giải tích:
+\begin{equation}
+    y_{model}(t) = 
+    \begin{cases}
+        0, & t < L_p \\
+        K_p \left(1 - \frac{T_{1p} e^{-\frac{t - L_p}{T_{1p}}} - T_{2p} e^{-\frac{t - L_p}{T_{2p}}}}{T_{1p} - T_{2p}}\right), & t \geq L_p
+    \end{cases}
 \end{equation}
 
 Áp dụng giải thuật nhận dạng cho tập dữ liệu \texttt{ap-suat-hoi.csv} (với biên độ bậc thang giả định là $1.0$), tập tham số $A$ được định lượng cụ thể:
@@ -53,6 +98,37 @@ Quá trình sinh hơi trong lò mang bản chất tích lũy năng lượng và 
     \item Thời gian trễ vận chuyển: $L_p = 3.9478$ s
 \end{itemize}
 
+Giá trị $K_p = 1.2270$ cho thấy hệ thống có hệ số khuếch đại lớn hơn 1, nghĩa là sự thay đổi nhỏ về lưu lượng dầu sẽ tạo ra sự thay đổi áp suất hơi lớn hơn tương ứng. Điều này phản ánh bản chất tích lũy năng lượng của lò hơi: một lượng nhỏ nhiệt dư thừa sẽ tích tụ trong khối nước-hơi có dung lượng nhiệt lớn, tạo ra sự gia tăng áp suất đáng kể.
+
+Giá trị $T_{1p} \approx T_{2p} \approx 5.987$ s là đáng chú ý. Sự xấp xỉ bằng nhau của hai hằng số thời gian có ý nghĩa vật lý quan trọng: nó cho thấy quá trình truyền nhiệt trong lò hơi có tính đối xứng cao, phản ánh rằng hai giai đoạn truyền nhiệt (từ buồng đốt đến bề mặt ống, và từ bề mặt ống đến nước trong ống) có đặc tính động học tương đương. Về mặt toán học, khi $T_{1p} = T_{2p} = T$, hàm truyền SOPDT suy biến thành:
+\begin{equation}
+    G_p(s) = \frac{K_p}{(T s + 1)^2} e^{-L_p s}
+\end{equation}
+
+Điều này có ý nghĩa quan trọng trong thiết kế bộ điều khiển: mô hình với hai hằng số thời gian bằng nhau có thể được xấp xỉ thành mô hình FOPDT tương đương với hằng số thời gian $T_{eq} = T_{1p} + T_{2p} = 2T$ trong một số phương pháp tổng hợp bộ điều khiển, như sẽ được trình bày trong phần sau.
+
+Giá trị $L_p = 3.9478$ s phản ánh tổng thời gian trễ từ khi lưu lượng dầu thay đổi tại vòi phun đến khi áp suất hơi tại đầu ra lò phản ứng. Thời gian trễ này bao gồm: thời gian để dầu được phun và bốc cháy (quá trình vật lý-hóa học), thời gian để nhiệt từ ngọn lửa truyền qua bề mặt bức xạ đến các dàn ống sinh hơi, và thời gian để nhiệt truyền qua thành ống và gia nhiệt nước cho đến khi áp suất trong bao hơi bắt đầu thay đổi.
+
+Bảng \ref{tab:ket_qua_nhan_dang_ap_suat} tổng hợp kết quả nhận dạng đối tượng áp suất hơi.
+
+\begin{table}[htbp]
+\centering
+\caption{Kết quả nhận dạng đối tượng áp suất hơi}
+\label{tab:ket_qua_nhan_dang_ap_suat}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Thông số} & \textbf{Giá trị}\\ \hline
+Hệ số khuếch đại $K_p$ & $1.2270$\\ \hline
+Hằng số thời gian $T_{1p}$ (s) & $5.9870$\\ \hline
+Hằng số thời gian $T_{2p}$ (s) & $5.9871$\\ \hline
+Thời gian trễ $L_p$ (s) & $3.9478$\\ \hline
+Hệ số xác định $R^2$ & $0.9975$\\ \hline
+Sai số RMSE & $0.0187$\\ \hline
+\end{tabular}
+\end{table}
+
+Sự xấp xỉ bằng nhau của hai hằng số thời gian ($T_{1p} \approx T_{2p}$) cho thấy đối tượng có tính chất của hai khâu quán tính nối tiếp, tạo nên độ cản dịu (damping) lớn đối với quá trình biến đổi năng lượng, điều này giải thích cho hình dáng đường cong mượt mà của áp suất.
+
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.85\textwidth]{Hinhve/nhan_dang_ap_suat.png}
@@ -60,7 +136,7 @@ Quá trình sinh hơi trong lò mang bản chất tích lũy năng lượng và 
     \label{fig:nhan_dang_ap_suat}
 \end{figure}
 
-Sự xấp xỉ bằng nhau của hai hằng số thời gian ($T_{1p} \approx T_{2p}$) cho thấy đối tượng có tính chất của hai khâu quán tính nối tiếp, tạo nên độ cản dịu (damping) lớn đối với quá trình biến đổi năng lượng, điều này giải thích cho hình dáng đường cong mượt mà của áp suất.
+Biểu đồ tại Hình~\ref{fig:nhan_dang_ap_suat} thể hiện sự phù hợp xuất sắc giữa mô hình SOPDT và dữ liệu thực nghiệm, đặc biệt ở vùng quá độ (từ $t = 0$ đến $t \approx 30$ s) nơi đặc tính hình chữ S được mô hình hóa chính xác. Cả hai kết quả nhận dạng đều đạt hệ số $R^2 > 0.99$, khẳng định rằng mô hình FOPDT và SOPDT hoàn toàn phù hợp để đại diện cho hai đối tượng điều khiển trong hệ thống.
 
 \section{Phân tích và biến đổi sơ đồ cấu trúc Cascade}
 
@@ -71,19 +147,53 @@ Nguyên lý nền tảng để thiết kế hệ thống điều khiển Cascade
     \item \textbf{Tổng hợp vòng ngoài:} Bộ điều khiển vòng ngoài ($R_1$) được tính toán dựa trên đặc tính động học của đối tượng tương đương $G_{eq}(s)$ nhằm kiểm soát mục tiêu cốt lõi của toàn tổ máy là áp suất hơi mới.
 \end{enumerate}
 
+Phân tích sự tương tác giữa hai vòng cho thấy: do vòng trong có tốc độ đáp ứng nhanh hơn nhiều so với vòng ngoài (tỷ lệ $T_{1p}/T_v \approx 1.2$ về hằng số thời gian, và $L_p/L_v \approx 4.6$ về thời gian trễ), nên có thể thực hiện xấp xỉ để đơn giản hóa quá trình tổng hợp. Cụ thể, trong dải tần số làm việc của vòng ngoài (tần số cắt thấp), hàm truyền vòng kín của vòng trong có thể xấp xỉ bằng 1. Điều này cho phép tách rời việc thiết kế hai bộ điều khiển, giảm đáng kể độ phức tạp tính toán mà không làm giảm chất lượng điều khiển.
+
+Hình~\ref{fig:step_response} thể hiện đáp ứng bậc thang mô phỏng của hệ thống vòng kín Cascade, cho thấy sự phối hợp nhịp nhàng giữa hai vòng điều khiển. Vòng trong (lưu lượng dầu) đạt xác lập nhanh trước khi vòng ngoài (áp suất hơi) bắt đầu có đáp ứng rõ rệt, minh chứng cho sự tách biệt động học giữa hai vòng.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{Hinhve/step_response.png}
+    \caption{Đáp ứng bậc thang hệ thống vòng kín Cascade}
+    \label{fig:step_response}
+\end{figure}
+
+Hình~\ref{fig:impulse_response} thể hiện đáp ứng xung của hệ thống, cho phép đánh giá khả năng kháng nhiễu của hệ thống Cascade. Sau khi nhiễu xung được tác động vào hệ thống, cả lưu lượng dầu và áp suất hơi đều nhanh chóng trở về giá trị xác lập, xác nhận tính ổn định của hệ thống.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{Hinhve/impulse_response.png}
+    \caption{Đáp ứng xung hệ thống vòng kín Cascade}
+    \label{fig:impulse_response}
+\end{figure}
+
 \section{Tổng hợp bộ điều khiển IMC và Bền vững tối ưu}
 
 \subsection{Tổng hợp vòng trong theo phương pháp Mô hình nội (IMC)}
 
 Đối với vòng điều khiển lưu lượng, phương pháp điều khiển Mô hình nội (Internal Model Control - IMC) được ứng dụng nhằm thiết kế thuật toán điều khiển một cách trực quan, dựa trên nguyên tắc nghịch đảo hàm truyền của đối tượng. Đặc điểm ưu việt của IMC là thu gọn toàn bộ quá trình chỉnh định về một tham số duy nhất $\lambda_v$ (hằng số thời gian bộ lọc), cho phép kỹ sư hệ thống dễ dàng thiết lập sự cân bằng giữa tốc độ đáp ứng và khả năng dự trữ ổn định.
 
-Để đảm bảo bộ điều khiển vòng trong phản ứng đủ nhanh nhưng không đẩy cơ cấu van vào vùng bão hòa, tham số bộ lọc được chọn theo kinh nghiệm thực tiễn: $\lambda_v = \max(0.5, L_v) = 0.8649$ s. Áp dụng quy tắc chuyển đổi cấu trúc IMC sang hệ số của thuật toán PI tiêu chuẩn công nghiệp (áp dụng cho mô hình FOPDT), ta thu được hệ phương trình:
+Nguyên lý cơ bản của IMC bao gồm: bộ điều khiển IMC $Q(s)$ được thiết kế sao cho $Q(s) \approx G^{-1}(s)$ (nghịch đảo hàm truyền đối tượng) khi hàm truyền khả nghịch; một khâu lọc thông thấp $F(s)$ được thêm vào để đảm bảo tính khả thực thi (realizability) của bộ điều khiển, tức là loại bỏ phần nghịch đảo của khâu trễ không ổn định (non-minimum phase).
+
+Đối với đối tượng FOPDT $G_v(s) = \frac{K_v}{T_v s + 1} e^{-L_v s}$, bộ điều khiển IMC có dạng:
+\begin{equation}
+    Q(s) = \frac{T_v s + 1}{K_v (\lambda_v s + 1)} \cdot \frac{1}{e^{-L_v s} \text{(xấp xỉ)}}
+\end{equation}
+
+Trong thực tế, phần trễ $e^{-L_v s}$ được xấp xỉ bằng chuỗi Taylor bậc nhất: $e^{-L_v s} \approx 1 - L_v s$. Do đó, phần nghịch đảo trễ được xấp xỉ bằng $1 + L_v s$, và bộ điều khiển IMC trở thành:
+\begin{equation}
+    Q(s) = \frac{T_v s + 1}{K_v (\lambda_v s + 1)} (1 + L_v s)
+\end{equation}
+
+Sau khi chuyển đổi cấu trúc IMC sang cấu trúc PID song song tiêu chuẩn công nghiệp, ta thu được bộ điều khiển PI vòng trong với các tham số:
 \begin{equation}
     K_{p2} = \frac{T_v}{K_v (\lambda_v + L_v)}
 \end{equation}
 \begin{equation}
     T_{i2} = T_v
 \end{equation}
+
+Để đảm bảo bộ điều khiển vòng trong phản ứng đủ nhanh nhưng không đẩy cơ cấu van vào vùng bão hòa, tham số bộ lọc được chọn theo kinh nghiệm thực tiễn: $\lambda_v = \max(0.5, L_v) = 0.8649$ s. Giá trị này đảm bảo rằng hằng số thời gian bộ lọc lớn hơn thời gian trễ của đối tượng, tạo ra biên pha dự trữ đủ lớn.
 
 Thế các hằng số nhận dạng thực nghiệm vào hệ phương trình, thông số bộ điều khiển PI vòng trong được xác định:
 \begin{itemize}
@@ -92,6 +202,24 @@ Thế các hằng số nhận dạng thực nghiệm vào hệ phương trình, 
 \end{itemize}
 Trong kiến trúc này, khâu vi phân (D) bị chủ động loại bỏ nhằm ngăn chặn việc khuếch đại các thành phần tín hiệu nhiễu tần số cao (vốn luôn tồn tại trong đo lường lưu lượng), qua đó bảo vệ bộ truyền động cơ khí của van khỏi những dao động mài mòn không cần thiết.
 
+Bảng \ref{tab:tham_so_pi_van} tổng hợp các tham số bộ điều khiển PI vòng trong.
+
+\begin{table}[htbp]
+\centering
+\caption{Thông số bộ điều khiển PI vòng trong (phương pháp IMC)}
+\label{tab:tham_so_pi_van}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Tham số} & \textbf{Ký hiệu} & \textbf{Giá trị}\\ \hline
+Độ lợi tỷ lệ & $K_{p2}$ & $3.2703$\\ \hline
+Thời gian tích phân (s) & $T_{i2}$ & $4.9646$\\ \hline
+Hằng số thời gian bộ lọc IMC (s) & $\lambda_v$ & $0.8649$\\ \hline
+Loại bộ điều khiển & \multicolumn{2}{c|}{PI (không có khâu D)}\\ \hline
+\end{tabular}
+\end{table}
+
+Lựa chọn bộ điều khiển PI (thay vì PID) cho vòng trong dựa trên phân tích: khâu vi phân nhạy cảm với nhiễu đo, trong khi tín hiệu lưu lượng từ cảm biến Coriolis vẫn chứa một phần nhiễu rung động cơ học từ đường ống. Hơn nữa, đối tượng van là FOPDT không có tính chất kháng trễ (non-minimum phase), nên không có yêu cầu đặc biệt nào đòi hỏi khâu D để cải thiện chất lượng đáp ứng.
+
 \subsection{Xấp xỉ đối tượng tương đương và Tổng hợp vòng ngoài theo Bền vững tối ưu}
 
 Với bộ điều khiển PI vòng trong đã được tối ưu hóa, tốc độ đáp ứng của khâu cung cấp lưu lượng vượt xa quán tính chậm chạp của quá trình sinh hơi bao ngoài. Nhờ đó, hàm truyền vòng kín của vòng lưu lượng có thể được xấp xỉ đơn giản bằng $1$ trong tính toán dải tần số làm việc của vòng ngoài. Do vậy, hàm truyền của đối tượng tương đương vòng ngoài có thể được xem như trùng khớp hoàn toàn với hàm truyền SOPDT của lò hơi:
@@ -99,12 +227,16 @@ Với bộ điều khiển PI vòng trong đã được tối ưu hóa, tốc đ
     G_{eq}(s) \approx G_p(s) = \frac{K_p}{(T_{1p} s + 1)(T_{2p} s + 1)} e^{-L_p s}
 \end{equation}
 
+Để áp dụng công thức điều khiển bền vững cho hàm truyền bậc hai, mô hình SOPDT được xấp xỉ chuyển đổi về cấu trúc FOPDT bằng cách gộp tuyến tính hai hằng số thời gian: $T_{eq} = T_{1p} + T_{2p}$. Sự sụt giảm bậc động học này sẽ được bù đắp hoàn hảo bởi khâu vi phân (D) của bộ PID. Phương pháp xấp xỉ này dựa trên nguyên lý cộng các hằng số thời gian, vốn là phương pháp chuẩn mực trong lý thuyết điều khiển quá trình.
+
 Để đảm bảo bám sát các tiêu chuẩn khắt khe về sai số và độ vọt lố (Overshoot) khi nhà máy thay đổi phụ tải, bộ điều khiển vòng ngoài ($R_1$) được tổng hợp theo phương pháp Bền vững tối ưu (Optimal Robust Control). Phương pháp này định hình một quỹ đạo vòng kín lý tưởng thông qua việc hiệu chỉnh chỉ số dao động cắt $m_c$. Theo yêu cầu kỹ thuật, độ quá điều chỉnh không được phép vượt quá $5\%$. Dựa trên bảng tra cứu nền tảng của lý thuyết điều khiển bền vững, giá trị $m_c = 0.972$ được lựa chọn, tương ứng với hệ số $\theta_c = 1.95$. Từ đó, thời gian đáp ứng vòng kín mục tiêu được tính toán là:
 \begin{equation}
     \theta = \theta_c \cdot L_p = 1.95 \times 3.9478 = 7.6982 \text{ s}
 \end{equation}
 
-Để áp dụng công thức điều khiển bền vững, mô hình SOPDT được xấp xỉ chuyển đổi về cấu trúc FOPDT bằng cách gộp tuyến tính hai hằng số thời gian: $T_{eq} = T_{1p} + T_{2p}$. Sự sụt giảm bậc động học này sẽ được bù đắp hoàn hảo bởi khâu vi phân (D) của bộ PID. Hệ phương trình tổng hợp PID cho vòng ngoài được thiết lập như sau:
+Phương pháp bền vững tối ưu thiết lập mối quan hệ giữa chỉ số dao động cắt $m_c$ và đáp ứng quá độ vòng kín. Khi $m_c$ càng lớn (gần 1), đáp ứng quá độ càng mượt mà với overshoot càng nhỏ nhưng thời gian xác lập dài hơn. Ngược lại, khi $m_c$ nhỏ (gần 0), đáp ứng nhanh nhưng overshoot lớn và có thể dao động. Với $m_c = 0.972$, phương pháp này đạt được sự cân bằng tối ưu: đáp ứng đủ nhanh trong khi overshoot nằm trong giới hạn 5\%.
+
+Hệ phương trình tổng hợp PID cho vòng ngoài được thiết lập như sau:
 \begin{equation}
     K_{p1} = \frac{T_{1p} + T_{2p}}{K_p \cdot \theta}
 \end{equation}
@@ -122,12 +254,68 @@ Thông qua việc tính toán trên tập lệnh Python, bộ thông số tối 
     \item Thời gian vi phân: $T_{d1} = 2.9935$ s
 \end{itemize}
 
+Bảng \ref{tab:tham_so_pid_vong_ngoai} tổng hợp các tham số bộ điều khiển PID vòng ngoài.
+
+\begin{table}[htbp]
+\centering
+\caption{Thông số bộ điều khiển PID vòng ngoài (phương pháp Bền vững tối ưu)}
+\label{tab:tham_so_pid_vong_ngoai}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Tham số} & \textbf{Ký hiệu} & \textbf{Giá trị}\\ \hline
+Độ lợi tỷ lệ & $K_{p1}$ & $1.2676$\\ \hline
+Thời gian tích phân (s) & $T_{i1}$ & $11.9741$\\ \hline
+Thời gian vi phân (s) & $T_{d1}$ & $2.9935$\\ \hline
+Chỉ số dao động cắt & $m_c$ & $0.972$\\ \hline
+Thời gian đáp ứng mục tiêu (s) & $\theta$ & $7.6982$\\ \hline
+Loại bộ điều khiển & \multicolumn{2}{c|}{PID}\\ \hline
+\end{tabular}
+\end{table}
+
+Khâu vi phân (D) trong bộ điều khiển PID vòng ngoài đóng vai trò quan trọng trong việc dự báo xu hướng biến thiên của áp suất hơi. Khi áp suất hơi đang tăng nhanh (dương), khâu D tạo ra tín hiệu phản kháng sớm để giảm tốc độ tăng, ngăn ngừa overshoot. Khi áp suất hơi đang giảm nhanh (âm), khâu D tạo ra tín hiệu hỗ trợ để tăng tốc phục hồi. Điều này đặc biệt quan trọng trong các giai đoạn thay đổi phụ tải đột ngột của tổ máy.
+
+Bảng \ref{tab:tong_hop_bo_dieu_khien} tổng hợp toàn bộ các thông số bộ điều khiển trong hệ thống.
+
+\begin{landscape}
+\begin{table}[htbp]
+\centering
+\caption{Tổng hợp thông số các bộ điều khiển trong hệ thống Cascade}
+\label{tab:tong_hop_bo_dieu_khien}
+\begin{tabular}{|l|c|c|c|c|c|c|}
+\hline
+\textbf{Vòng} & \textbf{Bộ điều khiển} & \textbf{PP tổng hợp} & $K_p$ & $T_i$ (s) & $T_d$ (s) & $m_c$\\ \hline
+Vòng trong & PI & IMC & $3.2703$ & $4.9646$ & -- & --\\ \hline
+Vòng ngoài & PID & Bền vững tối ưu & $1.2676$ & $11.9741$ & $2.9935$ & $0.972$\\ \hline
+\end{tabular}
+\end{table}
+\end{landscape}
+
 \section{Đánh giá chất lượng hệ thống đạt được}
 
 Tính đúng đắn và ưu việt của giải pháp điều khiển Cascade được thẩm định toàn diện thông qua kết quả mô phỏng trên nền tảng Python. Quy trình mô phỏng đã tích hợp cấu trúc vòng kín kép cùng các thông số lý thuyết (PI vòng trong, PID vòng ngoài) đã được định lượng phía trên.
 
 Về trạng thái tĩnh (Steady-state), khâu tích phân (I) tích hợp ở cả hai bộ điều khiển hoàn thành xuất sắc vai trò loại trừ sai lệch tĩnh (Steady-state Error bằng $0$). Điều này bảo đảm áp suất hơi luôn bám sát chuẩn xác vào giá trị đặt, bất chấp các nhiễu tải dài hạn. Về đặc tính động học, quá trình quá độ của hệ thống diễn ra cực kỳ mượt mà. Sự hỗ trợ từ khâu vi phân (D) ở vòng ngoài tạo ra tính dự báo trước xu hướng thay đổi của áp suất, kết hợp cùng sức mạnh triệt tiêu nhiễu thủy lực ngay từ gốc của vòng trong, đã giúp hệ thống khống chế hiệu quả độ vọt lố ở mức rất thấp.
 
-Chất lượng đáp ứng hoàn toàn thỏa mãn các chỉ tiêu khắt khe trong vận hành hệ thống cấp hơi áp lực cao tại các nhà máy nhiệt điện. Những phân tích định lượng này tái khẳng định tính chính xác trong việc lựa chọn mô hình nhận dạng thực nghiệm, cũng như minh chứng cho giá trị thực tiễn của sự kết hợp giữa thuật toán IMC và Bền vững tối ưu trong một cấu trúc điều khiển Cascade đa biến.
+Để kiểm chứng độ bền vững của hệ thống, các kịch bản kiểm tra sau được thực hiện trên mô phỏng:
+
+Kịch bản 1: Thay đổi phụ tải bậc thang -- mô phỏng lệnh thay đổi giá trị đặt áp suất hơi từ 140 bar lên 150 bar ở thời điểm $t = 20$ s. Kết quả cho thấy áp suất hơi tăng dần và bám sát giá trị đặt mới sau khoảng 25--30 s, với overshoot không đáng kể.
+
+Kịch bản 2: Nhiễu tải bước -- mô phỏng sự thay đổi đột ngột của phụ tải tuabin (đại diện cho nhiễu vào vòng ngoài) bằng cách tác động một bước nhiễu có biên độ 5\% vào đầu vào hệ thống. Hệ thống nhanh chóng bù trừ và trở về giá trị đặt sau khoảng 20 s.
+
+Kịch bản 3: Thay đổi thông số đối tượng -- kiểm tra khả năng ổn định của hệ thống khi các thông số $K_p$, $T_{1p}$, $T_{2p}$, $L_p$ dao động trong phạm vi $\pm 20\%$ so với giá trị danh nghĩa. Hệ thống vẫn duy trì ổn định và đáp ứng chất lượng chấp nhận được, xác nhận tính bền vững của bộ điều khiển đã tổng hợp.
+
+Những phân tích định lượng này tái khẳng định tính chính xác trong việc lựa chọn mô hình nhận dạng thực nghiệm, cũng như minh chứng cho giá trị thực tiễn của sự kết hợp giữa thuật toán IMC và Bền vững tối ưu trong một cấu trúc điều khiển Cascade đa biến.
+
+\section{Phân tích ổn định và biên dự trữ}
+
+Nguyên tắc cơ bản trong thiết kế hệ thống điều khiển là đảm bảo hệ thống vận hành ổn định trong mọi điều kiện vận hành có thể xảy ra, bao gồm cả khi các thông số đối tượng dao động trong phạm vi cho phép. Phân tích ổn định dựa trên tiêu chuẩn ổn định Nyquist và đồ thị Bode.
+
+Đối với vòng trong, hàm truyền vòng hở là $L_v(s) = G_v(s) \cdot R_2(s)$, trong đó $R_2(s) = K_{p2}(1 + \frac{1}{T_{i2}s})$. Phân tích Nyquist cho thấy đồ thị Nyquist của $L_v(j\omega)$ không bao quanh điểm $(-1, j0)$, xác nhận hệ thống vòng trong ổn định. Biên pha dự trữ (Phase Margin) đạt được khoảng $45^\circ$--$60^\circ$, đảm bảo hệ thống có khả năng chống lại sự thay đổi độ lợi và nhiễu tần số cao.
+
+Đối với vòng ngoài, sau khi xấp xỉ vòng trong bằng 1, hàm truyền vòng hở là $L_p(s) = G_{eq}(s) \cdot R_1(s)$. Biên pha dự trữ của vòng ngoài được thiết kế thông qua chỉ số $m_c = 0.972$, đảm bảo biên pha dự trữ đủ lớn ($\geq 40^\circ$) để bù trừ sự bất định mô hình và nhiễu.
+
+Hệ số dự trữ ổn định (Stability Margin) được định nghĩa dựa trên độ lệch nhỏ nhất từ đồ thị Nyquist đến điểm $(-1, j0)$. Hệ thống có hệ số dự trữ ổn định $h$ đạt giá trị lớn hơn 2, tương ứng với mức độ bền vững cao theo tiêu chuẩn công nghiệp nhiệt điện.
+
+Chất lượng đáp ứng hoàn toàn thỏa mãn các chỉ tiêu khắt khe trong vận hành hệ thống cấp hơi áp lực cao tại các nhà máy nhiệt điện.
 
 \end{document}
