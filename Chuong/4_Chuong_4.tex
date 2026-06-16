@@ -3,31 +3,66 @@
 \documentclass[../main.tex]{subfiles}
 \begin{document}
 
-\section{Kết luận về giải pháp và kết quả nhận được}
+\section{Kết luận về giải pháp và kết quả đạt được}
 
-Quá trình thực hiện bài tập lớn về phân tích và tổng hợp hệ thống điều khiển lưu lượng dầu nhiên liệu và phụ tải lò hơi đã hoàn thành trọn vẹn các yêu cầu đề ra, từ khâu khảo sát thực trạng công nghệ và xây dựng sơ đồ điều khiển đến mô phỏng kiểm chứng bằng phần mềm.
+\subsection{Tổng quan giải pháp}
 
-Về giải pháp kỹ thuật, hệ thống đã được thiết kế theo cấu trúc điều khiển hai vòng (cascade) phân cấp chặt chẽ: vòng trong nhanh điều chỉnh lưu lượng dầu thông qua van FCV nhằm loại bỏ các nhiễu thủy lực đầu vào, vòng ngoài chậm điều chỉnh áp suất hơi của bộ phận sinh hơi. Cấu trúc điều khiển hai vòng này là phương án tối ưu, đáp ứng hoàn hảo các yêu cầu công nghệ nhiệt điện.
+Quá trình phân tích và tổng hợp hệ thống điều khiển lưu lượng dầu nhiên liệu và phụ tải lò hơi đã hoàn thành toàn bộ yêu cầu: khảo sát thực trạng công nghệ, xây dựng sơ đồ điều khiển, mô hình hóa, nhận dạng mô hình, tổng hợp bộ điều khiển và kiểm chứng mô phỏng.
 
-Quá trình thực hiện bài tập lớn đã mang lại những kết quả khả quan trong cả hai khâu nhận dạng và thiết kế bộ điều khiển. Đối với bài toán nhận dạng, nhóm đã số hóa và xây dựng thành công mô hình động học cho hai đối tượng chính yếu dựa trên bộ dữ liệu thực nghiệm đã qua làm sạch bằng công cụ Automeris WebPlotDigitizer và ngôn ngữ lập trình Python. Cụ thể, động học vòng trong của van điều khiển được mô tả chính xác thông qua hàm truyền quán tính bậc nhất có trễ (QTB1T) như sau:
-\begin{equation}
-    O_2(s) = \frac{0{,}8836}{4{,}8694s + 1} e^{-0{,}8213s}
-\end{equation}
-Bên cạnh đó, động học vòng ngoài của bộ phận sinh hơi được biểu diễn phù hợp nhất dưới dạng hàm truyền quán tính bậc hai có trễ (QTB2T) suy biến:
-\begin{equation}
-    O_1(s) = \frac{1{,}2147}{(6{,}0356s + 1)^2} e^{-4{,}0457s}
-\end{equation}
+Giải pháp được lựa chọn là cấu trúc điều khiển hai vòng (cascade) phân cấp: vòng trong điều khiển lưu lượng dầu qua van FCV để triệt tiêu nhiễu thủy lực ngay tại gốc; vòng ngoài điều khiển áp suất hơi mới của bộ phận sinh hơi. Cấu trúc này tối ưu đáp ứng đặc tính động học khác biệt giữa hai phân hệ (van đáp ứng trong vài giây, lò hơi có quán inertia lớn với thời gian quá độ hàng chục giây) và đáp ứng các yêu cầu khắt khe của hệ thống nhiệt điện công nghiệp.
 
-Dựa trên các mô hình toán học đã được xác lập vững chắc, phương pháp nghịch đảo mô hình bền vững đã được ứng dụng để thiết kế thành công các bộ điều khiển tối ưu cho từng vòng lặp. Vòng trong được kiểm soát bởi bộ điều khiển PI với hàm truyền $R_2(s) = 4{,}978 \left(1 + \frac{1}{4{,}8694s}\right)$, trong khi vòng ngoài được điều chỉnh bởi bộ điều khiển PID có hàm truyền $R_1(s) = 1{,}8222 \left(1 + \frac{1}{12{,}0712s} + 3{,}0178s\right)$. Việc kiểm chứng trên nền tảng MATLAB/Simulink đã khẳng định chất lượng xuất sắc của hệ thống thiết kế. Vòng lưu lượng phản ứng cực kỳ nhanh nhạy với thời gian quá độ chỉ khoảng $T_{s2} \approx 6\,\text{s}$. Đồng thời, vòng áp suất hơi vòng ngoài hoạt động vô cùng ổn định, hầu như không xuất hiện dao động, khống chế được độ vọt lố ở mức cực tiểu dưới $5\%$ cùng thời gian quá độ hợp lý $T_{s1} \approx 32\,\text{s}$. Đặc biệt, hệ thống đã triệt tiêu hoàn toàn sai lệch tĩnh ($e_{ss} = 0$), đáp ứng trọn vẹn các yêu cầu khắt khe của hệ thống điều khiển công nghiệp.
+\subsection{Kết quả mô hình hóa và nhận dạng}
 
-\section{Kết luận về hiệu quả sản xuất, kinh tế-xã hội và môi trường}
+Dựa trên dữ liệu thực nghiệm đã qua làm sạch, hai mô hình quán tính bậc nhất có trễ (QTB1T) và quán tính bậc hai có trễ (QTB2T) được xác định phù hợp cho hai đối tượng điều khiển:
 
-Việc triển khai thành công hệ điều khiển hai vòng tự động cho lưu lượng dầu nhiên liệu và phụ tải lò hơi mang lại những lợi ích toàn diện, có thể đánh giá trên hai phương diện chính. Về mặt hiệu quả sản xuất và kinh tế, khả năng điều khiển chính xác lưu lượng dầu cùng áp suất hơi đóng vai trò cốt lõi trong việc tối ưu hóa hiệu suất của buồng đốt. Quá trình này giúp giảm thiểu đáng kể lượng dầu HFO tiêu thụ trong các giai đoạn khởi động lò, trực tiếp cắt giảm chi phí nhiên liệu và chi phí vận hành tổng thể cho nhà máy. Thêm vào đó, việc khống chế tốt độ vọt lố và duy trì sự ổn định của áp suất hơi nước đã loại bỏ hoàn toàn các nguy cơ quá tải nhiệt cục bộ. Sự ổn định này giúp ngăn chặn các hiện tượng hỏng hóc tiềm ẩn tại hệ thống ống sinh hơi, góp phần nâng cao tuổi thọ của thiết bị và tiết kiệm đáng kể các khoản chi phí bảo trì định kỳ. 
+\begin{enumerate}
+    \item \textbf{Vòng trong (van điều khiển lưu lượng)}:
+    \[
+        G_v(s) = \frac{0{,}8836}{4{,}8694\,s + 1}\,e^{-0{,}8213\,s}
+    \]
+    với hệ số xác định $R^2 = 0{,}9987$, khẳng định mô hình phù hợp gần như hoàn toàn với dữ liệu thực nghiệm.
 
-Bên cạnh lợi ích kinh tế, hệ thống còn mang lại những đóng góp tích cực về mặt xã hội và môi trường. Nhờ duy trì tỷ lệ nhiên liệu - không khí luôn ở trạng thái lý tưởng, quá trình đốt cháy được diễn ra hoàn toàn, làm giảm triệt để sự phát thải các loại khí độc hại gây ô nhiễm không khí như $\text{CO}$, $\text{NO}_x$, $\text{SO}_x$ và muội than. Hơn thế nữa, sự hiện diện của các mạch điều khiển liên khóa bảo vệ thông minh, chẳng hạn như cơ chế tự động ngắt bơm khi mức dầu xuống cực thấp (mức LL) hay tự động khóa van nạp khi phát hiện nguy cơ tràn bể (mức HH), đã tạo ra một lá chắn an toàn vững chắc. Các cơ chế này giúp ngăn chặn từ xa mọi rủi ro về rò rỉ nhiên liệu, bảo đảm an toàn cháy nổ ở mức cao nhất và loại bỏ hoàn toàn nguy cơ ô nhiễm nguồn nước tại khu vực lân cận nhà máy.
+    \item \textbf{Vòng ngoài (bộ phận sinh hơi)}:
+    \[
+        O_1(s) = \frac{1{,}2147}{(6{,}0356\,s + 1)^2}\,e^{-4{,}0457\,s}
+    \]
+    với $R^2 = 0{,}9975$, phản ánh chính xác đặc tính quá độ hình chữ S của quá trình truyền nhiệt hai giai đoạn trong lò hơi.
+\end{enumerate}
 
-\section{Kiến nghị}
+\subsection{Tổng hợp bộ điều khiển và kiểm chứng}
 
-Mặc dù hệ thống hiện tại đã đáp ứng tốt các chỉ tiêu thiết kế, nhóm nghiên cứu nhận thấy vẫn còn nhiều tiềm năng để tiếp tục tối ưu hóa. Hướng phát triển thứ nhất là nghiên cứu và ứng dụng các cấu trúc bù trễ nâng cao, chẳng hạn như thuật toán dự báo Smith (Smith Predictor) hay phương pháp điều khiển dự báo mô hình (Model Predictive Control - MPC), đặc biệt dành cho vòng điều khiển áp suất hơi bên ngoài. Hướng đi này xuất phát từ thực tế rằng thời gian trễ thuần của lò hơi vẫn đang chiếm một tỷ lệ tương đối lớn so với hằng số thời gian của hệ thống; việc áp dụng các kỹ thuật điều khiển hiện đại có khả năng rút ngắn hơn nữa thời gian quá độ của toàn mạch. Hướng phát triển thứ hai tập trung vào việc tích hợp các thuật toán tự chỉnh định thích nghi (Adaptive Auto-Tuning) vào hệ thống điều khiển PLC/DCS trong thực tế. Công nghệ này sẽ cho phép hệ thống có khả năng tự động cập nhật và tinh chỉnh liên tục bộ tham số PID. Điều này mang ý nghĩa thực tiễn to lớn trong việc duy trì hiệu suất điều khiển tối ưu, đặc biệt khi đặc tính động học của các thiết bị chấp hành, điển hình như van điều khiển, bị suy giảm hoặc biến đổi theo thời gian do hệ quả tất yếu của quá trình mài mòn cơ học.
+Áp dụng phương pháp nghịch đảo mô hình bền vững kết hợp IMC và Bền vững tối ưu, hai bộ điều khiển được tổng hợp với các thông số:
+
+\begin{table}[htbp]
+\centering
+\caption{Thông số bộ điều khiển hai vòng}
+\label{tab:controller_params}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Vòng} & \textbf{Bộ ĐK} & \textbf{Phương pháp} & $K_p$ & $T_i$ (s) \\
+\hline
+Vòng trong & PI & IMC & $4{,}978$ & $4{,}8694$ \\
+\hline
+Vòng ngoài & PID & Bền vững tối ưu & $1{,}8222$ & $12{,}0712$ \\
+\hline
+\end{tabular}
+\end{table}
+
+Kết quả kiểm chứng mô phỏng trên MATLAB/Simulink cho thấy hệ thống hoạt động ổn định và đáp ứng toàn bộ chỉ tiêu:
+
+\begin{itemize}
+    \item Vòng trong (lưu lượng dầu): thời gian xác lập $T_{s2} \approx 6$\,s, phản ứng cực kỳ nhanh nhạy, triệt tiêu nhiễu thủy lực ngay tại vòng trong trước khi lan truyền.
+    \item Vòng ngoài (áp suất hơi): thời gian xác lập $T_{s1} \approx 32$\,s, độ vọt lố $< 5\%$, hầu như không dao động.
+    \item Sai lệch tĩnh: $e_{ss} = 0$ (nhờ khâu tích phân I), đảm bảo áp suất hơi luôn bám sát giá trị đặt.
+    \item Độ bền vững: hệ thống ổn định khi thông số đối tượng thay đổi trong phạm vi $\pm 20\%$.
+\end{itemize}
+
+\subsection{Kết luận và ý nghĩa}
+
+Cấu trúc điều khiển hai vòng đã chứng minh hiệu quả vượt trội so với cấu trúc đơn vòng, đặc biệt phù hợp với đặc tính trễ và quán inertia lớn của lò hơi nhiệt điện. Kết hợp IMC (đơn giản, phù hợp đối tượng QTB1T của van) và Bền vững tối ưu (kiểm soát chặt overshoot, phù hợp đối tượng QTB2T có trễ lớn của lò) là lựa chọn hợp lý, cân bằng tốc độ đáp ứng và độ ổn định.
+
+Về hiệu quả thực tiễn, giải pháp mang lại lợi ích kinh tế (giảm tiêu thụ dầu nhiên liệu, tiết kiệm chi phí vận hành), xã hội và môi trường (giảm phát thải khí độc CO, NO$_x$, SO$_x$) đồng thời nâng cao độ an toàn nhờ các cơ chế bảo vệ liên động (MFT) được tích hợp trong hệ thống.
+
+Hướng phát triển tiếp theo có thể tập trung vào việc ứng dụng các kỹ thuật điều khiển dự báo (Smith Predictor, MPC) cho vòng ngoài để rút ngắn thời gian quá độ do trễ thuần của lò hơi, hoặc tích hợp thuật toán tự chỉnh định thích nghi (Adaptive Auto-Tuning) để duy trì hiệu suất tối ưu khi đặc tính thiết bị suy giảm theo thời gian.
 
 \end{document}

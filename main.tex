@@ -12,14 +12,16 @@
 \usepackage[utf8]{vietnam}
 \usepackage[top=2cm, bottom=3cm, left=3.5cm, right=2.5cm]{geometry}
 
+\usepackage{pifont} % Cho ký hiệu \ding trong danh sách
 \usepackage{tikz} % Thư viện vẽ hình
-\usetikzlibrary{calc, arrows.meta, positioning} % Add calc, arrows.meta, and positioning libraries for TikZ coordinates and styles
+\usetikzlibrary{calc, arrows.meta, positioning, patterns, shapes.geometric} % Add calc, arrows.meta, positioning, patterns, shapes.geometric libraries for TikZ coordinates and styles
 \usepackage{graphicx} % Cho phép chèn hỉnh ảnh
 \usepackage{fancybox} % Tạo khung box
 \usepackage{indentfirst} % Thụt đầu dòng ở dòng đầu tiên trong đoạn
 \usepackage{amsthm} % Cho phép thêm các môi trường định nghĩa
 \usepackage{latexsym} % Các kí hiệu toán học
 \usepackage{amsmath} % Hỗ trợ một số biểu thức toán học
+\usepackage{relsize} % Hỗ trợ \mathsmaller cho subscript trong math mode
 \usepackage{amssymb} % Bổ sung thêm kí hiệu về toán học
 \usepackage{amsbsy} % Hỗ trợ các kí hiệu in đậm
 \usepackage{times} % Chọn font Time New Romans
@@ -61,6 +63,10 @@
 % colortbl được tự động load bởi xcolor với option table
 
 \usepackage{listings} % Gói cho phép chèn code và định dạng code
+\usepackage{tcolorbox} % Gói tạo hộp màu
+\tcbuselibrary{skins} % Thư viện hỗ trợ tcolorbox
+\usepackage{pgfplots} % Vẽ đồ thị trong TikZ
+\pgfplotsset{compat=1.18}
 
 % --- CẤU HÌNH HIỂN THỊ CODE ---
 % ==== FONTS & UTF-8 (khuyên dùng XeLaTeX) ====
@@ -301,7 +307,7 @@
 	
 \usepackage[all]{hypcap} % Cho phép tham chiếu chính xác đến hình ảnh và bảng biểu
 
-\graphicspath{{figures/}{../figures/}} % Thư mục chứa các hình ảnh
+\graphicspath{{figures/}{../figures/}{tikz/}} % Thư mục chứa các hình ảnh và TikZ
 
 \counterwithin{figure}{chapter} % Đánh số hình ảnh kèm theo chapter. Ví dụ: Hình 1.1, 1.2,..
 
@@ -446,11 +452,11 @@
 \label{chuong3}
 \subfile{Chuong/3_Chuong_3.tex}
 
-% \newpage
-% % \pagestyle{fancy} % Áp dụng header và footer
-% \chapter{KẾT LUẬN VÀ KIẾN NGHỊ}
-% \label{chuong4}
-% \subfile{Chuong/4_Chuong_4.tex}
+\newpage
+% \pagestyle{fancy} % Áp dụng header và footer
+\chapter{KẾT LUẬN VÀ KIẾN NGHỊ}
+\label{chuong4}
+\subfile{Chuong/4_Chuong_4.tex}
 
 % \newpage
 % % \pagestyle{fancy} % Áp dụng header và footer
