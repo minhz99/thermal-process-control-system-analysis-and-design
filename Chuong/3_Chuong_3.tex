@@ -46,7 +46,7 @@ trong đó $K_p$ là hệ số khuếch đại, $T_{1p}$ và $T_{2p}$ là hai h�
         %% HÀNG 2: VÒNG NGOÀI (LÒ)
         \node[label style] (lblLo) at (0, 0) {Vòng ngoài (Lò):};
         \node[io] (Fp) at (uv |- lblLo) {$F(s)$};
-        \node[outer block] (Gp) at (Gv |- lblLo) {$G_p(s)=\dfrac{K_p}{(T_{1p}s+1)(T_{2p}s+1)}\,e^{-L_p s}$};
+        \node[inner block, right=-2cm of Fp] (Gp) at (Gv |- lblLo) {$G_p(s)=\dfrac{K_p}{(T_{1p}s+1)(T_{2p}s+1)}\,e^{-L_p s}$};
         \node[io, right=of Gp] (Pp) {$P(s)$};
 
         %% ĐƯỜNG MŨI TÊN
@@ -109,7 +109,7 @@ trong đó $K_p$ là hệ số khuếch đại, $T_{1p}$ và $T_{2p}$ là hai h�
 \node[left, gray!50!black] at (0,2) {$u(t)$};
 
 % Legend box -- placed inside the plot area (upper right corner)
-\node[draw, fill=yellow!15, rounded corners, anchor=north east, font=\small] at (9.9,4.9) {
+\node[draw, fill=yellow!15, rounded corners, anchor=north east, font=\small] at (15.9,4.9) {
     \begin{tabular}{p{3.2cm}}
     \textbf{Chú thích:}\\
     $K$: Hệ số khuếch đại tĩnh\\
@@ -120,7 +120,7 @@ trong đó $K_p$ là hệ số khuếch đại, $T_{1p}$ và $T_{2p}$ là hai h�
 };
 
 % Annotation for rise time -- placed inside the plot area (lower right)
-\node[anchor=north east, draw, fill=white, font=\small] at (9.9, 0.3) {
+\node[anchor=north east, draw, fill=white, font=\small] at (9.9, 3) {
     \begin{tabular}{p{3.2cm}}
     \textbf{Đặc tính QTB1T:}\\
     Đáp ứng bắt đầu tại $t = L$
@@ -168,8 +168,8 @@ Hình~\ref{fig:qtb_response} minh họa đáp ứng bậc thang đơn vị với
 \node[red!70!black, above right] at (2.5,1.5) {\small Điểm uốn};
 
 % Legend -- placed inside plot (upper right)
-\node[anchor=north east, draw, fill=white, font=\small] at (9.9, 4.4) {
-    \begin{tabular}{p{3.2cm}}
+\node[anchor=north east, draw, fill=white, font=\small] at (13.9, 5) {
+    \begin{tabular}{p{3.95cm}}
     \textcolor{blue}{\textbf{---}} QTB1T\\
     \quad $\dfrac{K}{Ts+1}e^{-Ls}$ \\[8pt]
     \textcolor{red!70!black}{\textbf{---}} QTB2T\\
@@ -178,8 +178,8 @@ Hình~\ref{fig:qtb_response} minh họa đáp ứng bậc thang đơn vị với
 };
 
 % Characteristics box -- placed inside plot (middle right)
-\node[anchor=north east, draw, fill=blue!5, font=\small] at (9.9, 2.0) {
-    \begin{tabular}{p{3.2cm}}
+\node[anchor=north east, draw, fill=blue!5, font=\small] at (18.9, 5.0) {
+    \begin{tabular}{p{4cm}}
     \textbf{Đặc điểm QTB2T:}\\
     Đường cong hình chữ S\\
     Có điểm uốn rõ rệt\\
@@ -235,13 +235,13 @@ Quá trình tiền xử lý dữ liệu bao gồm các bước chính:
     % Flowchart boxes
     \node[draw, rectangle, fill=blue!10, minimum width=4cm, align=center] (raw) at (0,0) {Dữ liệu thô\\(\texttt{van-dap-ung-xung-1,6t.csv})};
 
-    \node[draw, diamond, fill=yellow!20, minimum size=1.5cm, align=center] (filter) at (0,-2) {Lọc nhiễu};
+    \node[draw, diamond, fill=yellow!20, minimum size=1.5cm, align=center] (filter) at (0,-2.5) {Lọc nhiễu};
 
-    \node[draw, rectangle, fill=yellow!20, minimum width=4cm, align=center] (filtered) at (0,-4) {Dữ liệu đã lọc\\Loại bỏ nhiễu tần số cao};
+    \node[draw, rectangle, fill=yellow!20, minimum width=4cm, align=center] (filtered) at (0,-5) {Dữ liệu đã lọc\\Loại bỏ nhiễu tần số cao};
 
-    \node[draw, diamond, fill=orange!20, minimum size=1.5cm, align=center] (outlier) at (0,-6) {Phát hiện\\outlier};
+    \node[draw, diamond, fill=orange!20, minimum size=1.5cm, align=center] (outlier) at (0,-8) {Phát hiện\\outlier};
 
-    \node[draw, rectangle, fill=orange!20, minimum width=4cm, align=center] (clean) at (0,-8) {Dữ liệu sạch\\Chuẩn bị nhận dạng};
+    \node[draw, rectangle, fill=orange!20, minimum width=4cm, align=center] (clean) at (0,-10.5) {Dữ liệu sạch\\Chuẩn bị nhận dạng};
 
     % Arrows
     \draw[->, thick] (raw) -- (filter);
@@ -254,8 +254,8 @@ Quá trình tiền xử lý dữ liệu bao gồm các bước chính:
     \node[right=0.5cm of outlier, align=center] {IQR Method};
 
     % Process description
-    \node[anchor=west, draw, fill=white] at (4,-4) {
-        \begin{tabular}{p{3.5cm}}
+    \node[anchor=west, draw, fill=white] at (4,-5) {
+        \begin{tabular}{p{5.5cm}}
         \textbf{Thông số tiền xử lý:}\\
         • Cửa sổ lọc: 5 mẫu\\
         • Tần số lấy mẫu: $f_s = 10$ Hz\\
@@ -315,8 +315,8 @@ Bảng \ref{tab:so_lieu_van} và Bảng \ref{tab:so_lieu_ap_suat} trình bày m�
     ]
 
     % Left Box: Raw Data
-    \node[draw, rectangle, fill=red!5, minimum width=4.5cm, minimum height=2.5cm, align=center, rounded corners] (raw) at (-3.2, 0) {
-        \begin{tabular}{p{4cm}}
+    \node[draw, rectangle, fill=red!5, minimum width=4.5cm, minimum height=2.5cm, align=center, rounded corners] (raw) at (-4.5, 0) {
+        \begin{tabular}{p{6cm}}
         \textbf{Dữ liệu thô:}\\
         • Nhiễu ngẫu nhiên cao tần\\
         • Chứa các giá trị ngoại lai\\
@@ -325,8 +325,8 @@ Bảng \ref{tab:so_lieu_van} và Bảng \ref{tab:so_lieu_ap_suat} trình bày m�
     };
 
     % Right Box: Clean Data
-    \node[draw, rectangle, fill=green!5, minimum width=4.5cm, minimum height=2.5cm, align=center, rounded corners] (clean) at (3.2, 0) {
-        \begin{tabular}{p{4cm}}
+    \node[draw, rectangle, fill=green!5, minimum width=4.5cm, minimum height=2.5cm, align=center, rounded corners] (clean) at (4.5, 0) {
+        \begin{tabular}{p{6cm}}
         \textbf{Dữ liệu đã lọc:}\\
         • Đã loại bỏ nhiễu cao tần\\
         • Loại bỏ các outlier (IQR)\\
@@ -404,8 +404,8 @@ Về mặt toán học, quá trình nhận dạng được định hình thành 
     \draw[->, thick] (update.north) |- (calc.east);
 
     % Legend
-    \node[anchor=north west, draw, fill=white] at (3.5, 0) {
-        \begin{tabular}{p{3.5cm}}
+    \node[anchor=north west, draw, fill=white] at (8, -2) {
+        \begin{tabular}{p{5cm}}
         \textbf{Thuật toán: Grid Search}\\[4pt]
         • Không cần tính đạo hàm\\
         • Quét lưới 3--4 biến\\
@@ -747,7 +747,7 @@ Direct Synthesis (DS) & Trung bình (8\%--15\%) & Rất nhanh & Tốt & Tốt & 
 });
 
 % Legend + table combined -- placed inside plot (right side)
-\node[anchor=north west, draw, fill=white, font=\small] at (9.2, 4.4) {
+\node[anchor=north west, draw, fill=white, font=\small] at (14, 6) {
     \begin{tabular}{p{3.8cm}}
     \textbf{Chú thích:}\\
     \textcolor{red!70!black}{\textbf{---}} Ziegler-Nichols: $OS \approx 25\%$, dao động\\[4pt]
@@ -758,7 +758,7 @@ Direct Synthesis (DS) & Trung bình (8\%--15\%) & Rất nhanh & Tốt & Tốt & 
 };
 
 % Performance metrics table -- placed below legend
-\node[anchor=north west, draw, fill=yellow!15, rounded corners, font=\small] at (9.2, 1.2) {
+\node[anchor=north west, draw, fill=yellow!15, rounded corners, font=\small] at (6, 2.5) {
     \begin{tabular}{|c|c|c|c|}
     \hline
     \textbf{PP} & \textbf{OS} & \textbf{$t_s$} & \textbf{$e_{ss}$} \\ \hline
@@ -774,7 +774,7 @@ Direct Synthesis (DS) & Trung bình (8\%--15\%) & Rất nhanh & Tốt & Tốt & 
     \label{fig:method_comparison}
 \end{figure}
 
-Hình~\ref{fig:method_comparison} minh họa trực quan đáp ứng bậc thang của bốn phương pháp:
+Hình~\ref{fig:method_comparison} Minh họa trực quan đáp ứng bậc thang của bốn phương pháp:
 \begin{itemize}
     \item \textbf{Ziegler-Nichols}: Có overshoot cao (~25\%) và dao động, dễ gây mất ổn định
     \item \textbf{IMC}: Đáp ứng nhanh, overshoot thấp (~8\%)
@@ -956,10 +956,10 @@ Loại bộ điều khiển & \multicolumn{2}{c|}{PI (không có khâu D)}\\ \hl
     \node[above=0.05cm of cl] {\footnotesize Mong muốn};
 
     \draw[->, thick] (Gc) -- node[above]{\footnotesize $u$} (Gv);
-    \draw[->, thick] (Gv) -- node[above]{\footnotesize $y$} (sum.east);
-    \draw[->, thick] (sum.north) -- ++(0,0.5) -| (Gc.north);
+    \draw[->, thick] (Gv) -- node[above]{\footnotesize $y$} (sum.west);
+    \draw[->, thick] (sum.south) -- ++(0,-1) -| (Gc.south);
     \draw[->, thick] (sum) -- (cl);
-    \draw[->, thick] ([xshift=-0.4cm]cl.west) |- ++(-1.5,0.5) node[above right]{\footnotesize $r$} -| (Gc.west);
+    \draw[->, thick] ([xshift=-0.4cm]cl.west) |- ++(-2.5,-2) node[above right]{\footnotesize $r$} -| (Gc.south);
 
     \end{tikzpicture}
     \caption{Minh họa nguyên lý Direct Synthesis: từ $G_{cl}(s)$ mong muốn suy ngược ra $G_c(s)$}
@@ -1237,7 +1237,7 @@ Vòng trong được đóng trước: $C_2(s) = R_2(s)\,G_v(s) / (1 + R_2(s)\,G_
 }) -- cycle;
 
 % Legend + conclusion -- placed inside plot
-\node[anchor=north west, draw, fill=white, font=\small] at (9.2, 4.4) {
+\node[anchor=north west, draw, fill=white, font=\small] at (14.5, 5.4) {
     \begin{tabular}{l}
     \textbf{Dải đáp ứng khi $K, T, L$}\\
     \quad thay đổi $\pm20\%$:\\[4pt]
@@ -1247,8 +1247,8 @@ Vòng trong được đóng trước: $C_2(s) = R_2(s)\,G_v(s) / (1 + R_2(s)\,G_
 };
 
 % Conclusion box
-\node[anchor=north west, draw, fill=green!15, rounded corners, font=\small] at (9.2, 2.2) {
-    \begin{tabular}{p{3.8cm}}
+\node[anchor=north west, draw, fill=green!15, rounded corners, font=\small] at (14.5, 1.8) {
+    \begin{tabular}{p{4.5cm}}
     \textbf{Kết luận:}\\
     Hệ thống vẫn ổn định và đáp ứng trong dải $\pm5\%$ khi thông số thay đổi $\pm20\%$.
     \end{tabular}
@@ -1358,7 +1358,7 @@ Hệ số dự trữ ổn định (Stability Margin) $h$ đạt giá trị lớn
 \end{axis}
 
 % Stability parameters box (placed below the axes, centered)
-\node[anchor=north, draw, fill=yellow!15, rounded corners, font=\small] at (0.45\textwidth, -5.4) {
+\node[anchor=north, draw, fill=yellow!15, rounded corners, font=\small] at (0.45\textwidth, -3.4) {
     \begin{tabular}{p{10cm}}
     \textbf{Thông số ổn định:} Biên pha dự trữ (PM): $\approx 45^\circ$--$60^\circ$ \quad Biên dự trữ (GM): $> 6$ dB \quad Hệ số dự trữ $h > 2$
     \end{tabular}
@@ -1377,7 +1377,5 @@ Hình~\ref{fig:bode_plot} thể hiện biểu đồ Bode (biên độ và pha th
 \end{itemize}
 
 Những phân tích định lượng này tái khẳng định tính chính xác trong lựa chọn mô hình nhận dạng thực nghiệm, cũng như minh chứng cho giá trị thực tiễn của sự kết hợp giữa IMC và Bền vững tối ưu trong cấu trúc điều khiển hai vòng.
-
-phamngocha
 
 \end{document}
