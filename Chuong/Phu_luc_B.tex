@@ -7,7 +7,7 @@
 
 Phần này trình bày mã nguồn Python dùng để mô phỏng đáp ứng bậc thang của hệ điều khiển hai vòng, bao gồm hàm truyền đối tượng QTB1T (van) và QTB2T suy biến (lò hơi), hai bộ điều khiển PI (vòng trong) và PID (vòng ngoài), cùng quy trình tính hàm truyền vòng kín và vẽ đồ thị kết quả.
 
-\lstinputlisting[language=Python, firstline=1, lastline=115,
+\lstinputlisting[language=Python, firstline=1, lastline=129,
   caption={Chương trình mô phỏng hệ điều khiển hai vòng (plot\_step\_response\_ascii.py)},
   label=lst:sim-cascade]
 {plot_step_response_ascii.py}
@@ -28,7 +28,7 @@ Các chỉ tiêu chất lượng thu được từ mô phỏng:
 
 Tương tự, chương trình đáp ứng xung (plot\_impulse\_response\_ascii.py) mô phỏng phản ứng của hệ thống khi có nhiễu xung tác động vào đầu vào, cho phép đánh giá khả năng kháng nhiễu. Kết quả được lưu tại Hinhve/impulse\_response.png và sử dụng trong Hình~\ref{fig:impulse_response}.
 
-\lstinputlisting[language=Python, firstline=1, lastline=166,
+\lstinputlisting[language=Python, firstline=1, lastline=137,
   caption={Chương trình mô phỏng đáp ứng xung hệ hai vòng (plot\_impulse\_response\_ascii.py)},
   label=lst:sim-impulse]
 {plot_impulse_response_ascii.py}
