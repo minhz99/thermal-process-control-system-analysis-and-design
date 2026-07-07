@@ -229,6 +229,7 @@ Bên cạnh chức năng điều khiển liên tục, hệ thống giám sát v�
 
 \begin{figure}[htbp]
     \centering
+    \scalebox{0.9}{
     \begin{tikzpicture}[
         >=Stealth,
         scale=0.8,
@@ -265,8 +266,8 @@ Bên cạnh chức năng điều khiển liên tục, hệ thống giám sát v�
         -- Lớp 2: Cảnh báo (Alarm)\\
         -- Lớp 3: Bảo vệ (Trip/MFT)
     };
-
     \end{tikzpicture}
+    }
     \caption{Sơ đồ phân cấp hệ thống bảo vệ}
     \label{fig:protection_hierarchy}
 \end{figure}
@@ -303,19 +304,18 @@ Nguyên tắc thiết lập các ngưỡng dựa trên phương pháp phân tíc
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.90\textwidth]{Hinhve/coriolis_flowmeter.png}
+    \includegraphics[width=0.80\textwidth]{Hinhve/coriolis_flowmeter.png}
     \caption{Cảm biến lưu lượng khối lượng Coriolis}
     \label{fig:coriolis}
 \end{figure}
 
 Nguyên lý đo của lưu lượng kế Coriolis dựa trên hiệu ứng Coriolis: khi dòng chảy đi qua các ống rung (thường là ống hình chữ U), lực Coriolis tác động lên thành ống tạo ra sự dịch pha (phase shift) giữa hai đầu của ống rung. Sự dịch pha này tỷ lệ thuận với lưu lượng khối lượng. Cảm biến này có độ chính xác cao (thường $\pm0.1\%$ đến $\pm0.2\%$ của giá trị đọc), không có các bộ phận chuyển động tiếp xúc trực tiếp với dòng chảy, và hoạt động tốt với nhiều loại chất lỏng bao gồm dầu FO có độ nhớt cao và nhiệt độ biến thiên rộng.
 
-Bảng~\ref{tab:so_sanh_luu_luong} so sánh cảm biến Coriolis với các loại cảm biến lưu lượng khác.
-
-\begin{table}[htbp]
+\begin{table}[h]
 \centering
 \caption{So sánh các loại cảm biến lưu lượng}
 \label{tab:so_sanh_luu_luong}
+\scalebox{0.9}{
 \begin{tabular}{|l|c|c|c|c|}
 \hline
 \textbf{Loại} & \textbf{Độ chính xác} & \textbf{Ảnh hưởng của độ nhớt} & \textbf{Chi phí} & \textbf{Phù hợp FO}\\ \hline
@@ -324,6 +324,7 @@ Orifice plate & $\pm1\%$--$3\%$ & Ảnh hưởng nhiều & Thấp & Trung bình\
 Turbine & $\pm0.5\%$ & Ảnh hưởng & Trung bình & Kém\\ \hline
 Vortex & $\pm1\%$ & Ảnh hưởng & Trung bình & Trung bình\\ \hline
 \end{tabular}
+}
 \end{table}
 
 \subsubsection{Cảm biến áp suất điện tử}
@@ -332,7 +333,7 @@ Vortex & $\pm1\%$ & Ảnh hưởng & Trung bình & Trung bình\\ \hline
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.70\textwidth]{Hinhve/rosemount-3051s-coplanar-pressure-transmitter-1-5-valve-4.png}
+    \includegraphics[width=0.60\textwidth]{Hinhve/rosemount-3051s-coplanar-pressure-transmitter-1-5-valve-4.png}
     \caption{Cảm biến áp suất Rosemount 3051S}
     \label{fig:rosemount}
 \end{figure}
@@ -345,20 +346,20 @@ Cơ cấu chấp hành của hệ thống là van điều khiển lưu lượng 
 
 Đặc điểm quan trọng về an toàn: van được thiết kế theo cấu hình "Fail-Close" (thường đóng); nghĩa là khi xảy ra sự cố mất nguồn cung cấp khí nén hoặc đứt cáp tín hiệu điều khiển, lực lò xo sẽ tự động đẩy trục van về vị trí đóng hoàn toàn. Cơ chế này đảm bảo cắt đứt dòng nhiên liệu đi vào lò, ngăn ngừa rủi ro cháy nổ không kiểm soát.
 
-\begin{figure}[htbp]
+Hình~\ref{fig:control_valve} minh họa van điều khiển tuyến tính với bộ định vị thông minh. Đặc tính động học của van được đặc trưng bởi hàm truyền bậc nhất có trễ (QTB1T), phù hợp với mô hình nhận dạng sẽ được trình bày ở Chương 3. Hình~\ref{fig:valve_structure} minh họa cấu tạo chi tiết van điều khiển với các thành phần chính và cơ chế fail-safe.
+
+\begin{figure}[h]
     \centering
-    \includegraphics[width=0.70\textwidth]{Hinhve/control_valve.png}
+    \includegraphics[width=0.60\textwidth]{Hinhve/control_valve.png}
     \caption{Van điều khiển tuyến tính dẫn động khí nén}
     \label{fig:control_valve}
 \end{figure}
 
-Hình~\ref{fig:control_valve} minh họa van điều khiển tuyến tính với bộ định vị thông minh. Đặc tính động học của van được đặc trưng bởi hàm truyền bậc nhất có trễ (QTB1T), phù hợp với mô hình nhận dạng sẽ được trình bày ở Chương 3.
-
-\begin{figure}[htbp]
+\begin{figure}[h]
     \centering
     \begin{tikzpicture}[
         >=Stealth,
-        scale=0.8,
+        scale=0.9,
         transform shape,
         component/.style={draw, rectangle, minimum width=2cm, minimum height=1.2cm, align=center}
     ]
@@ -407,8 +408,6 @@ Hình~\ref{fig:control_valve} minh họa van điều khiển tuyến tính với
     \caption{Cấu tạo van điều khiển với cơ chế Fail-Close}
     \label{fig:valve_structure}
 \end{figure}
-
-Hình~\ref{fig:valve_structure} minh họa cấu tạo chi tiết van điều khiển với các thành phần chính và cơ chế fail-safe.
 
 \subsubsection{Cảm biến nhiệt độ RTD}
 

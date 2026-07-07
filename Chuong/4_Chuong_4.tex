@@ -31,24 +31,24 @@ Dựa trên dữ liệu thực nghiệm đã qua làm sạch, hai mô hình quá
 
 \subsection{Tổng hợp bộ điều khiển và kiểm chứng}
 
-Áp dụng phương pháp nghịch đảo mô hình bền vững kết hợp IMC và Bền vững tối ưu, hai bộ điều khiển được tổng hợp với các thông số:
+Áp dụng phương pháp tổng hợp dựa trên mô hình kết hợp IMC, Direct Synthesis và Bền vững tối ưu, các bộ điều khiển của hệ thống hai vòng được tổng hợp với các thông số chính như sau:
 
 \begin{table}[htbp]
 \centering
-\caption{Thông số bộ điều khiển hai vòng}
+\caption{Thông số bộ điều khiển hai vòng (phương pháp được lựa chọn)}
 \label{tab:controller_params}
-\begin{tabular}{|l|c|c|c|c|}
+\begin{tabular}{|l|c|c|c|c|c|c|}
 \hline
-\textbf{Vòng} & \textbf{Bộ ĐK} & \textbf{Phương pháp} & $K_p$ & $T_i$ (s) \\
+\textbf{Vòng} & \textbf{Bộ ĐK} & \textbf{Phương pháp} & $K_p$ & $T_i$ (s) & $T_d$ (s) & $\lambda$ (s) \\
 \hline
-Vòng trong & PI & IMC & $4{,}978$ & $4{,}8694$ \\
+Vòng trong & PI & IMC & $3{,}3532$ & $4{,}8694$ & -- & $0{,}8213$ \\
 \hline
-Vòng ngoài & PID & Bền vững tối ưu & $1{,}8222$ & $12{,}0712$ \\
+Vòng ngoài & PID & Bền vững tối ưu & $1{,}2595$ & $12{,}0712$ & $3{,}0178$ & -- \\
 \hline
 \end{tabular}
 \end{table}
 
-Kết quả kiểm chứng mô phỏng trên MATLAB/Simulink cho thấy hệ thống hoạt động ổn định và đáp ứng toàn bộ chỉ tiêu:
+Kết quả kiểm chứng mô phỏng trên Python với thư viện \texttt{scipy.signal} cho thấy hệ thống hoạt động ổn định và đáp ứng toàn bộ chỉ tiêu:
 
 \begin{itemize}
     \item Vòng trong (lưu lượng dầu): thời gian xác lập $T_{s2} \approx 6$\,s, phản ứng cực kỳ nhanh nhạy, triệt tiêu nhiễu thủy lực ngay tại vòng trong trước khi lan truyền.
@@ -61,7 +61,7 @@ Kết quả kiểm chứng mô phỏng trên MATLAB/Simulink cho thấy hệ th�
 
 Cấu trúc điều khiển hai vòng đã chứng minh hiệu quả vượt trội so với cấu trúc đơn vòng, đặc biệt phù hợp với đặc tính trễ và quán inertia lớn của lò hơi nhiệt điện. Kết hợp IMC (đơn giản, phù hợp đối tượng QTB1T của van) và Bền vững tối ưu (kiểm soát chặt overshoot, phù hợp đối tượng QTB2T có trễ lớn của lò) là lựa chọn hợp lý, cân bằng tốc độ đáp ứng và độ ổn định.
 
-Về hiệu quả thực tiễn, giải pháp mang lại lợi ích kinh tế (giảm tiêu thụ dầu nhiên liệu, tiết kiệm chi phí vận hành), xã hội và môi trường (giảm phát thải khí độc CO, NO$_x$, SO$_x$) đồng thời nâng cao độ an toàn nhờ các cơ chế bảo vệ liên động (MFT) được tích hợp trong hệ thống.
+Về hiệu quả thực tiễn, giải pháp hứa hẹn mang lại lợi ích kinh tế (giảm tiêu thụ dầu nhiên liệu, tiết kiệm chi phí vận hành), xã hội và môi trường (giảm phát thải khí độc CO, NO$_x$, SO$_x$) đồng thời nâng cao độ an toàn nhờ các cơ chế bảo vệ liên động (MFT) được tích hợp trong hệ thống.
 
 Hướng phát triển tiếp theo có thể tập trung vào việc ứng dụng các kỹ thuật điều khiển dự báo (Smith Predictor, MPC) cho vòng ngoài để rút ngắn thời gian quá độ do trễ thuần của lò hơi, hoặc tích hợp thuật toán tự chỉnh định thích nghi (Adaptive Auto-Tuning) để duy trì hiệu suất tối ưu khi đặc tính thiết bị suy giảm theo thời gian.
 

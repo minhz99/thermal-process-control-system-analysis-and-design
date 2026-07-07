@@ -4,15 +4,11 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import scipy.signal as sig
 
-
 def mult(p1, p2):
     return np.convolve(p1, p2)
-
-
 def add(p1, p2):
     return np.polyadd(p1, p2)
-
-
+    
 # FOPDT: G(s)=K/(T*s+1)*e^(-L*s) with Pade order 1 for delay
 def fopdt(K, T, L):
     num0 = [K]
@@ -21,7 +17,6 @@ def fopdt(K, T, L):
     den_p = [L / 2.0, 1.0]
     return mult(num0, num_p), mult(den0, den_p)
 
-
 # SOPDT: G(s)=K/((T1*s+1)(T2*s+1))*e^(-L*s)
 def sopdt(K, T1, T2, L):
     num0 = [K]
@@ -29,14 +24,12 @@ def sopdt(K, T1, T2, L):
     num_p = [-L / 2.0, 1.0]
     den_p = [L / 2.0, 1.0]
     return mult(num0, num_p), mult(den0, den_p)
-
-
+    
 # PI controller: R(s)=Kp*(1+1/(Ti*s))
 def pi_controller(Kp, Ti):
     num = [Kp * Ti, Kp]
     den = [Ti, 0.0]
     return num, den
-
 
 # PID controller: R(s)=Kp*(1+1/(Ti*s)+Td*s)
 def pid_controller(Kp, Ti, Td):
@@ -44,14 +37,12 @@ def pid_controller(Kp, Ti, Td):
     den = [Ti, 0.0]
     return num, den
 
-
 def closed_loop(R_num, R_den, G_num, G_den):
     OL_num = mult(R_num, G_num)
     OL_den = mult(R_den, G_den)
     CL_num = OL_num
     CL_den = add(OL_den, OL_num)
     return CL_num, CL_den
-
 
 # --- NOMINAL PARAMETERS ---
 Kv = 0.8776
@@ -70,7 +61,6 @@ Kp1 = 1.2676
 Ti1 = 11.9741
 Td1 = 2.9935
 
-
 # --- BUILD TRANSFER FUNCTIONS ---
 Gv_num, Gv_den = fopdt(Kv, Tv, Lv)
 R2_num, R2_den = pi_controller(Kp2, Ti2)
@@ -82,7 +72,6 @@ Geq_num, Geq_den = Gp_num, Gp_den
 R1_num, R1_den = pid_controller(Kp1, Ti1, Td1)
 C1_num, C1_den = closed_loop(R1_num, R1_den, Geq_num, Geq_den)
 
-
 # --- SIMULATE STEP RESPONSES ---
 t_inner = np.linspace(0.0, 50.0, 2000)
 sys_c2 = sig.TransferFunction(C2_num, C2_den)
@@ -91,7 +80,6 @@ _, y2_step = sig.step(sys_c2, T=t_inner)
 t_outer = np.linspace(0.0, 60.0, 2000)
 sys_c1 = sig.TransferFunction(C1_num, C1_den)
 _, y1_step = sig.step(sys_c1, T=t_outer)
-
 
 # --- PLOTTING CODE (ASCII labels/comments only) ---
 fig, ax1 = plt.subplots(figsize=(10, 6))

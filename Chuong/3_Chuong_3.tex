@@ -10,7 +10,6 @@
 Dựa trên phân tích đặc tính động học từ dữ liệu thực nghiệm, hai mô hình toán học được xây dựng để đại diện cho hai đối tượng điều khiển trong hệ điều khiển hai vòng.
 
 Đối với vòng trong, đối tượng van điều khiển lưu lượng có đặc tính đáp ứng nhanh với thời gian trễ nhỏ. Dựa trên hình dạng đáp ứng bậc thang, mô hình QTB1T (First-Order Plus Dead Time) được xác định là phù hợp:
-
 \begin{equation}
     G_v(s) = \frac{K_v}{T_v s + 1}\, e^{-L_v s}
     \label{eq:qtb1t}
@@ -19,7 +18,6 @@ Dựa trên phân tích đặc tính động học từ dữ liệu thực nghi�
 trong đó $K_v$ là hệ số khuếch đại tĩnh, $T_v$ là hằng số thời gian quán tính, và $L_v$ là thời gian trễ vận chuyển. Mô hình này có ba thông số cần xác định thông qua thuật toán nhận dạng tối ưu hóa.
 
 Đối với vòng ngoài, quá trình sinh hơi trong lò hơi có đặc tính đáp ứng chậm với đường cong dạng chữ S rõ rệt. Mô hình QTB2T (Second-Order Plus Dead Time) được lựa chọn để phản ánh đặc tính hai giai đoạn của quá trình truyền nhiệt:
-
 \begin{equation}
     G_p(s) = \frac{K_p}{(T_{1p} s + 1)(T_{2p} s + 1)}\, e^{-L_p s}
     \label{eq:qtb2t}
@@ -212,28 +210,20 @@ Việc lựa chọn mô hình QTB1T cho van và QTB2T cho lò hơi dựa trên c
 \section{Xử lý số liệu thực nghiệm}
 % ============================================================
 
-Để có cơ sở dữ liệu tin cậy phục vụ cho công tác nhận dạng mô hình toán học và tổng hợp thuật toán điều khiển, nhóm đã tiến hành thu thập số liệu thực nghiệm mô tả đáp ứng quá độ của cả hai đối tượng: vòng trong (đối tượng van điều khiển lưu lượng) và vòng ngoài (đối tượng lò hơi sinh áp suất).
+Để có cơ sở dữ liệu tin cậy phục vụ cho công tác nhận dạng mô hình toán học và tổng hợp thuật toán điều khiển, nhóm đã sử dụng số liệu thực nghiệm mô tả đáp ứng quá độ của cả hai đối tượng: vòng trong (đối tượng van điều khiển lưu lượng) và vòng ngoài (đối tượng lò hơi sinh áp suất).
 
-Phương pháp thu thập được thực hiện bằng cách áp dụng một tín hiệu kích thích dạng bậc thang (Step Input) vào đầu vào của hệ thống khi đang ở trạng thái làm việc ổn định, sau đó sử dụng hệ thống thu thập dữ liệu (DAQ) để ghi nhận diễn biến của tín hiệu đầu ra theo thời gian. Các tập dữ liệu thu được lưu trữ dưới định dạng tệp CSV, cụ thể là tệp \texttt{van-dap-ung-xung-1,6t.csv} đối với đáp ứng của lưu lượng dầu, và tệp đáp ứng áp suất hơi tương ứng.
-
-Quá trình tiền xử lý dữ liệu bao gồm các bước chính:
-\begin{enumerate}
-    \item \textbf{Lọc nhiễu}: Bộ lọc trung bình di động (Moving Average Filter) với cửa sổ 5 mẫu loại bỏ thành phần nhiễu tần số cao
-    \item \textbf{Xử lý outlier}: Phương pháp IQR (Interquartile Range) phát hiện và loại bỏ giá trị ngoại lai
-    \item \textbf{Chuẩn hóa thời gian}: Nội suy tuyến tính đảm bảo các điểm dữ liệu cách đều nhau
-    \item \textbf{Xác định breakpoint}: Thuật toán phát hiện thay đổi (change detection) xác định thời điểm bắt đầu đáp ứng quá độ
-\end{enumerate}
+Phương pháp thu thập của số liệu được thực hiện bằng cách áp dụng một tín hiệu kích thích dạng bậc thang (Step Input) vào đầu vào của hệ thống khi đang ở trạng thái làm việc ổn định, sau đó sử dụng hệ thống thu thập dữ liệu (DAQ) để ghi nhận diễn biến của tín hiệu đầu ra theo thời gian. Các tập dữ liệu thu được lưu trữ dưới định dạng tệp CSV, cụ thể là tệp {\footnotesize\texttt{van-dap-ung-xung-1,6t.csv}} đối với đáp ứng của lưu lượng dầu, và tệp đáp ứng áp suất hơi tương ứng. Hình~\ref{fig:preprocessing} minh họa quy trình tiền xử lý dữ liệu thực nghiệm.
 
 \begin{figure}[H]
     \centering
     \begin{tikzpicture}[
         >=Stealth,
-        scale=0.85,
+        scale=0.7,
         transform shape
     ]
 
     % Flowchart boxes
-    \node[draw, rectangle, fill=blue!10, minimum width=4cm, align=center] (raw) at (0,0) {Dữ liệu thô\\(\texttt{van-dap-ung-xung-1,6t.csv})};
+    \node[draw, rectangle, fill=blue!10, minimum width=4cm, align=center] (raw) at (0,0) {Dữ liệu thô\\({\footnotesize\texttt{van-dap-ung-xung-1,6t.csv}})};
 
     \node[draw, diamond, fill=yellow!20, minimum size=1.5cm, align=center] (filter) at (0,-2.5) {Lọc nhiễu};
 
@@ -241,7 +231,7 @@ Quá trình tiền xử lý dữ liệu bao gồm các bước chính:
 
     \node[draw, diamond, fill=orange!20, minimum size=1.5cm, align=center] (outlier) at (0,-8) {Phát hiện\\outlier};
 
-    \node[draw, rectangle, fill=orange!20, minimum width=4cm, align=center] (clean) at (0,-10.5) {Dữ liệu sạch\\Chuẩn bị nhận dạng};
+    \node[draw, rectangle, fill=orange!20, minimum width=4cm, align=center] (clean) at (0,-11) {Dữ liệu sạch\\Chuẩn bị nhận dạng};
 
     % Arrows
     \draw[->, thick] (raw) -- (filter);
@@ -268,15 +258,13 @@ Quá trình tiền xử lý dữ liệu bao gồm các bước chính:
     \label{fig:preprocessing}
 \end{figure}
 
-Hình~\ref{fig:preprocessing} minh họa quy trình tiền xử lý dữ liệu thực nghiệm.
-
 Bảng \ref{tab:so_lieu_van} và Bảng \ref{tab:so_lieu_ap_suat} trình bày một phần dữ liệu đã được trích xuất từ các tệp thực nghiệm, minh họa rõ nét xu hướng tăng dần của đáp ứng đầu ra sau khi nhận được tín hiệu kích thích.
 
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
 \caption{Trích xuất số liệu thực nghiệm đáp ứng van điều khiển lưu lượng}
 \label{tab:so_lieu_van}
-\scalebox{0.9}{
+\scalebox{0.75}{
 \begin{tabular}{|c|c|c|c|}
 \hline
 \textbf{Thời gian (s)} & \textbf{Đáp ứng lưu lượng (t/h)} & \textbf{Thời gian (s)} & \textbf{Đáp ứng lưu lượng (t/h)}\\ \hline
@@ -288,11 +276,11 @@ Bảng \ref{tab:so_lieu_van} và Bảng \ref{tab:so_lieu_ap_suat} trình bày m�
 }
 \end{table}
 
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
 \caption{Trích xuất số liệu thực nghiệm đáp ứng áp suất hơi}
 \label{tab:so_lieu_ap_suat}
-\scalebox{0.95}{
+\scalebox{0.78}{
 \begin{tabular}{|c|c|c|c|}
 \hline
 \textbf{Thời gian (s)} & \textbf{Đáp ứng áp suất (bar)} & \textbf{Thời gian (s)} & \textbf{Đáp ứng áp suất (bar)}\\ \hline
@@ -306,69 +294,69 @@ Bảng \ref{tab:so_lieu_van} và Bảng \ref{tab:so_lieu_ap_suat} trình bày m�
 
 Đặc điểm của các tập số liệu này thể hiện tính chất quá độ điển hình của các đối tượng công nghiệp: có thời gian trễ ban đầu và đường cong đáp ứng hình chữ S tiệm cận dần về giá trị xác lập.
 
-\begin{figure}[H]
-    \centering
-    \begin{tikzpicture}[
-        >=Stealth,
-        scale=0.85,
-        transform shape
-    ]
+% \begin{figure}[H]
+%     \centering
+%     \begin{tikzpicture}[
+%         >=Stealth,
+%         scale=0.85,
+%         transform shape
+%     ]
 
-    % Left Box: Raw Data
-    \node[draw, rectangle, fill=red!5, minimum width=4.5cm, minimum height=2.5cm, align=center, rounded corners] (raw) at (-4.5, 0) {
-        \begin{tabular}{p{6cm}}
-        \textbf{Dữ liệu thô:}\\
-        • Nhiễu ngẫu nhiên cao tần\\
-        • Chứa các giá trị ngoại lai\\
-        • Gây sai số khi nhận dạng
-        \end{tabular}
-    };
+%     % Left Box: Raw Data
+%     \node[draw, rectangle, fill=red!5, minimum width=4.5cm, minimum height=2.5cm, align=center, rounded corners] (raw) at (-4.5, 0) {
+%         \begin{tabular}{p{6cm}}
+%         \textbf{Dữ liệu thô:}\\
+%         • Nhiễu ngẫu nhiên cao tần\\
+%         • Chứa các giá trị ngoại lai\\
+%         • Gây sai số khi nhận dạng
+%         \end{tabular}
+%     };
 
-    % Right Box: Clean Data
-    \node[draw, rectangle, fill=green!5, minimum width=4.5cm, minimum height=2.5cm, align=center, rounded corners] (clean) at (4.5, 0) {
-        \begin{tabular}{p{6cm}}
-        \textbf{Dữ liệu đã lọc:}\\
-        • Đã loại bỏ nhiễu cao tần\\
-        • Loại bỏ các outlier (IQR)\\
-        • Giữ nguyên đặc tính động học
-        \end{tabular}
-    };
+%     % Right Box: Clean Data
+%     \node[draw, rectangle, fill=green!5, minimum width=4.5cm, minimum height=2.5cm, align=center, rounded corners] (clean) at (4.5, 0) {
+%         \begin{tabular}{p{6cm}}
+%         \textbf{Dữ liệu đã lọc:}\\
+%         • Đã loại bỏ nhiễu cao tần\\
+%         • Loại bỏ các outlier (IQR)\\
+%         • Giữ nguyên đặc tính động học
+%         \end{tabular}
+%     };
 
-    % Transformation Arrow
-    \draw[->, very thick, blue!70!black] (raw) -- (clean) 
-        node[midway, above, font=\bfseries\small, text=blue!70!black] {Tiền xử lý};
+%     % Transformation Arrow
+%     \draw[->, very thick, blue!70!black] (raw) -- (clean) 
+%         node[midway, above, font=\bfseries\small, text=blue!70!black] {Tiền xử lý};
 
-    \end{tikzpicture}
-    \caption{So sánh dữ liệu thô và dữ liệu sau tiền xử lý}
-    \label{fig:data_comparison}
-\end{figure}
+%     \end{tikzpicture}
+%     \caption{So sánh dữ liệu thô và dữ liệu sau tiền xử lý}
+%     \label{fig:data_comparison}
+% \end{figure}
 
-Hình~\ref{fig:data_comparison} thể hiện dữ liệu trước và sau khi tiền xử lý. Phần lớn nhiễu ngẫu nhiên đã được loại bỏ trong khi hình dạng đặc tính động học chính được bảo toàn.
+% Hình~\ref{fig:data_comparison} thể hiện dữ liệu trước và sau khi tiền xử lý. Phần lớn nhiễu ngẫu nhiên đã được loại bỏ trong khi hình dạng đặc tính động học chính được bảo toàn.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.7\textwidth]{Hinhve/dac-tinh-van-dap-ung-xung-1,6t.png}
-    \caption{Đáp ứng bậc thang thực nghiệm của đối tượng van điều khiển lưu lượng dầu}
-    \label{fig:van_dap_ung_xung_2}
-\end{figure}
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.7\textwidth]{Hinhve/dac-tinh-van-dap-ung-xung-1,6t.png}
+%     \caption{Đáp ứng bậc thang thực nghiệm của đối tượng van điều khiển lưu lượng dầu}
+%     \label{fig:van_dap_ung_xung_2}
+% \end{figure}
 
-Hình~\ref{fig:van_dap_ung_xung_2} thể hiện đáp ứng bậc thang gốc (raw data) của đối tượng van, cho thấy dữ liệu sau khi tiền xử lý đã loại bỏ phần lớn nhiễu ngẫu nhiên và giữ được hình dạng đặc tính động học chuẩn xác.
+% Hình~\ref{fig:van_dap_ung_xung_2} thể hiện đáp ứng bậc thang gốc (raw data) của đối tượng van, cho thấy dữ liệu sau khi tiền xử lý đã loại bỏ phần lớn nhiễu ngẫu nhiên và giữ được hình dạng đặc tính động học chuẩn xác.
 
-Nguồn số liệu mang tính thực tiễn cao này sẽ là dữ liệu đầu vào trực tiếp cho thuật toán nhận dạng phi tuyến, giúp xác định các thông số động học chính xác cho mô hình QTB1T và QTB2T.
+% Nguồn số liệu mang tính thực tiễn cao này sẽ là dữ liệu đầu vào trực tiếp cho thuật toán nhận dạng phi tuyến, giúp xác định các thông số động học chính xác cho mô hình QTB1T và QTB2T.
 
 % ============================================================
 \section{Nhận dạng đối tượng điều khiển}
 % ============================================================
 
-Trong điều khiển tự động hóa hiện đại, quá trình tổng hợp và chỉnh định bộ điều khiển phụ thuộc hoàn toàn vào mức độ chính xác của mô hình toán học đại diện cho đối tượng thực tế. Phương pháp nhận dạng đối tượng được lựa chọn dựa trên việc phân tích đáp ứng bậc thang (Step Response) của hệ thống trong miền thời gian.
+Trong điều khiển tự động hóa hiện đại, quá trình tổng hợp và chỉnh định bộ điều khiển phụ thuộc hoàn toàn vào mức độ chính xác của mô hình toán học đại diện cho đối tượng thực tế. Phương pháp nhận dạng đối tượng được lựa chọn dựa trên việc phân tích đáp ứng bậc thang của hệ thống trong miền thời gian.
 
 Về mặt toán học, quá trình nhận dạng được định hình thành bài toán tối ưu hóa phi tuyến: tìm kiếm tập tham số $A$ sao cho hàm mục tiêu sai số toàn phương $J$ đạt giá trị cực tiểu:
 
-\begin{figure}[H]
+\begin{figure}[!htbp]
     \centering
     \begin{tikzpicture}[
         >=Stealth,
-        scale=0.85,
+        scale=0.75,
         transform shape,
         flowchart/.style={draw, rectangle, minimum width=3cm, minimum height=1cm, align=center}
     ]
@@ -409,7 +397,7 @@ Về mặt toán học, quá trình nhận dạng được định hình thành 
         \textbf{Thuật toán: Grid Search}\\[4pt]
         • Không cần tính đạo hàm\\
         • Quét lưới 3--4 biến\\
-        • Chạy nhiều lần với\\ \quad điểm khởi tạo khác nhau
+        • Chạy nhiều lần với các\\ \quad điểm khởi tạo khác nhau
         \end{tabular}
     };
 
@@ -418,16 +406,15 @@ Về mặt toán học, quá trình nhận dạng được định hình thành 
     \label{fig:identification_algorithm}
 \end{figure}
 
-Hình~\ref{fig:identification_algorithm} minh họa sơ đồ thuật toán nhận dạng tối ưu hóa được sử dụng.
-
 Một bước tiền xử lý quan trọng trước khi nhận dạng là chuẩn hóa dữ liệu. Do tín hiệu bậc thang kích thích có biên độ khác nhau (biên độ 1.6 đối với van và 1.0 đối với áp suất hơi), dữ liệu được chuẩn hóa bằng cách chia cho biên độ bậc thang tương ứng, đảm bảo các tham số nhận dạng ($K$, $T$, $L$) phản ánh đặc tính động học thuần túy.
 
-Để đánh giá chất lượng nhận dạng, kỹ sư sử dụng thêm hệ số xác định $R^2$ (càng gần 1 càng tốt) và sai số bình phương trung bình gốc RMSE (càng nhỏ càng tốt):
-
-\begin{align}
-    R^2 &= 1 - \frac{\sum_{i=1}^{N}(y_i - \hat{y}_i)^2}{\sum_{i=1}^{N}(y_i - \bar{y})^2} \label{eq:r_squared} \\
-    \text{RMSE} &= \sqrt{\frac{1}{N}\sum_{i=1}^{N}(y_i - \hat{y}_i)^2} \label{eq:rmse}
-\end{align}
+Để đánh giá chất lượng nhận dạng, cần sử dụng thêm hệ số xác định $R^2$ (càng gần 1 càng tốt) và sai số bình phương trung bình gốc RMSE (càng nhỏ càng tốt):
+\begin{equation}
+    R^2 = 1 - \frac{\sum_{i=1}^{N}(y_i - \hat{y}_i)^2}{\sum_{i=1}^{N}(y_i - \bar{y})^2}
+\end{equation}
+\begin{equation}
+    \text{RMSE} = \sqrt{\frac{1}{N}\sum_{i=1}^{N}(y_i - \hat{y}_i)^2}
+\end{equation}
 
 Lựa chọn thuật toán tối ưu hóa bình phương tối thiểu kết hợp quét lưới (grid search) thay vì các phương pháp nhận dạng truyền thống vì: quét lưới không cần tính đạo hàm, đơn giản trong triển khai, và hiệu quả đối với bài toán 3--4 biến. Thuật toán được chạy nhiều lần với các điểm khởi tạo khác nhau, kết quả cuối cùng được chọn từ lần chạy cho giá trị $J$ nhỏ nhất.
 
@@ -435,10 +422,9 @@ Với cấu trúc điều khiển hai vòng đã đề xuất, hai khâu động
 
 \subsection{Nhận dạng đối tượng van (Vòng trong)}
 
-Đối tượng van điều khiển có đặc tính động học tương đối nhanh nhưng vẫn tồn tại độ trễ do cơ khí và ma sát đường ống dẫn. Do đó, mô hình xấp xỉ quán tính bậc nhất có trễ (First-Order Plus Dead Time -- QTB1T) được lựa chọn. Hàm truyền có dạng như trong Phương trình~\ref{eq:qtb1t}.
+Đối tượng van điều khiển có đặc tính động học tương đối nhanh nhưng vẫn tồn tại độ trễ do cơ khí và ma sát đường ống dẫn. Do đó, mô hình xấp xỉ quán tính bậc nhất có trễ (QTB1T) được lựa chọn. Hàm truyền có dạng như trong Phương trình~\ref{eq:qtb1t}.
 
 Đáp ứng bậc thang đơn vị trong miền thời gian:
-
 \begin{equation}
     y_{\mathrm{model}}(t) =
     \begin{cases}
@@ -448,7 +434,7 @@ Với cấu trúc điều khiển hai vòng đã đề xuất, hai khâu động
     \label{eq:qtb1t_step}
 \end{equation}
 
-Tiến hành đưa dữ liệu thực nghiệm từ tệp \texttt{van-dap-ung-xung-1,6t.csv} (biên độ tín hiệu bậc thang đầu vào $1.6$) vào thuật toán, hệ thống hội tụ và xuất ra bộ thông số tối ưu:
+Tiến hành đưa dữ liệu thực nghiệm từ tệp {\footnotesize\texttt{van-dap-ung-xung-1,6t.csv}} (biên độ tín hiệu bậc thang đầu vào $1.6$) vào thuật toán, hệ thống hội tụ và xuất ra bộ thông số tối ưu:
 
 \begin{itemize}
     \item Hệ số khuếch đại tĩnh: $K_v = 0{,}8836$
@@ -460,12 +446,11 @@ Giá trị $K_v = 0{,}8836$ cho thấy hệ thống có hệ số khuếch đạ
 
 Hệ số $R^2 = 0{,}9987$ cho thấy mô hình QTB1T giải thích được 99.87\% biến thiên của dữ liệu thực nghiệm, xác nhận cấu trúc QTB1T hoàn toàn phù hợp với đặc tính động học của van.
 
-Bảng \ref{tab:ket_qua_nhan_dang_van} tổng hợp kết quả nhận dạng đối tượng van.
-
 \begin{table}[H]
 \centering
 \caption{Kết quả nhận dạng đối tượng van điều khiển lưu lượng}
 \label{tab:ket_qua_nhan_dang_van}
+\scalebox{0.8}{
 \begin{tabular}{|l|c|}
 \hline
 \textbf{Thông số} & \textbf{Giá trị}\\ \hline
@@ -475,89 +460,100 @@ Thời gian trễ $L_v$ (s) & $0{,}8213$\\ \hline
 Hệ số xác định $R^2$ & $0{,}9987$\\ \hline
 Sai số RMSE & $0{,}0142$\\ \hline
 \end{tabular}
+}
 \end{table}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{Hinhve/nhan_dang_van.png}
+    \includegraphics[width=0.8\textwidth]{Hinhve/nhan_dang_van.png}
     \caption{Đồ thị so sánh kết quả nhận dạng đối tượng van điều khiển theo mô hình QTB1T}
     \label{fig:nhan_dang_van}
 \end{figure}
 
 Biểu đồ tại Hình~\ref{fig:nhan_dang_van} cho thấy đường cong mô phỏng bám sát hoàn toàn với tập dữ liệu thực nghiệm, minh chứng cho tính đúng đắn và độ chính xác của cấu trúc QTB1T đối với phân hệ van lưu lượng.
 
-\begin{figure}[!htbp]
-    \centering
-\begin{tikzpicture}[>=Stealth, scale=0.75, transform shape]
+% \begin{figure}[!htbp]
+%     \centering
+% \begin{tikzpicture}[>=Stealth, scale=0.75, transform shape]
 
-\begin{axis}[
-    width=0.4\textwidth,
-    height=5cm,
-    at={(0,0)},
-    anchor=west,
-    xlabel={Thời gian (s)},
-    ylabel={Phần dư},
-    title={Đồ thị phần dư theo thời gian},
-    grid=major,
-    legend pos=north east
-]
-\addplot[blue, only marks, mark=*, mark size=1.5] coordinates {
-    (0, 0.002) (1, -0.003) (2, 0.001) (3, -0.002) (4, 0.003)
-    (5, -0.001) (6, 0.002) (7, -0.003) (8, 0.001) (9, -0.002)
-    (10, 0.002) (11, -0.001) (12, 0.003) (13, -0.002) (14, 0.001)
-};
-\addlegendentry{Phần dư}
-\addplot[red!50!black, dashed, domain=0:14] {0.01};
-\addplot[red!50!black, dashed, domain=0:14] {-0.01};
-\addlegendentry{$\pm3\sigma$}
-\addplot[gray!70!black, dashed, domain=0:14] {0};
-\addlegendentry{0}
-\end{axis}
+% \begin{axis}[
+%     width=0.4\textwidth,
+%     height=5cm,
+%     at={(0,0)},
+%     anchor=west,
+%     xlabel={Thời gian (s)},
+%     ylabel={Phần dư},
+%     title={Đồ thị phần dư theo thời gian},
+%     grid=major,
+%     legend pos=north east
+% ]
+% \addplot[blue, only marks, mark=*, mark size=1.5] coordinates {
+%     (0, 0.002) (1, -0.003) (2, 0.001) (3, -0.002) (4, 0.003)
+%     (5, -0.001) (6, 0.002) (7, -0.003) (8, 0.001) (9, -0.002)
+%     (10, 0.002) (11, -0.001) (12, 0.003) (13, -0.002) (14, 0.001)
+% };
+% \addlegendentry{Phần dư}
+% \addplot[red!50!black, dashed, domain=0:14] {0.01};
+% \addplot[red!50!black, dashed, domain=0:14] {-0.01};
+% \addlegendentry{$\pm3\sigma$}
+% \addplot[gray!70!black, dashed, domain=0:14] {0};
+% \addlegendentry{0}
+% \end{axis}
 
-\begin{axis}[
-    width=0.4\textwidth,
-    height=5cm,
-    at={(0.5\textwidth,0)},
-    anchor=west,
-    xlabel={Phần dư chuẩn hóa},
-    ylabel={Tần suất},
-    title={Histogram phần dư},
-    grid=major,
-    legend pos=north east,
-    ybar interval=1
-]
-\addplot[blue!70!black, fill=blue!30] coordinates {
-    (-0.015, 1) (-0.01, 2) (-0.005, 4) (0, 6) (0.005, 4) (0.01, 2) (0.015, 1)
-};
-\addlegendentry{Tần suất}
-\end{axis}
+% \begin{axis}[
+%     width=0.4\textwidth,
+%     height=5cm,
+%     at={(0.5\textwidth,0)},
+%     anchor=west,
+%     xlabel={Phần dư chuẩn hóa},
+%     ylabel={Tần suất},
+%     title={Histogram phần dư},
+%     grid=major,
+%     legend pos=north east,
+%     ybar interval=1
+% ]
+% \addplot[blue!70!black, fill=blue!30] coordinates {
+%     (-0.015, 1) (-0.01, 2) (-0.005, 4) (0, 6) (0.005, 4) (0.01, 2) (0.015, 1)
+% };
+% \addlegendentry{Tần suất}
+% \end{axis}
 
-\end{tikzpicture}
-    \caption{Kiểm chứng mô hình van: phân tích phần dư (Residual Analysis)}
-    \label{fig:validation_van}
-\end{figure}
+% \end{tikzpicture}
+%     \caption{Kiểm chứng mô hình van: phân tích phần dư (Residual Analysis)}
+%     \label{fig:validation_van}
+% \end{figure}
 
-Hình~\ref{fig:validation_van} thể hiện kết quả kiểm chứng mô hình van bằng phương pháp phân tích phần dư:
-\begin{itemize}
-    \item Phần dư dao động ngẫu nhiên quanh giá trị 0, không có xu hướng hệ thống
-    \item Phân bố phần dư tuân theo phân bố chuẩn (xấp xỉ Gaussian)
-    \item Không có autocorrelation đáng kể (xác nhận independence)
-\end{itemize}
+% Hình~\ref{fig:validation_van} thể hiện kết quả kiểm chứng mô hình van bằng phương pháp phân tích phần dư:
+% \begin{itemize}
+%     \item Phần dư dao động ngẫu nhiên quanh giá trị 0, không có xu hướng hệ thống
+%     \item Phân bố phần dư tuân theo phân bố chuẩn (xấp xỉ Gaussian)
+%     \item Không có autocorrelation đáng kể (xác nhận independence)
+% \end{itemize}
 
 \subsection{Nhận dạng đối tượng áp suất hơi (Vòng ngoài)}
 
-Quá trình sinh hơi trong lò mang bản chất tích lũy năng lượng và trao đổi nhiệt phức tạp qua nhiều bề mặt kim loại. Đáp ứng của áp suất hơi diễn ra chậm chạp với đặc tính quá độ hình chữ S rất rõ rệt. Vì vậy, mô hình quán tính bậc hai có trễ (Second-Order Plus Dead Time -- QTB2T) là phù hợp nhất. Hàm truyền có dạng như trong Phương trình~\ref{eq:qtb2t}.
+Quá trình sinh hơi trong lò mang bản chất tích lũy năng lượng và trao đổi nhiệt phức tạp qua nhiều bề mặt kim loại. Đáp ứng của áp suất hơi diễn ra chậm chạp với đặc tính quá độ hình chữ S rất rõ rệt. Vì vậy, mô hình QTB2T là phù hợp nhất. Hàm truyền có dạng như trong Phương trình~\ref{eq:qtb2t}.
 
-Đáp ứng bậc thang đơn vị trong miền thời gian:
-
+Đáp ứng bậc thang đơn vị trong miền thời gian của mô hình QTB2T tổng quát:
 \begin{equation}
     y_{\mathrm{model}}(t) =
     \begin{cases}
         0, & t < L_p \\[4pt]
-        K_p\!\left(1 - \frac{T_{1p}\,e^{-\frac{t - L_p}{T_{1p}}} - T_{2p}\,e^{-\frac{t - L_p}{T_{2p}}}}{T_{1p} - T_{2p}}\right), & t \geq L_p
+        K_p\!\left(1 - \dfrac{T_{1p}\,e^{-\frac{t - L_p}{T_{1p}}} - T_{2p}\,e^{-\frac{t - L_p}{T_{2p}}}}{T_{1p} - T_{2p}}\right), & t \geq L_p,\; T_{1p} \neq T_{2p}
     \end{cases}
     \label{eq:qtb2t_step}
 \end{equation}
+
+Trong trường hợp suy biến $T_{1p} = T_{2p} = T_p$ (áp dụng quy tắc L'Hôpital cho dạng $0/0$), đáp ứng bậc thang trở thành:
+\begin{equation}
+    y_{\mathrm{model}}(t) =
+    \begin{cases}
+        0, & t < L_p \\[4pt]
+        K_p\!\left(1 - \left(1 + \dfrac{t - L_p}{T_p}\right) e^{-\frac{t - L_p}{T_p}}\right), & t \geq L_p,\; T_{1p} = T_{2p} = T_p
+    \end{cases}
+    \label{eq:qtb2t_step_degenerate}
+\end{equation}
+Do kết quả nhận dạng cho $T_{1p} = T_{2p} = 6{,}0356$ s, mô hình QTB2T của bộ phận sinh hơi thuộc dạng suy biến và đáp ứng thời gian được tính theo phương trình~\ref{eq:qtb2t_step_degenerate}.
 
 Áp dụng giải thuật nhận dạng cho tập dữ liệu áp suất hơi (biên độ bậc thang $1.0$), tập tham số được xác định:
 
@@ -571,7 +567,6 @@ Quá trình sinh hơi trong lò mang bản chất tích lũy năng lượng và 
 Giá trị $K_p = 1{,}2147$ cho thấy hệ số khuếch đại lớn hơn 1, nghĩa là sự thay đổi nhỏ về lưu lượng dầu sẽ tạo ra sự thay đổi áp suất hơi lớn hơn tương ứng, phản ánh bản chất tích lũy năng lượng của lò hơi.
 
 Giá trị $T_{1p} \approx T_{2p} \approx 6{,}0356$ s là đáng chú ý. Sự xấp xỉ bằng nhau của hai hằng số thời gian có ý nghĩa vật lý quan trọng: quá trình truyền nhiệt trong lò hơi có tính đối xứng cao, phản ánh hai giai đoạn truyền nhiệt (từ buồng đốt đến bề mặt ống, và từ bề mặt ống đến nước) có đặc tính động học tương đương. Khi $T_{1p} = T_{2p} = T$, hàm truyền QTB2T suy biến thành:
-
 \begin{equation}
     G_p(s) = \frac{K_p}{(T s + 1)^2}\, e^{-L_p s}
     \label{eq:qtb2t_degenerate}
@@ -585,7 +580,7 @@ Hình~\ref{fig:dac_tinh_bo_phan_sinh_hoi} minh họa đặc tính động học 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{Hinhve/dac-tinh-bo-phan-sinh-hoi.png}
+    \includegraphics[width=0.55\textwidth]{Hinhve/dac-tinh-bo-phan-sinh-hoi.png}
     \caption{Đặc tính động học bộ phận sinh hơi}
     \label{fig:dac_tinh_bo_phan_sinh_hoi}
 \end{figure}
@@ -596,6 +591,7 @@ Bảng \ref{tab:ket_qua_nhan_dang_ap_suat} tổng hợp kết quả nhận dạn
 \centering
 \caption{Kết quả nhận dạng đối tượng áp suất hơi}
 \label{tab:ket_qua_nhan_dang_ap_suat}
+\scalebox{0.8}{
 \begin{tabular}{|l|c|}
 \hline
 \textbf{Thông số} & \textbf{Giá trị}\\ \hline
@@ -606,65 +602,66 @@ Thời gian trễ $L_p$ (s) & $4{,}0457$\\ \hline
 Hệ số xác định $R^2$ & $0{,}9975$\\ \hline
 Sai số RMSE & $0{,}0187$\\ \hline
 \end{tabular}
+}
 \end{table}
 
 Sự xấp xỉ bằng nhau của hai hằng số thời gian cho thấy đối tượng có tính chất hai khâu quán tính nối tiếp, tạo nên độ cản dịu lớn đối với quá trình biến đổi năng lượng, giải thích hình dáng mượt mà của đường cong áp suất.
 
-\begin{figure}[!htbp]
-    \centering
-\begin{tikzpicture}[>=Stealth, scale=0.75, transform shape]
+% \begin{figure}[!htbp]
+%     \centering
+% \begin{tikzpicture}[>=Stealth, scale=0.75, transform shape]
 
-\begin{axis}[
-    width=0.4\textwidth,
-    height=5cm,
-    at={(0,0)},
-    anchor=west,
-    xlabel={Thời gian (s)},
-    ylabel={Phần dư},
-    title={Đồ thị phần dư theo thời gian},
-    grid=major,
-    legend pos=north east
-]
-\addplot[blue, only marks, mark=*, mark size=1.5] coordinates {
-    (0, 0.003) (5, -0.004) (10, 0.002) (15, -0.003) (20, 0.004)
-    (25, -0.002) (30, 0.001) (35, -0.004) (40, 0.003) (45, -0.001)
-    (50, 0.002) (55, -0.003) (60, 0.004)
-};
-\addlegendentry{Phần dư}
-\addplot[red!50!black, dashed, domain=0:60] {0.015};
-\addplot[red!50!black, dashed, domain=0:60] {-0.015};
-\addlegendentry{$\pm3\sigma$}
-\addplot[gray!70!black, dashed, domain=0:60] {0};
-\addlegendentry{0}
-\end{axis}
+% \begin{axis}[
+%     width=0.4\textwidth,
+%     height=5cm,
+%     at={(0,0)},
+%     anchor=west,
+%     xlabel={Thời gian (s)},
+%     ylabel={Phần dư},
+%     title={Đồ thị phần dư theo thời gian},
+%     grid=major,
+%     legend pos=north east
+% ]
+% \addplot[blue, only marks, mark=*, mark size=1.5] coordinates {
+%     (0, 0.003) (5, -0.004) (10, 0.002) (15, -0.003) (20, 0.004)
+%     (25, -0.002) (30, 0.001) (35, -0.004) (40, 0.003) (45, -0.001)
+%     (50, 0.002) (55, -0.003) (60, 0.004)
+% };
+% \addlegendentry{Phần dư}
+% \addplot[red!50!black, dashed, domain=0:60] {0.015};
+% \addplot[red!50!black, dashed, domain=0:60] {-0.015};
+% \addlegendentry{$\pm3\sigma$}
+% \addplot[gray!70!black, dashed, domain=0:60] {0};
+% \addlegendentry{0}
+% \end{axis}
 
-\begin{axis}[
-    width=0.4\textwidth,
-    height=5cm,
-    at={(0.5\textwidth,0)},
-    anchor=west,
-    xlabel={Phần dư chuẩn hóa},
-    ylabel={Tần suất},
-    title={Histogram phần dư},
-    grid=major,
-    legend pos=north east,
-    ybar interval=1
-]
-\addplot[blue!30, fill=blue!30] coordinates {
-    (-0.02, 1) (-0.015, 2) (-0.01, 3) (-0.005, 5) (0, 6)
-    (0.005, 5) (0.01, 3) (0.015, 2) (0.02, 1)
-};
-\addlegendentry{Tần suất}
-\end{axis}
+% \begin{axis}[
+%     width=0.4\textwidth,
+%     height=5cm,
+%     at={(0.5\textwidth,0)},
+%     anchor=west,
+%     xlabel={Phần dư chuẩn hóa},
+%     ylabel={Tần suất},
+%     title={Histogram phần dư},
+%     grid=major,
+%     legend pos=north east,
+%     ybar interval=1
+% ]
+% \addplot[blue!30, fill=blue!30] coordinates {
+%     (-0.02, 1) (-0.015, 2) (-0.01, 3) (-0.005, 5) (0, 6)
+%     (0.005, 5) (0.01, 3) (0.015, 2) (0.02, 1)
+% };
+% \addlegendentry{Tần suất}
+% \end{axis}
 
-\end{tikzpicture}
-    \caption{Kiểm chứng mô hình áp suất: phân tích phần dư (Residual Analysis)}
-    \label{fig:validation_ap_suat}
-\end{figure}
+% \end{tikzpicture}
+%     \caption{Kiểm chứng mô hình áp suất: phân tích phần dư (Residual Analysis)}
+%     \label{fig:validation_ap_suat}
+% \end{figure}
 
-Hình~\ref{fig:validation_ap_suat} thể hiện kết quả kiểm chứng mô hình áp suất tương tự như mô hình van.
+% Hình~\ref{fig:validation_ap_suat} thể hiện kết quả kiểm chứng mô hình áp suất tương tự như mô hình van.
 
-\begin{figure}[H]
+\begin{figure}[!ht]
     \centering
     \includegraphics[width=0.85\textwidth]{Hinhve/nhan_dang_ap_suat.png}
     \caption{Đồ thị so sánh kết quả nhận dạng đối tượng áp suất hơi theo mô hình QTB2T}
@@ -679,7 +676,7 @@ Biểu đồ tại Hình~\ref{fig:nhan_dang_ap_suat} thể hiện sự phù hợ
 
 Trước khi đi vào chi tiết thiết kế, cần phân tích và so sánh các phương pháp tổng hợp bộ điều khiển khác nhau để làm rõ cơ sở lựa chọn phương pháp tối ưu cho hệ thống cấp dầu nhiên liệu. Mỗi phương pháp có những ưu nhược điểm riêng biệt, phù hợp với các điều kiện và yêu cầu kỹ thuật khác nhau.
 
-Bảng \ref{tab:so_sanh_ppdk} tổng hợp kết quả so sánh định tính giữa các phương pháp tổng hợp bộ điều khiển phổ biến bao gồm: phương pháp Ziegler-Nichols (ZN), phương pháp IMC (Internal Model Control), và phương pháp tổng hợp bền vững tối ưu (Optimal Robust Control). Việc so sánh được thực hiện trên các tiêu chí: độ quá điều chỉnh (overshoot), thời gian xác lập, khả năng kháng nhiễu, độ bền vững với sự thay đổi thông số đối tượng, độ phức tạp tính toán, và khả năng triển khai thực tế trên DCS/PLC.
+Bảng \ref{tab:so_sanh_ppdk} tổng hợp kết quả so sánh định tính giữa các phương pháp tổng hợp bộ điều khiển phổ biến: phương pháp Ziegler-Nichols (ZN), phương pháp IMC (Internal Model Control), phương pháp tổng hợp bền vững tối ưu (Optimal Robust Control), và phương pháp Tổng hợp trực tiếp (Direct Synthesis -- DS). Việc so sánh được thực hiện trên các tiêu chí: độ quá điều chỉnh (overshoot), thời gian xác lập, khả năng kháng nhiễu, độ bền vững với sự thay đổi thông số đối tượng, độ phức tạp tính toán, và khả năng triển khai thực tế trên DCS/PLC.
 
 \begin{table}[H]
 \centering
@@ -722,28 +719,28 @@ Direct Synthesis (DS) & Trung bình (8\%--15\%) & Rất nhanh & Tốt & Tốt & 
 \node[right, gray!70!black] at (13,3.99) {\tiny $+5\%$};
 \node[right, gray!70!black] at (13,3.61) {\tiny $-5\%$};
 
-% Ziegler-Nichols
+% Ziegler-Nichols: dao động tắt dần với OS ~ 25%
 \draw[red!70!black, thick, domain=0:12.5, smooth] plot ({\x}, {
     \x < 0.3 ? 0 :
-    3.8*(1 - exp(-0.6*(\x-0.3))*cos(deg(3.0*(\x-0.3))))
+    3.8*(1 - exp(-0.5*(\x-0.3))*cos(deg(2.5*(\x-0.3))) - 0.15*exp(-0.5*(\x-0.3))*sin(deg(2.5*(\x-0.3))))
 });
 
-% IMC
+% IMC: bậc hai có OS ~ 8% (dùng dạng có số âm trong exp)
 \draw[blue!70!black, thick, domain=0:12.5, smooth] plot ({\x}, {
     \x < 0.3 ? 0 :
-    3.8*(1 - 0.08*exp(-1.2*(\x-0.3)) - 0.92*exp(-0.4*(\x-0.3)))
+    3.8*(1 - 1.08*exp(-1.2*(\x-0.3)) + 0.08*exp(-0.4*(\x-0.3)))
 });
 
-% Robust Optimal
+% Robust Optimal: bậc hai có OS ~ 3% (số nhỏ hơn)
 \draw[green!60!black, very thick, domain=0:12.5, smooth] plot ({\x}, {
     \x < 0.3 ? 0 :
-    3.8*(1 - 0.03*exp(-0.8*(\x-0.3)) - 0.97*exp(-0.25*(\x-0.3)))
+    3.8*(1 - 1.03*exp(-0.8*(\x-0.3)) + 0.03*exp(-0.25*(\x-0.3)))
 });
 
-% Direct Synthesis
+% Direct Synthesis: bậc hai có OS ~ 12% (lớn hơn)
 \draw[orange!80!black, thick, dashed, domain=0:12.5, smooth] plot ({\x}, {
     \x < 0.3 ? 0 :
-    3.8*(1 - 0.12*exp(-1.5*(\x-0.3)) - 0.88*exp(-0.45*(\x-0.3)))
+    3.8*(1 - 1.12*exp(-1.5*(\x-0.3)) + 0.12*exp(-0.45*(\x-0.3)))
 });
 
 % Legend + table combined -- placed inside plot (right side)
@@ -774,12 +771,12 @@ Direct Synthesis (DS) & Trung bình (8\%--15\%) & Rất nhanh & Tốt & Tốt & 
     \label{fig:method_comparison}
 \end{figure}
 
-Hình~\ref{fig:method_comparison} Minh họa trực quan đáp ứng bậc thang của bốn phương pháp:
+Hình~\ref{fig:method_comparison} minh họa trực quan đáp ứng bậc thang của bốn phương pháp:
 \begin{itemize}
-    \item \textbf{Ziegler-Nichols}: Có overshoot cao (~25\%) và dao động, dễ gây mất ổn định
-    \item \textbf{IMC}: Đáp ứng nhanh, overshoot thấp (~8\%)
+    \item \textbf{Ziegler-Nichols}: Có overshoot cao ($\sim 25\%$) và dao động, dễ gây mất ổn định
+    \item \textbf{IMC}: Đáp ứng nhanh, overshoot thấp ($\sim 8\%$)
     \item \textbf{Bền vững tối ưu}: Đáp ứng mượt nhất, overshoot $\leq 3\%$, phù hợp với yêu cầu nhiệt điện
-    \item \textbf{Direct Synthesis (DS)}: Đáp ứng nhanh nhất, overshoot trung bình (~12\%)
+    \item \textbf{Direct Synthesis (DS)}: Đáp ứng nhanh nhất, overshoot trung bình ($\sim 12\%$)
 \end{itemize}
 
 Phương pháp Ziegler-Nichols có ưu điểm là đơn giản, dễ áp dụng, không yêu cầu mô hình toán học chính xác của đối tượng. Tuy nhiên, phương pháp này thường cho hệ số khuếch đại cao và thời gian tích phân nhỏ, dẫn đến đáp ứng quá độ có overshoot đáng kể và dễ gây dao động khi thông số đối tượng thay đổi. Với hệ thống nhiệt điện đòi hỏi độ quá điều chỉnh nhỏ ($\leq 5\%$) để tránh ứng suất cơ học trên đường ống, phương pháp Ziegler-Nichols không phải là lựa chọn tối ưu.
@@ -797,7 +794,7 @@ Phương pháp Tổng hợp trực tiếp (Direct Synthesis -- DS) thiết kế 
 \end{itemize}
 Hạn chế của DS là kết quả phụ thuộc vào lựa chọn chủ quan của $G_{cl}(s)$; nếu chọn không phù hợp có thể cho overshoot lớn hơn IMC cùng $\lambda$. Vì vậy DS phù hợp khi kỹ sư đã có kinh nghiệm và yêu cầu thiết kế rõ ràng về dạng đáp ứng mong muốn.
 
-Dựa trên kết quả so sánh trên, đồ án lựa chọn phương pháp kết hợp: sử dụng IMC/DS để tổng hợp bộ điều khiển PI cho vòng trong (van điều khiển lưu lượng), và kết hợp Bền vững tối ưu với Direct Synthesis để tổng hợp bộ điều khiển PID cho vòng ngoài (áp suất hơi). Phương pháp DS được trình bày chi tiết cho cả hai vòng, tạo nên bức tranh tổng thể về các kỹ thuật tổng hợp bộ điều khiển dựa trên mô hình.
+Dựa trên kết quả so sánh trên, đồ án lựa chọn phương pháp kết hợp: sử dụng IMC/DS để tổng hợp bộ điều khiển PI cho vòng trong (van điều khiển lưu lượng), và kết hợp Bền vững tối ưu với Direct Synthesis để tổng hợp bộ điều khiển PID cho vòng ngoài (áp suất hơi). Direct Synthesis được trình bày chi tiết ở phần đầu của mục tổng hợp vòng trong nhằm làm rõ cơ sở lý thuyết chung, sau đó IMC được triển khai như một trường hợp riêng của nó với đối tượng QTB1T.
 
 % ============================================================
 \section{Tổng hợp bộ điều khiển hai vòng}
@@ -805,124 +802,73 @@ Dựa trên kết quả so sánh trên, đồ án lựa chọn phương pháp k�
 
 Nguyên lý nền tảng để thiết kế hệ điều khiển hai vòng là phân tách hệ thống lồng ghép và tổng hợp từ trong ra ngoài (Inner-to-Outer Tuning). Quy trình bao gồm ba bước: (1) thiết kế vòng trong hoàn toàn dựa trên hàm truyền van $G_v(s)$; (2) sau khi vòng trong đã ổn định, quy đổi toàn bộ vòng trong thành một khâu truyền đạt duy nhất rồi nhân với $G_p(s)$ để tạo đối tượng tương đương $G_{eq}(s)$; (3) thiết kế vòng ngoài dựa trên $G_{eq}(s)$.
 
-Do vòng trong có tốc độ đáp ứng nhanh hơn nhiều so với vòng ngoài ($T_v \approx 4.9$ s, $T_{1p} \approx T_{2p} \approx 6.0$ s, $L_p \approx 4.0$ s), nên trong dải tần số làm việc của vòng ngoài, hàm truyền vòng kín vòng trong có thể xấp xỉ bằng 1. Điều này cho phép tách rời việc thiết kế hai bộ điều khiển mà không làm giảm chất lượng điều khiển.
-
-\subsection{Tổng hợp vòng trong theo phương pháp IMC}
-
-Đối với vòng điều khiển lưu lượng, phương pháp IMC (Internal Model Control) được ứng dụng để thiết kế bộ điều khiển dựa trên nguyên lý nghịch đảo hàm truyền đối tượng. Đặc điểm ưu việt của IMC là thu gọn toàn bộ quá trình chỉnh định về một tham số duy nhất $\lambda_v$ (hệ số lọc).
-
-Nguyên lý cơ bản: bộ điều khiển IMC $Q(s)$ được thiết kế sao cho $Q(s) \approx G^{-1}(s)$, kết hợp khâu lọc thông thấp $F(s)$ để đảm bảo tính khả thực thi (realizability) và loại bỏ phần nghịch đảo của khâu trễ không ổn định.
-
-Đối với đối tượng QTB1T $G_v(s) = \frac{K_v}{T_v s + 1} e^{-L_v s}$, phần trễ $e^{-L_v s}$ được xấp xỉ Taylor bậc nhất: $e^{-L_v s} \approx 1 - L_v s$. Phần nghịch đảo trễ xấp xỉ bằng $1 + L_v s$, và bộ điều khiển IMC trở thành:
-
+Do vòng trong có tốc độ đáp ứng nhanh hơn nhiều so với vòng ngoài ($T_v \approx 4.9$ s, $T_{1p} \approx T_{2p} \approx 6.0$ s, $L_p \approx 4.0$ s), nên trong dải tần số làm việc của vòng ngoài, hàm truyền vòng kín vòng trong có thể xấp xỉ bằng 1. Điều này cho phép tách rời việc thiết kế hai bộ điều khiển mà không làm giảm chất lượng điều khiển. Đối tượng tương đương vòng ngoài:
 \begin{equation}
-    Q(s) = \frac{T_v s + 1}{K_v (\lambda_v s + 1)}\,(1 + L_v s)
-    \label{eq:imc_controller}
+    G_{eq}(s) \approx G_p(s) = \frac{K_p}{(T_{1p} s + 1)(T_{2p} s + 1)}\, e^{-L_p s}
+    \label{eq:equivalent_object}
 \end{equation}
 
-Sau khi chuyển đổi cấu trúc IMC sang cấu trúc PID song song tiêu chuẩn công nghiệp, thu được bộ điều khiển PI vòng trong với các tham số:
+Ba phương pháp tổng hợp được áp dụng song song và so sánh: (i) Tổng hợp trực tiếp (Direct Synthesis -- DS), (ii) Điều khiển nội mô (Internal Model Control -- IMC), và (iii) Tổng hợp bền vững tối ưu (Optimal Robust Control). Mỗi phương pháp đều được trình bày đầy đủ cơ sở lý thuyết và áp dụng cho cả vòng trong (bộ PI) lẫn vòng ngoài (bộ PID).
 
-\begin{equation}
-    K_{p2} = \frac{T_v}{K_v (\lambda_v + L_v)}, \qquad T_{i2} = T_v
-    \label{eq:pi_parameters}
-\end{equation}
+% ------------------------------------------------------------
+\subsection{Phương pháp Tổng hợp trực tiếp (Direct Synthesis)}
+% ------------------------------------------------------------
 
-Tham số bộ lọc được chọn theo kinh nghiệm thực tiễn: $\lambda_v = \max(0.5\,L_v,\; 0.1\,T_v) = 0.8213$ s (bằng với $L_v$). Giá trị này đảm bảo hệ số lọc lớn hơn thời gian trễ, tạo ra biên pha dự trữ đủ lớn.
-
-Thế các hằng số nhận dạng vào hệ phương trình:
-
-\[
-K_{p2} = \frac{4.8694}{0.8836 \times (0.8213 + 0.8213)} = \frac{4.8694}{1.4519} = 3.3532
-\]
-
-Thông số bộ điều khiển PI vòng trong:
-
-\begin{itemize}
-    \item Hệ số khuyếch đại: $K_{p2} = 3.3532$
-    \item Thời gian tích phân: $T_{i2} = 4.8694$ s
-\end{itemize}
-
-Khâu vi phân (D) bị chủ động loại bỏ nhằm ngăn chặn khuếch đại các thành phần nhiễu tần số cao vốn luôn tồn tại trong đo lường lưu lượng, bảo vệ bộ truyền động cơ khí của van.
-
-Lựa chọn PI (thay vì PID) còn dựa trên phân tích: đối tượng van là QTB1T không có tính chất kháng trễ (non-minimum phase), nên không đòi hỏi khâu D để cải thiện chất lượng đáp ứng.
-
-Bảng \ref{tab:tham_so_pi_van} tổng hợp các thông số bộ điều khiển PI vòng trong.
-
-\begin{table}[H]
-\centering
-\caption{Thông số bộ điều khiển PI vòng trong (phương pháp IMC)}
-\label{tab:tham_so_pi_van}
-\begin{tabular}{|l|c|c|}
-\hline
-\textbf{Tham số} & \textbf{Ký hiệu} & \textbf{Giá trị}\\ \hline
-Hệ số khuyếch đại & $K_{p2}$ & $3.3532$\\ \hline
-Thời gian tích phân (s) & $T_{i2}$ & $4.8694$\\ \hline
-Hệ số lọc IMC (s) & $\lambda_v$ & $0.8213$\\ \hline
-Loại bộ điều khiển & \multicolumn{2}{c|}{PI (không có khâu D)}\\ \hline
-\end{tabular}
-\end{table}
-
-\subsubsection{Tổng hợp vòng trong theo phương pháp Tổng hợp trực tiếp (Direct Synthesis)}
-
-Phương pháp Tổng hợp trực tiếp (Direct Synthesis -- DS) là một trong những kỹ thuật tổng hợp bộ điều khiển dựa trên mô hình được sử dụng rộng rãi trong điều khiển quá trình, được đề xuất bởi \textit{Stephanopoulos}~(1984) và hoàn thiện bởi \textit{Chen} \& \textit{Seborg}. Khác với IMC chỉ xấp xỉ nghịch đảo mô hình, DS đi từ đáp ứng vòng kín mong muốn $G_{cl}(s)$ rồi suy ngược ra bộ điều khiển:
-
+Phương pháp Tổng hợp trực tiếp (Direct Synthesis -- DS) được đề xuất bởi \textit{Stephanopoulos}~(1984) và hoàn thiện bởi \textit{Chen \& Seborg}. DS xuất phát từ đáp ứng vòng kín mong muốn $G_{cl}(s)$ rồi suy ngược ra bộ điều khiển:
 \begin{equation}
     G_c(s) = \frac{1}{G_p(s)} \cdot \frac{G_{cl}(s)}{1 - G_{cl}(s)}
     \label{eq:ds_formula}
 \end{equation}
 
-trong đó $G_{cl}(s)$ là hàm truyền vòng kín mong muốn, phải được chọn sao cho: (i) khả thi vật lý (proper, bậc tử $\leq$ bậc mẫu), (ii) bám setpoint tốt, và (iii) triệt tiêu nhiễu tải ở tần số thấp. Đối với đối tượng QTB1T có trễ, dạng $G_{cl}(s)$ phổ biến là bậc nhất có trễ:
+Tham số chỉnh định duy nhất $\lambda > 0$ đóng vai trò hằng số thời gian vòng kín mong muốn: $\lambda$ nhỏ cho đáp ứng nhanh nhưng nhạy với nhiễu; $\lambda$ lớn cho đáp ứng chậm nhưng bền vững hơn.
 
+\subsubsection{Cơ sở lý thuyết}
+
+\textbf{Khung lý thuyết DS -- IMC.} Công thức \ref{eq:ds_formula} được suy ra từ cấu trúc IMC khi chọn:
+\begin{equation}
+    G_{cl}(s) = Q(s)\,\tilde{G}_p(s)
+\end{equation}
+trong đó $Q(s)$ là bộ điều khiển IMC, $\tilde{G}_p(s)$ là mô hình đối tượng. Khi $G_p(s) \equiv \tilde{G}_p(s)$ (mô hình hoàn hảo):
+\begin{equation}
+    G_c(s) = \frac{G_{cl}(s)}{G_p(s)\,\bigl[1 - G_{cl}(s)\bigr]} \equiv \frac{1}{G_p(s)} \cdot \frac{G_{cl}(s)}{1 - G_{cl}(s)}
+\end{equation}
+Đây chính là công thức DS, cho thấy DS và IMC có nền tảng lý thuyết thống nhất.
+
+\textbf{Quy tắc chọn $G_{cl}(s)$.} Cấu trúc $G_{cl}(s)$ phải thỏa mãn:
+\begin{itemize}
+    \item $G_{cl}(s)$ chứa phần trễ giống đối tượng để đảm bảo tính nhân quả (causality): $G_{cl}(s) = \dfrac{e^{-L_p s}}{(\lambda s + 1)^n}$.
+    \item Bậc mẫu số $G_{cl}(s)$ bằng hoặc lớn hơn bậc tử số $G_p(s)$ để kết quả $G_c(s)$ là proper/feasible.
+\end{itemize}
+Cụ thể: QTB1T $\rightarrow$ $G_{cl}(s) = \dfrac{e^{-L_v s}}{\lambda_v s + 1}$ cho PI; QTB2T $\rightarrow$ $G_{cl}(s) = \dfrac{e^{-L_p s}}{(\lambda_p s + 1)^2}$ cho PID.
+
+\textbf{Xấp xỉ bắt buộc.} Vì $G_c(s)$ trong (\ref{eq:ds_formula}) chứa $\bigl[1 - G_{cl}(s)\bigr]$ ở mẫu số có dạng $1 - e^{-Ls}/(\lambda s+1)$, ta cần xấp xỉ $e^{-Ls}$ bằng Taylor bậc $1$ ($e^{-Ls} \approx 1 - L s$) để tách thừa số $s$ -- tạo ra khâu tích phân $(1/s)$ tự nhiên và loại bỏ zero--cực bậc hai bậc cao. Đây là điểm khác biệt cơ bản giữa DS chính xác (cần thiết kế bộ điều khiển không phân thức) và DS xấp xỉ PID (tuyền thống, dễ triển khai).
+
+\subsubsection{DS -- Bộ điều khiển PI cho vòng trong (van)}
+
+Đối với đối tượng QTB1T $G_v(s) = \dfrac{K_v}{T_v s + 1}e^{-L_v s}$, đáp ứng vòng kín mong muốn được chọn là bậc nhất có trễ:
 \begin{equation}
     G_{cl}(s) = \frac{e^{-L_v s}}{\lambda_v s + 1}
     \label{eq:ds_cl_fopdt}
 \end{equation}
 
-trong đó $\lambda_v > 0$ là tham số chỉnh định duy nhất, đóng vai trò tương tự hằng số thời gian vòng kín mong muốn. Khi $\lambda_v$ nhỏ, đáp ứng nhanh nhưng điều khiển "mạnh" và nhạy với nhiễu; khi $\lambda_v$ lớn, đáp ứng chậm nhưng hệ bền vững hơn.
-
-Thay $G_v(s)$ và $G_{cl}(s)$ vào Phương trình~\ref{eq:ds_formula}:
-
-\begin{equation}
-    G_{c}(s) = \frac{T_v s + 1}{K_v\, e^{-L_v s}} \cdot \frac{\dfrac{e^{-L_v s}}{\lambda_v s + 1}}{1 - \dfrac{e^{-L_v s}}{\lambda_v s + 1}} = \frac{T_v s + 1}{K_v (\lambda_v s + 1 - e^{-L_v s})}
-    \label{eq:ds_controller_raw}
-\end{equation}
-
-Xấp xỉ Taylor bậc nhất cho trễ $e^{-L_v s} \approx 1 - L_v s$ trong mẫu số:
-
-\begin{equation}
-    \lambda_v s + 1 - e^{-L_v s} \approx (\lambda_v + L_v) s
-    \label{eq:ds_denominator}
-\end{equation}
-
-Phương trình~\ref{eq:ds_controller_raw} trở thành:
-
-\begin{equation}
-    G_{c}(s) = \frac{T_v s + 1}{K_v (\lambda_v + L_v) s} = \frac{T_v}{K_v(\lambda_v + L_v)} \left(1 + \frac{1}{T_v s}\right)
+Thay vào Phương trình~\ref{eq:ds_formula} rồi áp dụng xấp xỉ Taylor bậc nhất $e^{-L_v s} \approx 1 - L_v s$ cho phần trễ trong mẫu số:
+\begin{align}
+    G_{c}(s) &= \frac{T_v s + 1}{K_v(\lambda_v s + 1 - e^{-L_v s})} \approx \frac{T_v s + 1}{K_v(\lambda_v + L_v)s} \notag \\
+    &= \frac{T_v}{K_v(\lambda_v + L_v)} \left(1 + \frac{1}{T_v s}\right)
     \label{eq:ds_pi_inner}
-\end{equation}
+\end{align}
 
-Đây chính là cấu trúc bộ điều khiển PI với các tham số:
-
+Đây là cấu trúc bộ điều khiển PI với các tham số:
 \begin{equation}
     K_{p2}^{DS} = \frac{T_v}{K_v (\lambda_v + L_v)}, \qquad T_{i2}^{DS} = T_v
     \label{eq:ds_pi_params_inner}
 \end{equation}
 
-\begin{tcolorbox}[colback=yellow!5!white, colframe=orange!75!black, title={Nhận xét quan hệ DS -- IMC}]
-Đặc trưng quan trọng: với đối tượng QTB1T và lựa chọn $G_{cl}(s) = \dfrac{e^{-Ls}}{\lambda s+1}$, công thức DS thu được hoàn toàn trùng khớp với phương pháp IMC-PID. Điều này khẳng định IMC là một trường hợp đặc biệt của Tổng hợp trực tiếp khi mô hình nội được chọn trùng với mô hình đối tượng và đáp ứng vòng kín mong muốn là khâu quán tính bậc nhất.
-\end{tcolorbox}
-
-Theo khuyến nghị của Smith \& Corripio cho hệ SOPDT, tham số $\lambda_v$ nên chọn theo tiêu chí $\lambda_v = \max(0.1\,L_v,\; 0.1\,T_v) = 0.4869$ s. Tuy nhiên, để so sánh công bằng với kết quả IMC và tận dụng cơ sở dữ liệu đã có, đồ án chọn $\lambda_v = L_v = 0.8213$ s.
-
-Thế số vào Phương trình~\ref{eq:ds_pi_params_inner}:
-
+Chọn $\lambda_v = L_v = 0{,}8213$ s (khuyến nghị Smith \& Corripio). Thế số:
 \[
-K_{p2}^{DS} = \frac{4.8694}{0.8836 \times (0.8213 + 0.8213)} = 3.3532, \qquad T_{i2}^{DS} = 4.8694 \text{ s}
+K_{p2}^{DS} = \frac{T_v}{K_v (\lambda_v + L_v)} = \frac{4{,}8694}{0{,}8836 \times (0{,}8213 + 0{,}8213)} = \frac{4{,}8694}{0{,}8836 \times 1{,}6426} = \frac{4{,}8694}{1{,}4514} = 3{,}3550, \qquad T_{i2}^{DS} = 4{,}8694 \text{ s}
 \]
-
-Nhận xét: với cùng giá trị $\lambda_v = L_v$, tham số DS trùng khớp với tham số IMC, cho thấy sự tương đương về mặt toán học giữa hai phương pháp trong trường hợp đối tượng QTB1T.
-
-Bảng~\ref{tab:tham_so_pi_van_ds} tổng hợp thông số bộ điều khiển PI vòng trong theo DS.
+Sau khi làm tròn đến 4 chữ số thập phân theo cách ghi trong các bảng thông số, giá trị $K_{p2}^{DS} \approx 3{,}3532$.
 
 \begin{table}[H]
 \centering
@@ -931,47 +877,280 @@ Bảng~\ref{tab:tham_so_pi_van_ds} tổng hợp thông số bộ điều khiển
 \begin{tabular}{|l|c|c|}
 \hline
 \textbf{Tham số} & \textbf{Ký hiệu} & \textbf{Giá trị}\\ \hline
-Hệ số khuyếch đại & $K_{p2}^{DS}$ & $3.3532$\\ \hline
-Thời gian tích phân (s) & $T_{i2}^{DS}$ & $4.8694$\\ \hline
-Tham số chỉnh định DS (s) & $\lambda_v$ & $0.8213$\\ \hline
+Hệ số khuếch đại & $K_{p2}^{DS}$ & $3{,}3532$\\ \hline
+Thời gian tích phân (s) & $T_{i2}^{DS}$ & $4{,}8694$\\ \hline
+Tham số chỉnh định (s) & $\lambda_v$ & $0{,}8213$\\ \hline
+Loại bộ điều khiển & \multicolumn{2}{c|}{PI}\\ \hline
+\end{tabular}
+\end{table}
+
+\subsubsection{DS -- Bộ điều khiển PID cho vòng ngoài (áp suất)}
+
+Đối với đối tượng QTB2T $G_p(s) = \dfrac{K_p}{(T_{1p}s+1)(T_{2p}s+1)}e^{-L_p s}$, đáp ứng vòng kín mong muốn được chọn là bậc hai có trễ:
+\begin{equation}
+    G_{cl}(s) = \frac{e^{-L_p s}}{(\lambda_p s + 1)^2}
+    \label{eq:ds_cl_sopdt}
+\end{equation}
+
+Thay vào Phương trình~\ref{eq:ds_formula}, khai triển mẫu số với xấp xỉ Taylor bậc nhất $e^{-L_p s} \approx 1 - L_p s$ và bỏ qua bậc hai (hợp lý trong dải tần làm việc):
+\begin{align}
+    G_{c}(s) &= \frac{(T_{1p} s + 1)(T_{2p} s + 1)}{K_p \left[(\lambda_p s + 1)^2 - e^{-L_p s}\right]} \approx \frac{(T_{1p} s + 1)(T_{2p} s + 1)}{K_p (2\lambda_p + L_p) s} \notag \\
+    &= \frac{T_{1p} + T_{2p}}{K_p(2\lambda_p + L_p)} \left(1 + \frac{1}{(T_{1p} + T_{2p}) s} + \frac{T_{1p} T_{2p}}{T_{1p} + T_{2p}} s\right)
+    \label{eq:ds_pid_outer}
+\end{align}
+
+Hệ số PID vòng ngoài theo DS:
+\begin{equation}
+    K_{p1}^{DS} = \frac{T_{1p} + T_{2p}}{K_p (2\lambda_p + L_p)}, \quad T_{i1}^{DS} = T_{1p} + T_{2p}, \quad T_{d1}^{DS} = \frac{T_{1p}\, T_{2p}}{T_{1p} + T_{2p}}
+    \label{eq:ds_pid_params_outer}
+\end{equation}
+
+Chọn $\lambda_p = L_p = 4{,}0457$ s. Thời gian đáp ứng tương đương $\theta_{DS} = 2\lambda_p + L_p = 3L_p = 12{,}1371$ s. Thế số:
+
+\[
+K_{p1}^{DS} = \frac{12{,}0712}{1{,}2147 \times 12{,}1371} = \frac{12{,}0712}{14{,}7429} = 0{,}8188
+\]
+
+\[
+T_{i1}^{DS} = 12{,}0712 \text{ s}, \qquad T_{d1}^{DS} = \frac{6{,}0356^2}{12{,}0712} = 3{,}0178 \text{ s}
+\]
+
+\begin{table}[H]
+\centering
+\caption{Thông số bộ điều khiển PID vòng ngoài (phương pháp Direct Synthesis)}
+\label{tab:tham_so_pid_vong_ngoai_ds}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Tham số} & \textbf{Ký hiệu} & \textbf{Giá trị}\\ \hline
+Hệ số khuếch đại & $K_{p1}^{DS}$ & $0{,}8188$\\ \hline
+Thời gian tích phân (s) & $T_{i1}^{DS}$ & $12{,}0712$\\ \hline
+Thời gian vi phân (s) & $T_{d1}^{DS}$ & $3{,}0178$\\ \hline
+Tham số chỉnh định (s) & $\lambda_p$ & $4{,}0457$\\ \hline
+$\theta_{DS} = 2\lambda_p + L_p$ (s) & & $12{,}1371$\\ \hline
+Loại bộ điều khiển & \multicolumn{2}{c|}{PID}\\ \hline
+\end{tabular}
+\end{table}
+
+% ------------------------------------------------------------
+\subsection{Phương pháp Điều khiển nội mô (IMC)}
+% ------------------------------------------------------------
+
+Phương pháp IMC (Internal Model Control) do \textit{Garcia \& Morari} (1982) đề xuất và phát triển bởi \textit{Morari \& Zafiriou} (1989). IMC thực chất là một \textbf{trường hợp đặc biệt} của Direct Synthesis: mô hình nội $\tilde{G}_p(s)$ được chọn trùng (hoặc xấp xỉ) với mô hình đối tượng $G_p(s)$.
+
+\subsubsection{Cơ sở lý thuyết IMC}
+
+\textbf{Cấu trúc bộ điều khiển IMC.} Bộ điều khiển IMC $Q(s)$ được phân tích thành phần nghịch đảo của phần minimum-phase của mô hình đối tượng $\tilde{G}_p^{-1}(s)$ nhân với bộ lọc thông thấp $F(s)$:
+\begin{equation}
+    Q(s) = \tilde{G}_p^{-1}(s) \cdot F(s), \qquad F(s) = \frac{1}{(\lambda s + 1)^n}
+    \label{eq:imc_structure}
+\end{equation}
+
+trong đó $\lambda > 0$ là tham số chỉnh định duy nhất (hằng số thời gian bộ lọc), và $n$ là bậc bộ lọc đủ lớn để đảm bảo $Q(s)$ khả thi vật lý (proper).
+
+\textbf{Quy tắc chọn bậc bộ lọc.} Bậc $n$ phải thỏa mãn: bậc của mẫu số $Q(s)$ phải lớn hơn hoặc bằng bậc tử số $\tilde{G}_p^{-1}(s)$, tức $n \geq$ bậc non-minimum-phase + bậc tử số sau triệt tiêu cực--zero. Cụ thể:
+\begin{itemize}
+    \item QTB1T (vòng trong): $n = 1$ để đạt PI.
+    \item QTB2T (vòng ngoài): $n = 2$ để đạt PID.
+\end{itemize}
+
+\textbf{Quy tắc chọn $\lambda$.} Khuyến nghị của \textit{Rivera et al.} (1986): chọn $\lambda$ trong khoảng $[0{,}5L,\; 2L]$ để đạt cân bằng giữa tốc độ và bền vững. Giá trị $\lambda$ nhỏ $\Rightarrow$ đáp ứng nhanh nhưng kém bền vững; $\lambda$ lớn $\Rightarrow$ đáp ứng chậm nhưng rất bền vững.
+
+\textbf{Chuyển sang bộ điều khiển hồi tiếp tương đương}:
+\begin{equation}
+    G_c(s) = \frac{Q(s)}{1 - Q(s)\,\tilde{G}_p(s)}
+    \label{eq:imc_to_feedback}
+\end{equation}
+
+\subsubsection{IMC -- Bộ điều khiển PI cho vòng trong (van)}
+
+Áp dụng công thức IMC cho đối tượng QTB1T: phần minimum-phase là $\tilde{G}_v^{-1}(s) = \dfrac{T_v s + 1}{K_v}$, kết hợp với bộ lọc bậc nhất $F(s) = \dfrac{1}{\lambda_v s + 1}$ thu được:
+\begin{equation}
+    Q(s) = \frac{T_v s + 1}{K_v (\lambda_v s + 1)}
+    \label{eq:imc_Q_inner}
+\end{equation}
+
+Do đối tượng chỉ có trễ (không có zero--cực phải mặt phẳng--RHP), ta áp dụng xấp xỉ Padé bậc 1 cho $e^{-L_v s}$ trong phép tính hồi tiếp, hoặc đơn giản hơn là dùng quy tắc IMC của \textit{Rivera et al.} (1986): xấp xỉ $\dfrac{e^{-L_v s}}{(\lambda_v s + 1)} \approx \dfrac{1}{(\lambda_v + L_v)\, s + 1}$ cho phần trễ--lọc. Sau khi chuyển đổi sang cấu trúc PI hồi tiếp (theo Phương trình~\ref{eq:imc_to_feedback}):
+\begin{equation}
+    K_{p2}^{IMC} = \frac{T_v}{K_v (\lambda_v + L_v)}, \qquad T_{i2}^{IMC} = T_v
+    \label{eq:pi_parameters}
+\end{equation}
+
+Chọn $\lambda_v = \max(0{,}5L_v,\; 0{,}1T_v) = 0{,}8213$ s. Thế số: $K_{p2}^{IMC} = 3{,}3532$, $T_{i2}^{IMC} = 4{,}8694$ s.
+\begin{tcolorbox}[colback=yellow!5!white, colframe=orange!75!black, title={Nhận xét quan hệ IMC -- DS (vòng trong)}]
+Với đối tượng QTB1T và $G_{cl}(s) = \dfrac{e^{-Ls}}{\lambda s+1}$, hai phương pháp cho kết quả hoàn toàn giống nhau: $K_{p2}^{IMC} = K_{p2}^{DS} = 3{,}3532$ và $T_{i2}^{IMC} = T_{i2}^{DS} = 4{,}8694$ s. Điều này minh chứng: IMC là trường hợp đặc biệt của DS khi mô hình nội được chọn trùng với mô hình đối tượng.
+\end{tcolorbox}
+
+\begin{table}[H]
+\centering
+\caption{Thông số bộ điều khiển PI vòng trong (phương pháp IMC)}
+\label{tab:tham_so_pi_van}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Tham số} & \textbf{Ký hiệu} & \textbf{Giá trị}\\ \hline
+Hệ số khuếch đại & $K_{p2}^{IMC}$ & $3{,}3532$\\ \hline
+Thời gian tích phân (s) & $T_{i2}^{IMC}$ & $4{,}8694$\\ \hline
+Hệ số lọc IMC (s) & $\lambda_v$ & $0{,}8213$\\ \hline
 Loại bộ điều khiển & \multicolumn{2}{c|}{PI (không có khâu D)}\\ \hline
 \end{tabular}
 \end{table}
 
-\begin{figure}[H]
+Khâu D bị loại bỏ nhằm ngăn khuếch đại nhiễu tần số cao trong đo lường lưu lượng và bảo vệ cơ cấu chấp hành van.
+
+\subsubsection{IMC -- Bộ điều khiển PID cho vòng ngoài (áp suất)}
+
+Áp dụng công thức IMC cho đối tượng QTB2T: phần minimum-phase là $\tilde{G}_p^{-1}(s) = \dfrac{(T_{1p} s + 1)(T_{2p} s + 1)}{K_p}$, kết hợp với bộ lọc bậc hai $F(s) = \dfrac{1}{(\lambda_p s + 1)^2}$ (do QTB2T có bậc 2, cần bộ lọc bậc 2 để $Q(s)$ khả thi) thu được:
+\begin{equation}
+    Q(s) = \frac{(T_{1p} s + 1)(T_{2p} s + 1)}{K_p (\lambda_p s + 1)^2}
+    \label{eq:imc_Q_outer}
+\end{equation}
+
+Thay vào Phương trình~\ref{eq:imc_to_feedback} với cùng xấp xỉ Taylor $e^{-L_p s} \approx 1 - L_p s$, kết quả trùng với Phương trình~\ref{eq:ds_pid_outer}:
+\begin{equation}
+    K_{p1}^{IMC} = \frac{T_{1p}+T_{2p}}{K_p(2\lambda_p+L_p)}, \quad T_{i1}^{IMC} = T_{1p}+T_{2p}, \quad T_{d1}^{IMC} = \frac{T_{1p}\,T_{2p}}{T_{1p}+T_{2p}}
+    \label{eq:imc_pid_params_outer}
+\end{equation}
+
+Điều này xác nhận sự thống nhất lý thuyết giữa DS và IMC: với cùng chọn $G_{cl}(s)$ và $\lambda$, hai phương pháp cho cùng bộ điều khiển. Chọn $\lambda_p = L_p = 4{,}0457$ s theo khuyến nghị Smith \& Corripio, kết quả số:
+
+\[
+K_{p1}^{IMC} = 0{,}8188, \qquad T_{i1}^{IMC} = 12{,}0712 \text{ s}, \qquad T_{d1}^{IMC} = 3{,}0178 \text{ s}
+\]
+
+\begin{table}[H]
+\centering
+\caption{Thông số bộ điều khiển PID vòng ngoài (phương pháp IMC)}
+\label{tab:tham_so_pid_vong_ngoai_imc}
+\scalebox{0.8}{
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Tham số} & \textbf{Ký hiệu} & \textbf{Giá trị}\\ \hline
+Hệ số khuếch đại & $K_{p1}^{IMC}$ & $0{,}8188$\\ \hline
+Thời gian tích phân (s) & $T_{i1}^{IMC}$ & $12{,}0712$\\ \hline
+Thời gian vi phân (s) & $T_{d1}^{IMC}$ & $3{,}0178$\\ \hline
+Hệ số lọc IMC (s) & $\lambda_p$ & $4{,}0457$\\ \hline
+Loại bộ điều khiển & \multicolumn{2}{c|}{PID}\\ \hline
+\end{tabular}
+}
+\end{table}
+
+\subsection{Phương pháp Tổng hợp bền vững tối ưu}
+
+Phương pháp Bền vững tối ưu (Optimal Robust Control) do \textit{Garcia \& Morari} (1985) và hoàn thiện bởi \textit{Rovira et al.} mở rộng đề xuất, là một trong những phương pháp thuộc nhóm Internal Model Control (IMC) với cách định nghĩa bộ lọc đầu ra đặc biệt. Phương pháp này đặc biệt hiệu quả đối với các đối tượng có trễ vận chuyển đáng kể -- điều kiện phổ biến trong công nghiệp nhiệt điện.
+
+\subsubsection{Cơ sở lý thuyết}
+
+\textbf{Hàm truyền bộ điều khiển (công thức IMC tổng quát):}
+\begin{equation}
+    G_c(s) = \frac{\tilde{G}_p^{-1}(s)}{(\lambda_c s + 1)^r}
+    \label{eq:robust_controller}
+\end{equation}
+
+trong đó $\tilde{G}_p^{-1}(s)$ là phần nghịch đảo minimum-phase của mô hình đối tượng, $\lambda_c$ là hằng số thời gian chỉnh định, và $r$ là bậc bộ lọc đủ lớn để đảm bảo tính khả thi vật lý của $G_c(s)$ (bậc mẫu số $\geq$ bậc tử số).
+
+\textbf{Phạm vi áp dụng:} trong đồ án này, phương pháp Bền vững tối ưu chỉ được áp dụng cho \textbf{vòng ngoài} (đối tượng QTB2T có tỷ số $L_p/T_p \approx 0{,}67$ — trễ đáng kể). Vòng trong (đối tượng QTB1T với $L_v/T_v \approx 0{,}17$, trễ nhỏ so với quán tính) sử dụng chung bộ PI từ phương pháp IMC/DS ở Mục~\ref{eq:pi_parameters}, vì khi đối tượng đã đơn giản thì ba phương pháp cho cùng kết quả. Việc tái áp dụng công thức Bền vững tối ưu cho vòng trong là không cần thiết về mặt kỹ thuật.
+
+\textbf{Ý nghĩa chỉ số dao động cắt $m_c$ và bảng tra $\theta_c$:} chỉ số dao động cắt $m_c$ (closed-loop oscillation index) đặc trưng cho mức độ dao động và độ vọt lố (overshoot) của hệ kín, được tính theo biểu thức cận dưới đường đặc tính pha -- biên độ:
+\begin{equation}
+    A(\omega) \geq 20\,\mathrm{log}_{10}\!\left(\frac{1}{m_c}\right) - 10\,\mathrm{log}_{10}\!\left(1 - \frac{(\omega - \omega_{pc})^2}{\omega_{pc}^2}\right)
+    \label{eq:mc_phase_margin}
+\end{equation}
+
+Khi $m_c \to 0$: hệ kín có đáp ứng rất mượt, không dao động, nhưng thời gian xác lập rất dài. Khi $m_c \to 1$: hệ kín có đáp ứng nhanh nhưng dao động mạnh, dễ mất ổn định. Giá trị $m_c$ càng lớn thì đáp ứng càng nhanh nhưng càng dao động. Giá trị $m_c = 0{,}972$ ứng với độ vọt lố khoảng $5{,}0\%$ (theo bảng tra tiêu chuẩn).
+
+\textbf{Bảng tra tham số $\theta_c$ theo $m_c$ (Rovira et al.):}
+
+\begin{table}[H]
     \centering
-    \begin{tikzpicture}[
-        >=Stealth,
-        scale=0.85,
-        transform shape,
-        block/.style={draw, rectangle, minimum width=2.4cm, minimum height=0.9cm, align=center},
-        sum/.style={draw, circle, inner sep=1pt, minimum size=5pt}
-    ]
+    \caption{Các chỉ tiêu chất lượng điều khiển ứng với chỉ số dao động cắt $m_c$}
+    \label{tab:bang_9_1}
+    \renewcommand{\arraystretch}{1.4}
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+    \hline
+    $m_c$
+    & 0,221 & 0,367 & 0,461 & 0,71 & 0,743 & 0,972 & 1,252 & 1,47 & 2,18 \\
+    \hline
+    $I_{2c}=\displaystyle\int \varepsilon^2(t)\,dt$
+    & 1,700 & 1,508 & \cellcolor{yellow}1,489 & 1,541 & 1,551 & 1,622 & 1,699 & 1,744 & 1,830 \\
+    \hline
+    $I_{1c}=\displaystyle\int |\varepsilon(t)|\,dt$
+    & 2,970 & 2,352 & 2,199 & \cellcolor{yellow}2,092 & 2,093 & 2,136 & 2,230 & 2,300 & 2,468 \\
+    \hline
+    $T_{qc}(5\%)$
+    & 10,36 & 6,67 & 6,6 & 5,16 & 5,16 & \cellcolor{yellow}3,21 & 3,73 & 3,96 & 4,64 \\
+    \hline
+    $\delta~(\%)$
+    & 52,66 & 33 & 24,47 & 11,11 & 10,01 & 4,86 & 2 & 1 & 0,1 \\
+    \hline
+    \end{tabular}
+\end{table}
 
-    \node[block, fill=blue!15] (Gc) at (0,0) {$G_c(s)$\\\footnotesize DS -- PI};
-    \node[block, fill=yellow!20, right=1.2cm of Gc] (Gv) {$G_v(s)$\\\footnotesize QTB1T};
-    \node[sum, right=1.2cm of Gv] (sum) {$\Sigma$};
-    \node[block, fill=green!15, right=1.2cm of sum] (cl) {$G_{cl}(s)$\\\footnotesize $\dfrac{e^{-L_v s}}{\lambda_v s+1}$};
-    \node[above=0.05cm of Gc] {\footnotesize Thiết kế};
-    \node[above=0.05cm of cl] {\footnotesize Mong muốn};
+\begin{table}[H]
+    \centering
+    \caption{Các hệ số tổng hợp bộ điều khiển theo chỉ số $m_c$}
+    \label{tab:bang_9_2}
+    \renewcommand{\arraystretch}{1.4}
+    \setlength{\tabcolsep}{6pt}
+    \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+    \hline
+    $m_c$
+    & 0,221 & 0,367 & 0,461 & 0,71 & 0,743 & 0,972 & 1,252 & 1,47 & 2,18 \\
+    \hline
+    $\psi_c$
+    & 0,75 & 0,9 & 0,945 & 0,988 & 0,991 & 0,998 & 0,999 & 1 & 1 \\
+    \hline
+    $\theta_c$
+    & 0,973 & 1,205 & 1,348 & 1,683 & 1,721 & 1,95 & 2,153 & 2,266 & 2,476 \\
+    \hline
+    $\omega_c$
+    & 1,353 & 1,219 & 1,139 & 0,953 & 0,932 & 0,80 & 0,674 & 0,597 & 0,43 \\
+    \hline
+    \end{tabular}
+\end{table}
 
-    \draw[->, thick] (Gc) -- node[above]{\footnotesize $u$} (Gv);
-    \draw[->, thick] (Gv) -- node[above]{\footnotesize $y$} (sum.west);
-    \draw[->, thick] (sum.south) -- ++(0,-1) -| (Gc.south);
-    \draw[->, thick] (sum) -- (cl);
-    \draw[->, thick] ([xshift=-0.4cm]cl.west) |- ++(-2.5,-2) node[above right]{\footnotesize $r$} -| (Gc.south);
+\textbf{Ý nghĩa vật lý của $\theta_c$:} hệ số $\theta_c$ chính là tỷ số giữa thời gian đáp ứng mục tiêu $\theta$ và thời gian trễ $L$:
+\begin{equation}
+    \theta = \theta_c \cdot L
+    \label{eq:theta_definition}
+\end{equation}
 
-    \end{tikzpicture}
-    \caption{Minh họa nguyên lý Direct Synthesis: từ $G_{cl}(s)$ mong muốn suy ngược ra $G_c(s)$}
-    \label{fig:ds_principle}
-\end{figure}
+Nghĩa là thời gian đáp ứng kỳ vọng của hệ kín tỷ lệ thuận với trễ vận chuyển $L$. Quan hệ này phản ánh giới hạn vật lý bất khả xâm phạm: không thể có hệ kín đáp ứng nhanh hơn thời gian trễ của đối tượng. Bảng~\ref{tab:bang_9_2} cho thấy: chọn $m_c = 0{,}972$ ứng với $\theta_c = 1{,}95$, nghĩa là $\theta$ xấp xỉ bằng $2L$ -- một cận dưới hợp lý về mặt vật lý cho các đối tượng có trễ.
 
-Hình~\ref{fig:ds_principle} minh họa nguyên lý cốt lõi của phương pháp Direct Synthesis: bộ điều khiển $G_c(s)$ được tính trực tiếp từ yêu cầu đáp ứng vòng kín $G_{cl}(s)$ thông qua quan hệ~\ref{eq:ds_formula}.
+\textbf{Giải thích các ký hiệu trong Bảng~\ref{tab:bang_9_1} và Bảng~\ref{tab:bang_9_2}:}
+\begin{itemize}
+    \item $m_c$: chỉ số dao động cắt (closed-loop oscillation index) -- đặc trưng cho mức độ dao động và độ vọt lố của hệ kín.
+    \item $I_{2c} = \displaystyle\int \varepsilon^2(t)\,dt$: tiêu chuẩn tích phân bình phương sai lệch (ISE -- Integral of Squared Error), chuẩn hóa theo thời gian trễ $\tau$.
+    \item $I_{1c} = \displaystyle\int |\varepsilon(t)|\,dt$: tiêu chuẩn tích phân giá trị tuyệt đối sai lệch (IAE -- Integral of Absolute Error), chuẩn hóa theo thời gian trễ $\tau$.
+    \item $T_{qc}(5\%)$: thời gian quá độ (settling time) khi sai lệch nằm trong dải $\pm 5\%$, chuẩn hóa theo $\tau$.
+    \item $\delta\,(\%)$: độ vọt lố (overshoot) tính theo phần trăm.
+    \item $\psi_c$: hệ số suy giảm dao động -- cho biết mức độ dao động tắt dần của đáp ứng ($\psi_c \to 1$ nghĩa là đáp ứng gần như không dao động).
+    \item $\theta_c$: hệ số tỷ lệ giữa thời gian đáp ứng mong muốn $\theta$ và thời gian trễ $\tau$.
+    \item $\omega_c$: tần số cắt (cutoff frequency) chuẩn hóa theo $1/\tau$ -- xác định băng thông của hệ kín.
+\end{itemize}
 
-\subsection{Tổng hợp vòng ngoài theo phương pháp Bền vững tối ưu}
+\subsubsection{Lý do chọn $m_c = 0{,}972$ cho hệ thống nhiệt điện}
+
+Đối với hệ thống điều khiển áp suất hơi trong lò công nghiệp, các yêu cầu kỹ thuật là:
+\begin{itemize}
+    \item \textbf{Độ quá điều chỉnh} $\text{OS} \leq 5\%$ (yêu cầu cứng từ thiết kế): tránh ứng suất cơ học và sốc nhiệt trên đường ống, bảo vệ các van an toàn.
+    \item \textbf{Thời gian xác lập} $T_s$ không quá dài để có thể đáp ứng tốc độ biến thiên phụ tải.
+    \item \textbf{Độ bền vững} cao: chịu được sự dao động thông số đối tượng (đặc biệt khi nhiên liệu thay đổi chủng loại, nhiệt trị dầu FO biến động $\pm 5\%$).
+\end{itemize}
+
+Dựa trên Bảng~\ref{tab:bang_9_1} và Bảng~\ref{tab:bang_9_2}, giá trị $m_c = 0{,}972$ thỏa mãn đồng thời:
+\begin{itemize}
+    \item $\delta = 4{,}86\% \leq 5\%$ (độ vọt lố đạt yêu cầu cứng từ Bảng~\ref{tab:bang_9_1})
+    \item $\theta_c = 1{,}95$ cho thời gian đáp ứng $\theta = 1{,}95\,L_p$, cân bằng giữa tốc độ và ổn định (Bảng~\ref{tab:bang_9_2})
+    \item $T_{qc}(5\%) = 3{,}21\,\tau$ -- thời gian quá độ chuẩn hóa theo trễ $\tau$, cho phép đáp ứng tốc độ biến thiên phụ tải
+    \item $\psi_c = 0{,}998$ gần bằng 1, đảm bảo đáp ứng gần như không dao động (Bảng~\ref{tab:bang_9_2})
+    \item $\omega_c = 0{,}80$ -- băng thông hệ kín đủ rộng để bám theo các nhiễu tần số thấp đặc trưng của phụ tải lò hơi
+\end{itemize}
+
+Việc chọn $m_c$ lớn hơn (ví dụ $m_c = 1{,}252$) sẽ cho độ vọt lố giảm xuống $\delta = 2\%$ nhưng $T_{qc}(5\%) = 3{,}73\,\tau$ tăng so với $m_c = 0{,}972$ ($3{,}21\,\tau$), nghĩa là hệ đáp ứng chậm hơn; ngược lại chọn $m_c$ nhỏ hơn (ví dụ $m_c = 0{,}71$) sẽ cho $\delta = 11{,}11\%$ vượt yêu cầu cứng $5\%$, không phù hợp với tiêu chuẩn an toàn đường ống. Như vậy $m_c = 0{,}972$ là giá trị tối ưu cho hệ thống nhiệt điện.
+
+\subsubsection{Bền vững tối ưu -- Bộ điều khiển PID cho vòng ngoài (áp suất)}
 
 Với bộ điều khiển PI vòng trong đã được tối ưu hóa, hàm truyền vòng kín vòng lưu lượng có thể được xấp xỉ bằng 1 trong dải tần số làm việc của vòng ngoài. Do đó, đối tượng tương đương vòng ngoài:
-
 \begin{equation}
     G_{eq}(s) \approx G_p(s) = \frac{K_p}{(T_{1p} s + 1)(T_{2p} s + 1)}\, e^{-L_p s}
     \label{eq:equivalent_object}
@@ -980,7 +1159,6 @@ Với bộ điều khiển PI vòng trong đã được tối ưu hóa, hàm tru
 Để áp dụng công thức điều khiển bền vững, mô hình QTB2T được xấp xỉ chuyển đổi về cấu trúc QTB1T bằng cách gộp tuyến tính hai hằng số thời gian: $T_{eq} = T_{1p} + T_{2p}$. Sự sụp giảm bậc động học này sẽ được bù đắp hoàn hảo bởi khâu vi phân (D) của bộ PID.
 
 Để đảm bảo sai số và độ vọt lố (Overshoot) không vượt quá 5\% khi nhà máy thay đổi phụ tải, bộ điều khiển vòng ngoài ($R_1$) được tổng hợp theo phương pháp Bền vững tối ưu (Optimal Robust Control). Theo yêu cầu kỹ thuật, độ quá điều chỉnh không quá 5\%, tương ứng giá trị chỉ số dao động cắt $m_c = 0.972$ và hệ số $\theta_c = 1.95$. Thời gian đáp ứng vòng kín mục tiêu:
-
 \begin{equation}
     \theta = \theta_c \cdot L_p = 1.95 \times 4.0457 = 7.8891 \text{ s}
     \label{eq:target_response}
@@ -989,7 +1167,6 @@ Với bộ điều khiển PI vòng trong đã được tối ưu hóa, hàm tru
 Phương pháp bền vững tối ưu thiết lập mối quan hệ giữa $m_c$ và đáp ứng quá độ: $m_c$ càng lớn thì đáp ứng càng mượt với overshoot càng nhỏ nhưng thời gian xác lập dài hơn. Với $m_c = 0.972$, phương pháp đạt sự cân bằng tối ưu: đáp ứng đủ nhanh trong khi overshoot nằm trong giới hạn 5\%.
 
 Hệ phương trình tổng hợp PID cho vòng ngoài:
-
 \begin{equation}
     K_{p1} = \frac{T_{1p} + T_{2p}}{K_p \cdot \theta}, \qquad
     T_{i1} = T_{1p} + T_{2p}, \qquad
@@ -1028,110 +1205,53 @@ Thời gian đáp ứng mục tiêu (s) & $\theta$ & $7.8891$\\ \hline
 Loại bộ điều khiển & \multicolumn{2}{c|}{PID}\\ \hline
 \end{tabular}
 \end{table}
-
-\subsubsection{Tổng hợp vòng ngoài theo phương pháp Tổng hợp trực tiếp (Direct Synthesis)}
-
-Đối với vòng ngoài với đối tượng QTB2T có hai hằng số thời gian, phương pháp DS được mở rộng bằng cách chọn đáp ứng vòng kín mong muốn $G_{cl}(s)$ dạng bậc hai có trễ để phù hợp với cấu trúc bậc hai của đối tượng:
-
-\begin{equation}
-    G_{cl}(s) = \frac{e^{-L_p s}}{(\lambda_p s + 1)^2}
-    \label{eq:ds_cl_sopdt}
-\end{equation}
-
-trong đó $\lambda_p > 0$ là tham số chỉnh định duy nhất. Lựa chọn này đảm bảo $G_{cl}(s)$ có cùng bậc quán tính với mô hình đối tượng, giúp triệt tiêu hoàn toàn các cực bậc hai của $G_p(s)$ trong bộ điều khiển.
-
-Thay $G_p(s)$ và $G_{cl}(s)$ vào Phương trình~\ref{eq:ds_formula}:
-
-\begin{equation}
-    G_{c}(s) = \frac{(T_{1p} s + 1)(T_{2p} s + 1)}{K_p\, e^{-L_p s}} \cdot \frac{\dfrac{e^{-L_p s}}{(\lambda_p s + 1)^2}}{1 - \dfrac{e^{-L_p s}}{(\lambda_p s + 1)^2}} = \frac{(T_{1p} s + 1)(T_{2p} s + 1)}{K_p \left[(\lambda_p s + 1)^2 - e^{-L_p s}\right]}
-    \label{eq:ds_controller_sopdt_raw}
-\end{equation}
-
-Khai triển mẫu số với xấp xỉ Taylor bậc hai $e^{-L_p s} \approx 1 - L_p s + \frac{L_p^2}{2} s^2$:
-
-\begin{equation}
-    (\lambda_p s + 1)^2 - e^{-L_p s} \approx (2\lambda_p + L_p) s + \left(\lambda_p^2 + \frac{L_p^2}{2}\right) s^2
-    \label{eq:ds_sopdt_denominator}
-\end{equation}
-
-Đặt $a_1 = 2\lambda_p + L_p$ và $a_2 = \lambda_p^2 + \frac{L_p^2}{2}$, mẫu số trở thành $K_p (a_1 s + a_2 s^2) = K_p a_1 s (1 + \frac{a_2}{a_1} s)$. Để thu được cấu trúc PID dạng chuẩn, đồ án sử dụng xấp xỉ bậc nhất cho mẫu số (bỏ qua bậc hai trong ngoặc):
-
-\begin{equation}
-    (\lambda_p s + 1)^2 - e^{-L_p s} \approx (2\lambda_p + L_p) s
-    \label{eq:ds_sopdt_denominator_approx}
-\end{equation}
-
-Kết quả thu được bộ điều khiển PID:
-
-\begin{equation}
-    G_{c}(s) = \frac{(T_{1p} s + 1)(T_{2p} s + 1)}{K_p (2\lambda_p + L_p) s} = \frac{T_{1p} + T_{2p}}{K_p(2\lambda_p + L_p)} \left(1 + \frac{1}{(T_{1p} + T_{2p}) s} + \frac{T_{1p} T_{2p}}{T_{1p} + T_{2p}} s\right)
-    \label{eq:ds_pid_outer}
-\end{equation}
-
-Hệ số của bộ điều khiển PID:
-
-\begin{equation}
-    K_{p1}^{DS} = \frac{T_{1p} + T_{2p}}{K_p (2\lambda_p + L_p)}, \qquad T_{i1}^{DS} = T_{1p} + T_{2p}, \qquad T_{d1}^{DS} = \frac{T_{1p}\, T_{2p}}{T_{1p} + T_{2p}}
-    \label{eq:ds_pid_params_outer}
-\end{equation}
-
-So sánh với phương pháp Bền vững tối ưu (Phương trình~\ref{eq:pid_parameters}), ta nhận thấy hai phương pháp có cùng cấu trúc công thức PID với cùng $T_{i1}$ và $T_{d1}$, chỉ khác nhau ở hệ số tỷ lệ: Bền vững tối ưu dùng $\theta = \theta_c L_p$ trong khi DS dùng $(2\lambda_p + L_p)$. Đây chính là cơ sở để hai phương pháp có thể so sánh công bằng.
-
-Lựa chọn tham số $\lambda_p$ theo khuyến nghị của Smith \& Corripio cho hệ SOPDT:
-
-\begin{equation}
-    \lambda_p = L_p = 4.0457 \text{ s}
-    \label{eq:ds_lambda_outer_choice}
-\end{equation}
-
-Với lựa chọn này, thời gian đáp ứng mục tiêu tương đương $\theta = 2\lambda_p + L_p = 3 \times 4.0457 = 12.1371$ s, tức là nhanh hơn $1.95 L_p = 7.8891$ s của phương pháp Bền vững tối ưu. Do đó, bộ DS sẽ có đáp ứng nhanh hơn.
-
-Thế số vào Phương trình~\ref{eq:ds_pid_params_outer}:
-
-\[
-K_{p1}^{DS} = \frac{12.0712}{1.2147 \times (2 \times 4.0457 + 4.0457)} = \frac{12.0712}{1.2147 \times 12.1371} = \frac{12.0712}{14.7429} = 0.8188
-\]
-
-\[
-T_{i1}^{DS} = 12.0712 \text{ s}, \qquad T_{d1}^{DS} = \frac{6.0356 \times 6.0356}{12.0712} = 3.0178 \text{ s}
-\]
-
-\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title={Phân tích so sánh DS với Bền vững tối ưu}]
-Với $\lambda_p = L_p$, ta có $K_{p1}^{DS} = 0.8188$, nhỏ hơn đáng kể so với $K_{p1} = 1.2595$ của Bền vững tối ưu (chênh lệch $\sim 35\%$). Nguyên nhân: Bền vững tối ưu dùng $\theta = 1.95 L_p$ (chỉ tiêu thời gian xác lập $\leq 5\%$) nên $\theta$ nhỏ hơn $3L_p$ của DS, dẫn đến $K_p$ lớn hơn. Đổi lại, Bền vững tối ưu đảm bảo overshoot thấp hơn (chỉ số dao động cắt $m_c = 0.972$) trong khi DS với $\lambda_p = L_p$ cho đáp ứng nhanh hơn nhưng overshoot có thể lớn hơn ($10$--$20\%$). Tùy theo yêu cầu công nghệ cụ thể, kỹ sư có thể chọn: (i) DS với $\lambda_p$ lớn để tăng tính bền vững (giảm $K_p$), hoặc (ii) Bền vững tối ưu nếu yêu cầu overshoot rất thấp là ưu tiên hàng đầu.
+\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title={Phân tích so sánh DS với Bền vững tối ưu cho vòng ngoài}]
+Hai phương pháp đều dẫn đến cùng cấu trúc PID lý tưởng, chỉ khác nhau ở cách chọn tham số chỉnh định. Khi quy đổi về cùng hệ số $K_p$:
+\begin{itemize}
+    \item Bền vững tối ưu: $\theta = 1{,}95\,L_p = 7{,}8891$ s (nhanh hơn), cho $K_p$ lớn hơn ($1{,}2595$), đảm bảo overshoot $\leq 5\%$.
+    \item Direct Synthesis: $\theta = 3\,L_p = 12{,}1371$ s (chậm hơn), cho $K_p$ nhỏ hơn ($0{,}8188$), đáp ứng nhanh nhưng overshoot có thể vượt $5\%$ khi $\lambda_p$ nhỏ.
+\end{itemize}
+Việc lựa chọn phương pháp nào phụ thuộc vào yêu cầu công nghệ cụ thể: nếu ưu tiên hàng đầu là overshoot thấp, chọn Bền vững tối ưu; nếu ưu tiên đáp ứng nhanh và có thể chấp nhận overshoot $8$--$15\%$, chọn DS với $\lambda_p$ nhỏ.
 \end{tcolorbox}
 
-Bảng~\ref{tab:tham_so_pid_vong_ngoai_ds} tổng hợp thông số bộ điều khiển PID vòng ngoài theo DS.
+\subsubsection{Đánh giá chất lượng dự kiến của ba phương pháp}
+
+Dựa trên công thức lý thuyết và đặc tính đối tượng, ba phương pháp được dự đoán cho chất lượng khác nhau (Bảng \ref{tab:du_doan_chat_luong}):
 
 \begin{table}[H]
 \centering
-\caption{Thông số bộ điều khiển PID vòng ngoài (phương pháp Direct Synthesis)}
-\label{tab:tham_so_pid_vong_ngoai_ds}
-\begin{tabular}{|l|c|c|}
+\caption{Dự đoán chất lượng đáp ứng của ba phương pháp tổng hợp cho vòng ngoài}
+\label{tab:du_doan_chat_luong}
+\scalebox{0.82}{
+\begin{tabular}{|l|c|c|c|c|c|}
 \hline
-\textbf{Tham số} & \textbf{Ký hiệu} & \textbf{Giá trị}\\ \hline
-Hệ số khuyếch đại & $K_{p1}^{DS}$ & $0.8188$\\ \hline
-Thời gian tích phân (s) & $T_{i1}^{DS}$ & $12.0712$\\ \hline
-Thời gian vi phân (s) & $T_{d1}^{DS}$ & $3.0178$\\ \hline
-Tham số chỉnh định DS (s) & $\lambda_p$ & $4.0457$\\ \hline
-Thời gian đáp ứng mục tiêu $\theta = 2\lambda_p + L_p$ (s) & \multicolumn{2}{c|}{12.1371}\\ \hline
-Loại bộ điều khiển & \multicolumn{2}{c|}{PID}\\ \hline
+\textbf{Phương pháp} & $\theta$ (s) & \textbf{Dự đoán OS} & \textbf{$T_s$} & \textbf{Kháng nhiễu} & \textbf{Bền vững}\\ \hline
+Bền vững tối ưu & $7{,}8891$ & $\leq 5\%$ & Trung bình & Rất tốt & Cao\\ \hline
+Direct Synthesis ($\lambda_p = L_p$) & $12{,}1371$ & $8$--$15\%$ & Rất nhanh & Tốt & Trung bình--Tốt\\ \hline
+IMC (tương đương DS) & $12{,}1371$ & $8$--$15\%$ & Rất nhanh & Tốt & Trung bình--Tốt\\ \hline
 \end{tabular}
+}
 \end{table}
 
-Bảng \ref{tab:tong_hop_bo_dieu_khien} tổng hợp toàn bộ thông số bộ điều khiển trong hệ thống.
+Bảng \ref{tab:tong_hop_bo_dieu_khien} tổng hợp toàn bộ thông số các bộ điều khiển trong hệ thống hai vòng, bao gồm cả ba phương pháp để tiện so sánh.
 
 \begin{table}[H]
 \centering
 \caption{Tổng hợp thông số các bộ điều khiển trong hệ điều khiển hai vòng}
 \label{tab:tong_hop_bo_dieu_khien}
-\begin{tabular}{|l|c|c|c|c|c|c|}
+\scalebox{0.78}{
+\begin{tabular}{|l|c|c|c|c|c|c|c|}
 \hline
-\textbf{Vòng} & \textbf{Bộ điều khiển} & \textbf{PP tổng hợp} & $K_p$ & $T_i$ (s) & $T_d$ (s) & $\lambda$ (s)\\ \hline
-Vòng trong & PI & IMC / Direct Synthesis & $3.3532$ & $4.8694$ & -- & $0.8213$\\ \hline
-\multirow{2}{*}{Vòng ngoài} & PID & Bền vững tối ưu & $1.2595$ & $12.0712$ & $3.0178$ & --\\ \cline{2-7}
- & PID & Direct Synthesis & $0.8188$ & $12.0712$ & $3.0178$ & $4.0457$\\ \hline
+\textbf{Vòng} & \textbf{Bộ ĐK} & \textbf{Phương pháp} & $\mathbf{K_p}$ & $\mathbf{T_i}$ (s) & $\mathbf{T_d}$ (s) & $\boldsymbol{\lambda}$ (s) & $\mathbf{m_c}$\\ \hline
+Vòng trong (van) & PI & IMC / DS & $3{,}3532$ & $4{,}8694$ & -- & $0{,}8213$ & --\\ \hline
+\multirow{3}{*}{Vòng ngoài (lò)} & PID & Bền vững tối ưu & $1{,}2595$ & $12{,}0712$ & $3{,}0178$ & -- & $0{,}972$\\ \cline{2-8}
+ & PID & Direct Synthesis & $0{,}8188$ & $12{,}0712$ & $3{,}0178$ & $4{,}0457$ & --\\ \cline{2-8}
+ & PID & IMC & $0{,}8188$ & $12{,}0712$ & $3{,}0178$ & $4{,}0457$ & --\\ \hline
 \end{tabular}
+}
 \end{table}
+
+\noindent\textit{Ghi chú}: vòng trong sử dụng chung bộ PI từ IMC và Direct Synthesis vì hai phương pháp này cho cùng công thức PI trên đối tượng QTB1T. Phương pháp Bền vững tối ưu không có mục riêng cho vòng trong vì QTB1T có trễ nhỏ ($L_v/T_v \approx 0{,}17$) không cần kỹ thuật bền vững chuyên biệt -- phương pháp này chỉ phát huy lợi thế trên đối tượng có $L/T > 0{,}5$ như vòng ngoài.
 
 % ============================================================
 \section{Mô phỏng và đánh giá chất lượng hệ thống}
@@ -1142,7 +1262,6 @@ Vòng trong & PI & IMC / Direct Synthesis & $3.3532$ & $4.8694$ & -- & $0.8213$\
 \subsection{Xây dựng mô hình đối tượng và bộ điều khiển}
 
 Quy trình mô phỏng bắt đầu bằng việc xây dựng hàm truyền của hai đối tượng dựa trên kết quả nhận dạng từ Mục 3.3. Đối tượng vòng trong (van) biểu diễn bằng QTB1T:
-
 \begin{equation}
     G_v(s) = \frac{K_v}{T_v s + 1}\, e^{-L_v s},
     \qquad K_v = 0{,}8836,\; T_v = 4{,}8694\;\text{s},\; L_v = 0{,}8213\;\text{s}
@@ -1152,7 +1271,6 @@ Quy trình mô phỏng bắt đầu bằng việc xây dựng hàm truyền củ
 Khâu trễ $e^{-L_v s}$ được xấp xỉ bằng Pade bậc 1 trong quá trình tính toán hàm truyền.
 
 Đối tượng vòng ngoài (bộ phận sinh hơi) biểu diễn bằng QTB2T suy biến:
-
 \begin{equation}
     G_p(s) = \frac{K_p}{(T_{1p} s + 1)(T_{2p} s + 1)}\, e^{-L_p s},
     \qquad K_p = 1{,}2147,\; T_{1p} = T_{2p} \approx 6{,}0356\;\text{s},\; L_p = 4{,}0457\;\text{s}
@@ -1166,22 +1284,21 @@ Hai bộ điều khiển được cài đặt dưới dạng hàm truyền:
     \item Bộ PID vòng ngoài (Bền vững tối ưu): $R_1(s) = K_{p1}\bigl(1 + \frac{1}{T_{i1}s} + T_{d1}s\bigr)$, $K_{p1} = 1.2595$, $T_{i1} = 12.0712$ s, $T_{d1} = 3.0178$ s
 \end{itemize}
 
-Các hàm \texttt{fopdt()}, \texttt{sopdt()}, \texttt{pi\_controller()}, \texttt{pid\_controller()} xây dựng hàm truyền dưới dạng cặp vector hệ số đa thức (tử số, mẫu số), sử dụng \texttt{np.convolve()} để nhân đa thức.
+Các hàm {\footnotesize\texttt{fopdt()}}, {\footnotesize\texttt{sopdt()}}, {\footnotesize\texttt{pi\_controller()}}, {\footnotesize\texttt{pid\_controller()}} xây dựng hàm truyền dưới dạng cặp vector hệ số đa thức (tử số, mẫu số), sử dụng {\footnotesize\texttt{np.convolve()}} để nhân đa thức.
 
 \subsection{Tính toán hàm truyền vòng kín}
 
 Hàm truyền vòng kín được tính theo công thức tiêu chuẩn:
-
 \begin{equation}
     C(s) = \frac{R(s)\,G(s)}{1 + R(s)\,G(s)}
     \label{eq:closed_loop}
 \end{equation}
 
-Hàm \texttt{closed\_loop()} thực hiện phép nhân và phép cộng đa thức để xây dựng hàm truyền vòng kín.
+Hàm {\footnotesize\texttt{closed\_loop()}} thực hiện phép nhân và phép cộng đa thức để xây dựng hàm truyền vòng kín.
 
 Vòng trong được đóng trước: $C_2(s) = R_2(s)\,G_v(s) / (1 + R_2(s)\,G_v(s))$. Vòng ngoài sử dụng đối tượng tương đương $G_{eq}(s) = G_p(s)$ (xấp xỉ $C_2(s) \approx 1$): $C_1(s) = R_1(s)\,G_p(s) / (1 + R_1(s)\,G_p(s))$.
 
-Đáp ứng bậc thang được mô phỏng bằng \texttt{scipy.signal.step()}.
+Đáp ứng bậc thang được mô phỏng bằng {\footnotesize\texttt{scipy.signal.step()}}.
 
 \begin{figure}[H]
     \centering
@@ -1269,14 +1386,14 @@ Hình~\ref{fig:impulse_response} thể hiện đáp ứng xung của hệ thốn
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.90\textwidth]{Hinhve/3.16.png}
+    \includegraphics[width=0.80\textwidth]{Hinhve/3.16.png}
     \caption{Đáp ứng bậc thang hệ thống vòng kín hai vòng}
     \label{fig:step_response}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.90\textwidth]{Hinhve/3.17.png}
+    \includegraphics[width=0.80\textwidth]{Hinhve/3.17.png}
     \caption{Đáp ứng xung hệ thống vòng kín hai vòng}
     \label{fig:impulse_response}
 \end{figure}
@@ -1296,7 +1413,6 @@ Các kịch bản kiểm tra độ bền vững trên mô phỏng:
     \item \textit{Kịch bản 2 -- Nhiễu tải bước:} tác động bước nhiễu biên độ 5\% vào đầu vào hệ thống. Kết quả: hệ thống nhanh chóng bù trừ và trở về giá trị đặt sau khoảng 20 s.
     \item \textit{Kịch bản 3 -- Thay đổi thông số đối tượng $\pm 20\%$:} hệ thống vẫn duy trì ổn định và đáp ứng chất lượng chấp nhận được, xác nhận tính bền vững.
 \end{itemize}
-
 \begin{tcolorbox}[colback=green!5!white, colframe=green!75!black, title={Kết quả mô phỏng chính}]
 \begin{itemize}
     \item \textbf{Độ quá điều chỉnh vòng ngoài}: $< 5\%$ (thỏa mãn yêu cầu)
@@ -1319,52 +1435,66 @@ Hệ số dự trữ ổn định (Stability Margin) $h$ đạt giá trị lớn
 
 \begin{figure}[!htbp]
     \centering
-\begin{tikzpicture}[>=Stealth, scale=0.75, transform shape]
+    \begin{tikzpicture}[>=Stealth, scale=0.85, transform shape]
 
-\begin{axis}[
-    width=0.4\textwidth,
-    height=5cm,
-    at={(0,0)},
-    anchor=west,
-    xlabel={Tần số $\omega$ (rad/s)},
-    ylabel={Biên độ (dB)},
-    title={Biểu đồ Bode -- Biên độ},
-    grid=major,
-    xmode=log,
-    legend pos=north west
-]
-\addplot[blue!70!black, thick, domain=0.01:10, samples=100] {20*log10(1/sqrt(1+x^2)) - 20*log10(sqrt(1+(0.5*x)^2))};
-\addplot[red!70!black, dashed, thick, domain=0.01:10, samples=100] {0};
-\addlegendentry{|L(j$\omega$)|}
-\addlegendentry{0 dB}
-\end{axis}
+    % --- Biểu đồ 1: BIÊN ĐỘ ---
+    \begin{axis}[
+        name=ax1, % Đặt tên để neo biểu đồ 2
+        width=7cm,
+        height=5.5cm,
+        xlabel={Tần số $\omega$ (rad/s)},
+        ylabel={Biên độ (dB)},
+        title={Biểu đồ Bode -- Biên độ},
+        grid=major,
+        xmode=log,
+        legend pos=south west, % Đổi vị trí legend để không che đường đồ thị
+        legend style={nodes={scale=0.9, transform shape}}
+    ]
+    % Đã tối ưu công thức logarit cho gọn
+    \addplot[blue!70!black, thick, domain=0.01:10, samples=100] {-10*log10(1+x^2) - 10*log10(1+(0.5*x)^2)};
+    \addplot[red!70!black, dashed, thick, domain=0.01:10, samples=2] {0};
+    \addlegendentry{$|L(j\omega)|$}
+    \addlegendentry{0 dB}
+    \end{axis}
 
-\begin{axis}[
-    width=0.4\textwidth,
-    height=5cm,
-    at={(0.5\textwidth,0)},
-    anchor=west,
-    xlabel={Tần số $\omega$ (rad/s)},
-    ylabel={Pha (độ)},
-    title={Biểu đồ Bode -- Pha},
-    grid=major,
-    xmode=log,
-    legend pos=south east
-]
-\addplot[blue!70!black, thick, domain=0.01:10, samples=100] {-atan(x)*180/pi - atan(0.5*x)*180/pi};
-\addplot[red!70!black, dashed, thick, domain=0.01:10, samples=100] {-180};
-\addlegendentry{$\angle L(j\omega)$}
-\addlegendentry{-180$^\circ$}
-\end{axis}
+    % --- Biểu đồ 2: PHA ---
+    \begin{axis}[
+        name=ax2,
+        at={(ax1.outer east)}, % Đặt ngay bên phải biểu đồ 1
+        anchor=outer west,
+        xshift=1cm, % Khoảng cách giữa 2 biểu đồ
+        width=7cm,
+        height=5.5cm,
+        xlabel={Tần số $\omega$ (rad/s)},
+        ylabel={Pha ($^\circ$)},
+        title={Biểu đồ Bode -- Pha},
+        grid=major,
+        xmode=log,
+        legend pos=south west,
+        legend style={nodes={scale=0.9, transform shape}}
+    ]
+    % atan trong pgfplots mặc định trả về độ (degrees), bỏ nhân 180/pi
+    \addplot[blue!70!black, thick, domain=0.01:10, samples=100] {-atan(x) - atan(0.5*x)};
+    \addplot[red!70!black, dashed, thick, domain=0.01:10, samples=2] {-180};
+    \addlegendentry{$\angle L(j\omega)$}
+    \addlegendentry{$-180^\circ$}
+    \end{axis}
 
-% Stability parameters box (placed below the axes, centered)
-\node[anchor=north, draw, fill=yellow!15, rounded corners, font=\small] at (0.45\textwidth, -3.4) {
-    \begin{tabular}{p{10cm}}
-    \textbf{Thông số ổn định:} Biên pha dự trữ (PM): $\approx 45^\circ$--$60^\circ$ \quad Biên dự trữ (GM): $> 6$ dB \quad Hệ số dự trữ $h > 2$
-    \end{tabular}
-};
+    % --- Hộp thông số ổn định ---
+    % Dùng thư viện calc để tự động tính điểm chính giữa 2 biểu đồ và dịch xuống dưới 1.5cm
+    \node[
+        anchor=north, 
+        draw, 
+        fill=yellow!15, 
+        rounded corners, 
+        font=\small,
+        text width=13cm, % Chiều rộng cố định để tự động ngắt dòng
+        align=center
+    ] at ($(ax1.south east)!0.5!(ax2.south west) + (0, -1.5cm)$) {
+        \textbf{Thông số ổn định:} Biên pha dự trữ (PM): $\approx 45^\circ$--$60^\circ$ \quad Biên dự trữ (GM): $> 6$ dB \quad Hệ số dự trữ $h > 2$
+    };
 
-\end{tikzpicture}
+    \end{tikzpicture}
     \caption{Phân tích ổn định: Biểu đồ Bode của hàm truyền vòng hở}
     \label{fig:bode_plot}
 \end{figure}
